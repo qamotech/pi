@@ -236,6 +236,205 @@ try{
     ok(P.APP_VERSION==='1.2.0','bloomfix: version bumped to 1.2.0',P.APP_VERSION);
   }catch(e){ok(false,'bloomfix block threw',e.stack)}
 
+  // v1.3.0 Come On In: neighbor home visits
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();
+    const base=new Date();base.setDate(base.getDate()+2);
+    const at=h=>{const d=new Date(base);d.setHours(h,0,0,0);P.timeTravel(d.getTime()-Date.now());P.step(.05)};
+    const v=S.vill[0],b=P.ISLE.B[v.h];
+    const knockText=async()=>{P.closePanel();const pr=P.knock(b);await wait(5);const t=P.DLG.full;await adv(6);await pr;await adv(4);return t};
+    let hin=-1,hout=-1;for(let h=9;h<22;h++){at(h);if(P.indoorNow(v)){if(hin<0)hin=h}else if(hout<0)hout=h}
+    ok(hin>=9&&hin<=20,'visits: neighbor has an indoor hour between 9 and 21',hin);
+    at(hin);P.step(.05);const a0=P.villActors().find(a=>a.v===v);ok(a0.home&&!P.npcs().includes(a0),'visits: indoor neighbor is not drawn outdoors');
+    const fr0=v.fr;const t1=await knockText();
+    ok(/come in/.test(t1)&&G.scene==='vhouse','visits: knocking in the window enters the vhouse',t1+' / '+G.scene);
+    ok(P.npcs().length===1&&P.npcs()[0].v===v,'visits: neighbor is in npcs() inside their home');
+    ok(v.fr===fr0+1&&S.stats.visits===1,'visits: first visit of the day gives +1 friendship',fr0+'->'+v.fr);
+    P.exitVHouse();ok(G.scene==='island'&&Math.abs(G.px-(b.door.x+.5)*32)<1&&Math.abs(G.py-(b.door.y+.75)*32)<1&&!P.tr,'visits: leaving puts you at their door, no derby');
+    await knockText();ok(G.scene==='vhouse'&&v.fr===fr0+1,'visits: second visit same day gives no friendship',v.fr);
+    // walk out the door tile
+    G.px=(4.5)*32;G.joy={x:0,y:1,m:1};for(let i=0;i<120&&G.scene==='vhouse';i++)P.step(.05);G.joy=null;ok(G.scene==='island','visits: walking onto the door tile returns to the island',G.scene);
+    if(hout>=0){at(hout);const t2=await knockText();ok(/isn't home/.test(t2)&&G.scene==='island','visits: outside the window says not home',t2)}
+    at(23);const t3=await knockText();ok(/fast asleep/.test(t3)&&G.scene==='island','visits: night says fast asleep',t3);
+    // room determinism + styles
+    const r1=P.vRoom(v),r2=P.vRoom(v);ok(JSON.stringify(r1.items)===JSON.stringify(r2.items)&&r1.items.length>=8,'visits: vRoom is deterministic',r1.items.length);
+    ok(Object.values(P.VSTYLE).every(s=>s.pool.length>=8&&s.pool.every(i=>P.IT[i])&&P.IT[s.wall]&&P.IT[s.floor]),'visits: every style id exists in IT');
+    const w=S.vill.find(q=>P.VPOOL[q.p].p!==P.VPOOL[v.p].p);
+    if(w){const rw=P.vRoom(w);ok(rw.wall!==r1.wall||rw.floor!==r1.floor||JSON.stringify(rw.items.map(f=>f.id))!==JSON.stringify(r1.items.map(f=>f.id)),'visits: different personalities differ')}
+    ok(r1.items.every(f=>P.IT[f.id]),'visits: every room item exists in IT');
+    // furniture gift shows up + inspect toast
+    S.inv.fill(null);P.addItem('fu_crown',1);const gi=S.inv.findIndex(s=>s&&s.id==='fu_crown');
+    {const a=P.villActors().find(q=>q.v===v);const pr=P.giftFlow(a,false);await wait(10);click(`[data-a="pickg"][data-i="${gi}"]`);await wait(10);await adv(10);await pr;await adv(4)}
+    ok(v.gifts.includes('fu_crown'),'visits: furniture gift recorded on v.gifts',JSON.stringify(v.gifts));
+    at(hin);await knockText();const gf=G.vh&&G.vh.room.items.find(f=>f.id==='fu_crown');ok(G.scene==='vhouse'&&gf&&gf.g,'visits: gifted piece is displayed in their room');
+    if(gf){let tt='';const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)tt+=n.textContent});mo.observe(document.getElementById('toasts'),{childList:true});
+      G.px=(gf.x+.5)*32;G.py=(gf.y+1.5)*32;G.fx=0;G.fy=-1;if(P.npcs()[0])P.npcs()[0].x=-999;P.act();await wait(5);mo.disconnect();ok(/A gift from you/.test(tt),'visits: inspecting says A gift from you',tt)}
+    // gifts cap
+    v.gifts=['fu_chair','fu_bed','fu_sofa','fu_lamp','fu_tv','fu_radio'];{S.inv.fill(null);P.addItem('fu_plant',1);const a=P.villActors().find(q=>q.v===v);const pr=P.giftFlow(a,false);await wait(10);click('[data-a="pickg"][data-i="0"]');await wait(10);await adv(10);await pr;await adv(4)}
+    ok(v.gifts.length<=6,'visits: gifts list keeps the last 6',v.gifts.length);
+    // favorite piece at fr>=60
+    P.exitVHouse();v.fr=80;v.fav=0;S.inv.fill(null);{const pr=P.knock(b);await wait(5);await adv(2);if(P.DLG.on&&P.DLG.choices)P.choose(0);await adv(8);await pr;await adv(4)}
+    ok(v.fav===1&&S.inv.some(s=>s&&s.id===G.vh.room.fav),'visits: good friend shares a copy of their favorite piece',G.vh&&G.vh.room.fav);
+    // save inside a vhouse reloads on the island; old saves get gifts arrays
+    const js=JSON.parse(JSON.stringify(S));js.pos={scene:'vhouse',px:100,py:100};js.vill.forEach(q=>delete q.gifts);
+    P.loadFrom(JSON.stringify(js));ok(P.G.scene==='island'&&P.S.vill.every(q=>Array.isArray(q.gifts)&&q.gifts.length===0),'visits: v1.2.0 save loads with gifts=[] on the island');
+    // own-house render: bounded draw list, Set of light ids
+    P.enterHouse();const S2=P.S;S2.houseLv=4;S2.house.items=[];for(let i=0;i<60;i++)S2.house.items.push({id:i%3?'fu_chair':'fu_lamp',x:i%13,y:Math.floor(i/13)});
+    for(let i=0;i<300;i++)P.render();ok(P.HOUSE_DRAW.length<=60+3,'visits: HOUSE_DRAW stays bounded over 300 renders',P.HOUSE_DRAW.length);
+    ok(P.LIGHT_IDS instanceof Set&&P.LIGHT_IDS.has('fu_lamp'),'visits: LIGHT_IDS is a Set of full ids');
+    S2.house.items=[];P.exitHouse();
+  }catch(e){ok(false,'visits block threw',e.stack)}
+
+  // v1.3.0 Seasonal Forage & Seasonal DIY
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();
+    const at=(mo,dd=15,h=11)=>{const d=new Date();d.setFullYear(d.getFullYear()+1,mo-1,dd);d.setHours(h,0,0,0);P.timeTravel(d.getTime()-Date.now());G.evK=-1};
+    const home=P.ISLE.B.find(b=>b.t==='home');const toHome=()=>{G.px=(home.door.x+.5)*32;G.py=(home.door.y+1.6)*32};
+    const live=id=>P.drifts.filter(d=>d.on&&(!id||d.id===id)).length;
+    const spawnN=n=>{for(let i=0;i<n;i++)P.manageDrifts()};
+    at(4);toHome();spawnN(80);
+    ok(live('petal')>=1,'forage: April (north) spawns petal drifts',live('petal'));
+    ok(P.drifts.length===4,'forage: drift pool is 4 records');
+    ok(P.events().some(e=>/Blossom petals are drifting/.test(e)),'forage: April events line',P.events().join('|'));
+    at(7);toHome();spawnN(80);ok(live()===0,'forage: no drifts in July',live());
+    S.hemi='S';at(10);toHome();spawnN(80);ok(live('petal')>=1,'forage: October (south) spawns petals',live('petal'));
+    S.hemi='N';at(4);toHome();
+    // net catch
+    S.inv.fill(null);S.inv[0]={id:'t_net0',q:1,d:10};S.eq=0;G.fx=0;G.fy=1;
+    {const d=P.drifts[0];P.drifts.forEach(q=>q.on=false);d.on=true;d.id='petal';d.t=1;const [x,y]=P.netTip();d.x=x+6;d.y=y-4;}
+    const f0=S.stats.forage||0;P.swingNet();
+    ok(P.invCount('petal')===1&&S.stats.forage===f0+1&&!P.drifts[0].on,'forage: swingNet catches a drift (+1 petal, stats.forage)',P.invCount('petal')+'/'+S.stats.forage);
+    ok(S.inv[0]&&S.inv[0].d===10,'forage: catching a drift does not wear the net');
+    // sunshells on the beach
+    const shells=()=>P.ISLE.obj.filter(o=>o&&o.k==='it'&&o.id==='sunshell').length;
+    at(7);P.dailyRefresh(S.lastDay);const T=P.ISLE.obj.map((o,i)=>o&&o.id==='sunshell'?P.ISLE.ter[i]:-1).filter(t=>t>=0);
+    ok(shells()>=1&&T.every(t=>t===2),'forage: July dailyRefresh places sunshells on sand',shells());
+    at(1);P.dailyRefresh(S.lastDay);ok(shells()===0,'forage: no sunshells in January',shells());
+    let bad=0;for(let k=0;k<30;k++){P.dailyRefresh(S.lastDay+k);const sh=S.dly.shop;if(/wblossom|wmaple|fpetal/.test(sh.wall+sh.floor))bad++;if(P.RECIPES[Object.keys(P.RECIPES).find(r=>P.RECIPES[r].out===sh.hot)].ss)bad++}
+    ok(!bad,'forage: seasonal DIY is never sold or hot in the shop',bad);
+    // crafting
+    at(4);S.inv.fill(null);P.learn('r_blossomlamp');P.addItem('petal',5);P.addItem('wood',2);P.craft('r_blossomlamp');
+    ok(P.invCount('fu_blossomlamp')===1&&P.invCount('petal')===0,'forage: blossom lamp crafts from petals');
+    ok(P.SS_RECIPES.length===12&&P.SS_RECIPES.every(k=>P.IT[P.RECIPES[k].out]&&!P.RECIPES[k].start),'forage: 12 seasonal recipes, all outputs defined',P.SS_RECIPES.length);
+    S.inv.fill(null);P.learn('r_blossomwall');P.addItem('petal',6);P.addItem('softwood',2);P.craft('r_blossomwall');
+    const wi=S.inv.findIndex(s=>s&&s.id==='wl_wblossom');ok(wi>=0&&P.IT.wl_wblossom.c==='wall','forage: seasonal wall recipe yields a wall item');
+    P.enterHouse();P.openInv();await wait(5);click(`[data-a="sel"][data-i="${wi}"]`);await wait(5);click('[data-a="apply"]');await wait(5);P.closePanel();
+    ok(S.house.wall==='wl_wblossom','forage: seasonal wall applies at home',S.house.wall);P.exitHouse();
+    // craft badge + calendar footer
+    P.openPhone('diy');await wait(5);ok(/class="ssb"[^>]*>🌸/.test(document.getElementById('pBody').innerHTML),'forage: in-season badge in DIY list');P.closePanel();
+    P.openPhone('cal');await wait(5);ok(/Seasonal forage now: <b>Blossom petal/.test(document.getElementById('pBody').innerHTML),'forage: calendar names current forage');P.closePanel();
+    // present teaches a seasonal recipe
+    S.recipes=S.recipes.filter(k=>k!=='r_petalrug'&&k!=='r_blossomlamp'&&k!=='r_blossomwall');S.inv.fill(null);P.addItem('present',1);
+    {const mr=Math.random,q=[.9,.1];Math.random=()=>q.length?q.shift():0;try{P.openPresent(0)}finally{Math.random=mr}await adv(4)}
+    ok(S.recipes.some(k=>P.RECIPES[k].ss==='petal'),'forage: present can teach an in-season recipe');
+    {const keep=S.recipes.slice();S.recipes=S.recipes.concat(Object.keys(P.RECIPES).filter(k=>!P.RECIPES[k].ss));const k=P.pickRecipe(['r_sli']);ok(k&&P.RECIPES[k].ss==='petal','forage: bottle pool used up falls back to seasonal',k);S.recipes=keep}
+    // season letter
+    {S.flags.ssMail='x';const m0=S.mail.length;at(4,20);P.dailyRefresh(S.lastDay);ok(S.mail.length===m0+1&&/DIY recipe/.test(S.mail[0].text),'forage: season letter teaches a recipe',S.mail[0]&&S.mail[0].text);
+     const m1=S.mail.length;P.dailyRefresh(S.lastDay);ok(S.mail.length===m1,'forage: season letter only once per season')}
+    // pool stays 4 over 1000 steps
+    at(4);toHome();P.closePanel();const ref=P.drifts;for(let i=0;i<1000;i++)P.step(.05);ok(P.drifts===ref&&P.drifts.length===4,'forage: pool length 4 after 1000 steps',P.drifts.length);
+    // reduce motion
+    S.set.rm=1;P.drifts.forEach(q=>q.on=false);toHome();spawnN(150);ok(live('petal')>=1,'forage: Reduce motion still spawns drifts',live());
+    {const d=P.drifts.find(q=>q.on);d.vx=0;d.t=1;const x0=d.x;P.updateDrifts(.5);ok(d.x===x0&&d.on,'forage: Reduce motion has no sway');
+     S.inv.fill(null);S.inv[0]={id:'t_net0',q:1,d:10};S.eq=0;G.fx=0;G.fy=1;P.drifts.forEach(q=>{if(q!==d)q.on=false});const [x,y]=P.netTip();d.x=x;d.y=y;P.swingNet();ok(P.invCount('petal')===1,'forage: Reduce motion drift can be caught')}
+    S.set.rm=null;
+    // old save
+    const js=JSON.parse(JSON.stringify(S));delete js.flags.ssMail;delete js.stats.forage;delete js.ach.forage;P.loadFrom(JSON.stringify(js));
+    ok(P.S.recipes.length===js.recipes.length&&P.S.name==='Tess'&&P.drifts.length===4,'forage: older save loads unchanged');
+  }catch(e){ok(false,'forage block threw',e.stack)}
+
+  // v1.4.0 Expeditions & Bicycles: 2 large islands, hopping bike system, character redesign, radar HUD & outdoor decor
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();
+    // 1. Two all-new larger islands
+    const wAtoll=P.genWorld(1001,'tour_atoll');
+    ok(wAtoll.W===76&&wAtoll.H===64&&wAtoll.kind==='tour_atoll','tour_atoll: 76x64 Coral Atoll generated',wAtoll.W+'x'+wAtoll.H);
+    const wCaldera=P.genWorld(2002,'tour_caldera');
+    ok(wCaldera.W===78&&wCaldera.H===66&&wCaldera.kind==='tour_caldera','tour_caldera: 78x66 Ancient Caldera generated',wCaldera.W+'x'+wCaldera.H);
+    P.startTour('tour_atoll');P.step(.05);P.render();
+    ok(P.W.kind==='tour_atoll'&&P.G.scene==='tour_atoll','tour_atoll: active expedition tour scene loaded');
+    P.returnHome();P.step(.05);
+    ok(P.W===P.ISLE&&P.G.scene==='island','tour_atoll: returned home cleanly');
+    P.startTour('tour_caldera');P.step(.05);P.render();
+    ok(P.W.kind==='tour_caldera'&&P.G.scene==='tour_caldera','tour_caldera: active caldera tour scene loaded');
+    P.returnHome();P.step(.05);
+
+    // 2. Craftable Bike Recipes & Hopping Bike System
+    ok(P.RECIPES.r_bike_frame&&P.RECIPES.r_bike_wheel&&P.RECIPES.r_bike&&P.RECIPES.r_bike_stunt,'bike: recipes exist');
+    S.inv.fill(null);
+    P.addItem('iron',10);P.addItem('hardwood',10);P.addItem('softwood',10);P.addItem('clay',10);
+    S.recipes.push('r_bike_frame','r_bike_wheel','r_bike','r_bike_stunt');
+    P.craft('r_bike_frame');ok(S.inv.some(s=>s&&s.id==='bike_frame'),'bike: crafted bike frame');
+    P.craft('r_bike_wheel');ok(S.inv.some(s=>s&&s.id==='bike_wheel'),'bike: crafted bike wheel 1');
+    P.craft('r_bike_wheel');ok(S.inv.filter(s=>s&&s.id==='bike_wheel').reduce((n,s)=>n+s.q,0)>=2,'bike: crafted bike wheel 2');
+    P.craft('r_bike');
+    const bikeIdx=S.inv.findIndex(s=>s&&s.id==='t_bike');
+    ok(bikeIdx>=0,'bike: crafted cruiser bicycle');
+    // Mount & travel speed
+    S.eq=bikeIdx;
+    ok(P.eqTool()&&P.eqTool().id==='t_bike','bike: bicycle equipped');
+    // Hopping
+    G.hopZ=0;G.hopVy=0;
+    const hopped=P.hopBike();
+    ok(hopped&&G.hopZ===1&&G.hopVy>100,'bike: hopBike triggers upward hop velocity',G.hopVy);
+    P.step(.1);
+    ok(G.hopZ>1,'bike: mid-air arc height increases',G.hopZ);
+    for(let k=0;k<30;k++)P.step(.05);
+    ok(G.hopZ===0&&G.hopVy===0,'bike: lands cleanly back on ground');
+    // Stunt bike: requires cruiser bike + gold + star
+    P.addItem('gold',2);P.addItem('star',2);
+    P.craft('r_bike_stunt');
+    const stuntIdx=S.inv.findIndex(s=>s&&s.id==='t_bike_stunt');
+    ok(stuntIdx>=0,'bike: crafted stunt hopper bicycle');
+    S.eq=stuntIdx;
+    ok(P.hopBike()&&G.hopVy>150,'bike: stunt bike has enhanced hop boost',G.hopVy);
+    for(let k=0;k<30;k++)P.step(.05);
+    S.eq=-1;
+
+    // 3. Main character look & rendering
+    const dummyCtx=document.createElement('canvas').getContext('2d');
+    let drawErr=false;
+    try{
+      P.drawPerson(dummyCtx,20,30,S.look,0,1,0,false);
+      P.drawPerson(dummyCtx,20,30,S.look,1,0,1,true,{bike:'stunt',hopZ:5});
+    }catch(err){drawErr=err}
+    ok(!drawErr,'look: drawPerson renders with upgraded facial features and bike',drawErr);
+
+    // 4. ShellPhone Radar & GPS Mini-Map HUD
+    const radar=document.getElementById('radarMap');
+    ok(radar&&radar.tagName==='CANVAS','radar: radar canvas exists in DOM');
+    let radErr=false;
+    try{radar.hidden=false;P.renderRadar();radar.hidden=true}catch(err){radErr=err}
+    ok(!radErr,'radar: renderRadar executes smoothly');
+
+    // 5. Outdoor Furniture Placement & Yard Decorator
+    S.inv.fill(null);
+    P.addItem('fu_bench',1);
+    const furnIdx=S.inv.findIndex(s=>s&&s.id==='fu_bench');
+    const ptx=Math.floor(G.px/32),pty=Math.floor(G.py/32);
+    let targetX=ptx,targetY=pty;
+    for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+      const tx=ptx+dx,ty=pty+dy;
+      if(P.W.ter[ty*P.W.W+tx]===3&&!P.W.obj[ty*P.W.W+tx]){targetX=tx;targetY=ty;break}
+    }
+    G.px=(targetX+0.5)*32;G.py=(targetY+1.5)*32;G.fx=0;G.fy=-1;
+    const placed=P.placeSlot(furnIdx);
+    ok(placed&&P.W.obj[targetY*P.W.W+targetX]&&P.W.obj[targetY*P.W.W+targetX].k==='furn','outdoor: placed furniture on island grass');
+    G.fx=0;G.fy=-1;
+    P.act();
+    ok(S.inv.some(s=>s&&s.id==='fu_bench')&&!P.W.obj[targetY*P.W.W+targetX],'outdoor: picked up outdoor furniture back into pockets');
+
+    // 6. Pockets category filter chips and auto-stacking
+    S.inv.fill(null);
+    S.inv[0]={id:'wood',q:3};
+    S.inv[1]={id:'wood',q:4};
+    S.inv[2]={id:'stone',q:5};
+    S.inv[3]={id:'stone',q:10};
+    P.PA.sort();
+    const woodCount=S.inv.filter(s=>s&&s.id==='wood').length;
+    ok(woodCount===1&&S.inv.find(s=>s&&s.id==='wood').q===7,'inventory: auto-sort stacks matching materials');
+  }catch(e){ok(false,'v1.4.0 block threw',e.stack)}
+
   // ---- feature tests: append new blocks above this line (END marker) ----
 }catch(e){errs.push('EXC '+e.stack)}
 const pre=document.createElement('pre');pre.id='RESULT';pre.textContent=out.join('\n')+'\n--ERRORS--\n'+errs.slice(0,25).join('\n');document.body.appendChild(pre);
