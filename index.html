@@ -58,10 +58,11 @@ input,select{font:inherit;color:inherit}
 @keyframes tin{from{opacity:0;transform:translateY(-14px) scale(.9)}}
 @keyframes tout{to{opacity:0;transform:translateY(-10px)}}
 #dock{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;pointer-events:auto}
-.round{width:52px;height:52px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);display:grid;place-items:center;font-size:24px;transition:transform .12s}
+.round{position:relative;min-width:44px;min-height:44px;width:52px;height:52px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);display:grid;place-items:center;font-size:24px;transition:transform .12s}
 .round:hover{transform:translateY(-2px)}
 .round:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(74,58,40,.2)}
 #bWish{background:#2b2f62;color:#ffe9a8}
+.badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#b54848;color:#fff;font:800 12px/20px var(--font);text-align:center;box-shadow:0 0 0 2px var(--paper)}
 #cap{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
 #cap div{background:rgba(255,250,240,.96);border-radius:26px;padding:18px 28px;box-shadow:var(--deep);text-align:center;font-size:20px;animation:tin .4s cubic-bezier(.2,1.4,.4,1) both;max-width:88vw}
 #cap .e{font-size:64px;display:block;margin-bottom:6px;animation:bob 1.2s ease-in-out infinite}
@@ -77,6 +78,7 @@ input,select{font:inherit;color:inherit}
 #dCh button{background:var(--paper);border-radius:999px;padding:8px 18px;box-shadow:var(--lift);text-align:right;min-width:160px}
 #dCh button:hover,#dCh button.sel{background:#fff0c8}
 #dCh button.sel::before{content:"▶ ";color:var(--acc)}
+#dCh .num{display:inline-block;min-width:18px;border-radius:6px;background:var(--paper2);color:var(--ink2);font-size:12px;text-align:center;margin-right:4px}
 
 /* ---------- panel ---------- */
 #panel{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(30,45,60,.35);pointer-events:auto;padding:12px}
@@ -118,6 +120,7 @@ input,select{font:inherit;color:inherit}
 .price{font-variant-numeric:tabular-nums;white-space:nowrap}
 .bar{height:10px;border-radius:9px;background:#eadbb8;overflow:hidden;margin-top:4px}
 .bar i{display:block;height:100%;background:var(--leaf)}
+.bar.tk{position:relative}.bar .tick{position:absolute;top:0;bottom:0;width:2px;background:rgba(74,58,40,.3)}.bar .tick.on{background:rgba(255,255,255,.85)}
 .ped{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px}
 .ped div{aspect-ratio:1;border-radius:14px;background:var(--paper2);display:grid;place-items:center;font-size:24px;position:relative}
 .ped div.no{filter:grayscale(1) brightness(.4);opacity:.35}
@@ -139,7 +142,7 @@ input[type=range]{accent-color:var(--leaf)}
 .sw{display:flex;gap:6px;flex-wrap:wrap}
 .sw button{width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
 .map{width:100%;height:auto;border-radius:18px;image-rendering:pixelated;background:#3f9fd2}
-#radarMap{position:fixed;top:14px;right:14px;z-index:22;width:110px;height:110px;border-radius:24px;border:3px solid rgba(255,255,255,.85);box-shadow:var(--deep);background:rgba(30,80,120,.78);backdrop-filter:blur(6px);pointer-events:none}
+#radarMap{display:block;width:110px;height:110px;flex:none;border-radius:24px;border:3px solid rgba(255,255,255,.85);box-shadow:var(--deep);background:rgba(30,80,120,.78);backdrop-filter:blur(6px);pointer-events:none}
 .inv-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
 .inv-chips button{padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;background:var(--paper2);border:none;cursor:pointer}
 .inv-chips button.on{background:var(--leaf);color:#fff}
@@ -164,7 +167,7 @@ input[type=range]{accent-color:var(--leaf)}
 #stick{position:absolute;left:calc(22px + env(safe-area-inset-left));bottom:calc(26px + env(safe-area-inset-bottom));width:132px;height:132px;border-radius:50%;background:rgba(255,250,240,.35);border:3px solid rgba(255,250,240,.6);pointer-events:auto;touch-action:none}
 #knob{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:var(--paper);box-shadow:var(--lift)}
 #tbtns{position:absolute;right:calc(14px + env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(2,64px);gap:10px;pointer-events:auto}
-#tbtns button{width:64px;height:64px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);font-size:22px;touch-action:none}
+#tbtns button{min-width:44px;min-height:44px;width:64px;height:64px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);font-size:22px;touch-action:none}
 #tbtns #bA{background:var(--leaf);color:#fff;font-size:24px}
 #tbtns #bB.on{background:var(--acc);color:#fff}
 body.touch #dock{bottom:calc(14px + env(safe-area-inset-bottom))}
@@ -174,6 +177,7 @@ body.touch #dlg{bottom:calc(236px + env(safe-area-inset-bottom))}
 @media (max-height:480px){
   body.touch #stick{width:104px;height:104px;left:calc(16px + env(safe-area-inset-left));bottom:calc(14px + env(safe-area-inset-bottom))}
   body.touch #knob{width:46px;height:46px;margin:-23px 0 0 -23px}
+  #radarMap{width:80px;height:80px;border-radius:18px}
   body.touch #tbtns{grid-template-columns:repeat(2,54px);gap:8px;right:calc(14px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom))}
   body.touch #tbtns button{width:54px;height:54px;font-size:19px}
   body.touch #dock{right:calc(14px + env(safe-area-inset-right));bottom:calc(144px + env(safe-area-inset-bottom))}
@@ -191,6 +195,7 @@ body.touch #dlg{bottom:calc(236px + env(safe-area-inset-bottom))}
   .pill{padding:6px 10px;gap:7px}
   #wallet{font-size:13px}
   #toasts{top:calc(100px + env(safe-area-inset-top))}
+  body.radarOn #toasts{top:calc(220px + env(safe-area-inset-top))}
 }
 
 @media (max-width:560px){
@@ -216,25 +221,25 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
   <div class="tr">
     <div id="wallet" class="pill"><span><span class="e">🎐</span> <b id="hCoins">0</b></span><span title="Tide Points"><span class="e">🌊</span> <b id="hPts">0</b></span></div>
     <button id="toolchip" class="pill" title="Switch tool (Q / R)"><span class="e" id="tIcon">✋</span><span id="tName">Hands</span><span id="durbar" hidden><i id="durfill"></i></span></button>
+    <canvas id="radarMap" width="110" height="110" role="img" aria-label="Island radar" hidden></canvas>
   </div>
   <div id="toasts" aria-live="polite"></div>
   <div id="cap" hidden></div>
   <div id="hint" hidden></div>
   <div id="dock">
-    <button class="round" id="bWish" title="Make a wish (Y)" hidden><span class="e">🌠</span></button>
-    <button class="round" id="bRadar" title="Toggle Radar (M)"><span class="e">🧭</span></button>
-    <button class="round" id="bBike" title="Ride Bike (B)"><span class="e">🚲</span></button>
-    <button class="round" id="bBag" title="Pockets (I)"><span class="e">🎒</span></button>
-    <button class="round" id="bPhone" title="ShellPhone (P)"><span class="e">📱</span></button>
+    <button class="round" id="bWish" title="Make a wish (Y)" aria-label="Make a wish" hidden><span class="e">🌠</span></button>
+    <button class="round" id="bRadar" title="Toggle radar (N)" aria-label="Toggle radar" aria-pressed="false"><span class="e">🧭</span></button>
+    <button class="round" id="bBike" title="Ride bike (B)" aria-label="Ride bike"><span class="e">🚲</span></button>
+    <button class="round" id="bBag" title="Pockets (I)" aria-label="Pockets"><span class="e">🎒</span></button>
+    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span></button>
   </div>
 </div>
-<canvas id="radarMap" width="120" height="120" aria-label="Island Radar Map" hidden></canvas>
 
 <div id="touch" hidden>
   <div id="stick"><div id="knob"></div></div>
   <div id="tbtns">
     <button id="bT" aria-label="Switch tool">🔧</button>
-    <button id="bHop" aria-label="Hop / Bell" title="Bunny Hop">🦘</button>
+    <button id="bHop" aria-label="Bike hop or mount" title="Bike hop">🦘</button>
     <button id="bA" aria-label="Action">A</button>
     <button id="bB" aria-label="Run">🏃</button>
     <button id="bX" aria-label="Put away tool">✋</button>
@@ -242,7 +247,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
 </div>
 
 <div id="dlg" hidden>
-  <div id="dCh"></div>
+  <div id="dCh" role="listbox" aria-label="Choices"></div>
   <div id="dlgBox" role="dialog" aria-live="polite"><div id="dName"></div><div id="dText"></div><div id="dNext">▼</div></div>
 </div>
 
@@ -271,14 +276,14 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
       <label>Shirt<div class="sw" id="swShirt"></div></label>
       <div class="acts"><button class="btn" type="submit" id="btnNew">🏝️ Start a new island</button><button class="btn alt" type="button" id="btnImport">Import save</button></div>
     </form>
-    <p class="foot">WASD / arrows to move · Shift to run · Space or E for action · Q / R to switch tools · I for pockets · P for phone<br>Original fan-made game inspired by cozy island life sims. Progress saves in this browser.</p>
+    <p class="foot"><span id="tVer"></span>WASD / arrows to move · Shift to run · Space or E for action · Q / R to switch tools · I for pockets · P for phone<br>Original fan-made game inspired by cozy island life sims. Progress saves in this browser.</p>
     <input type="file" id="fileIn" accept="application/json,.json" hidden>
   </div>
 </div>
 <script>
 'use strict';
 (()=>{
-const APP_VERSION='1.2.0';
+const APP_VERSION='1.5.0';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -367,7 +372,7 @@ const SEASONAL_FURN=[['pumpkin','Jack-o\'-lantern','🎃',1800,'10'],['snowman',
 const CRAFT_FURN=[['logstool','Log stool','🪵'],['stonestool','Stone stool','🪨'],['campfire','Campfire','🔥'],['birdbath','Birdbath','⛲'],['basket','Woven basket','🧺'],
 ['shelllamp','Shell lamp','🐚'],['lantern','Paper lantern','🏮'],['claypot','Terra-cotta pot','🏺'],['bench','Garden bench','🪑'],['starlamp','Star lamp','🌟'],
 ['mushlamp','Mushroom lamp','🍄'],['wreath','Acorn wreath','🌰'],['tidesign','Tide Points sign','🌊'],['flag','Island flag','🚩'],['photo','Neighbor photo','🖼️'],['flowerarch','Flower arch','🌸'],
-['blossomlamp','Blossom lamp','💮'],['mapleumb','Maple umbrella','☂️'],['leafpile','Leaf pile','🍂'],['frostlamp','Frost lamp','💠'],['icechair','Ice chair','🧊'],
+['phono','Record player','🎶'],['blossomlamp','Blossom lamp','💮'],['mapleumb','Maple umbrella','☂️'],['leafpile','Leaf pile','🍂'],['frostlamp','Frost lamp','💠'],['icechair','Ice chair','🧊'],
 ['flakewreath','Flake wreath','❄️'],['sunfountain','Sunshell fountain','⛲'],['sunbench','Sunshell bench','🏖️'],['sandcastle','Sandcastle','🏰']];
 const WALLS=[['wcream','Cream wall','#fbefd5','#f3e2bf','plain',1200],['wmint','Mint stripe wall','#d8f1e0','#bfe6cc','stripe',1800],['wrose','Rose dot wall','#fbe0e6','#f3bfcc','dots',1800],
 ['wsky','Sky wall','#d6ecfa','#b7dcf3','stripe',1600],['wlog','Log cabin wall','#c48a55','#a86f3f','wood',2400],['wnight','Starry wall','#2b2f62','#ffe9a8','dots',3200],['wbrick','Brick wall','#c86a4f','#a6503a','brick',2200],
@@ -413,11 +418,29 @@ def('bike_frame',{n:'Bike frame',e:'🚲',p:600,c:'mat',s:5,desc:'A lightweight 
 def('bike_wheel',{n:'Bike wheel',e:'⚙️',p:300,c:'mat',s:10,desc:'A spoked rubber tire and steel rim for bicycles.'});
 FURN_RAW.forEach(([id,n,e,b])=>def('fu_'+id,{n,e,p:Math.round(b/4),buy:b,c:'furn'}));
 SEASONAL_FURN.forEach(([id,n,e,b,ms])=>def('fu_'+id,{n,e,p:Math.round(b/4),buy:b,c:'furn',ms:parseRanges(ms)}));
-CRAFT_FURN.forEach(([id,n,e])=>def('fu_'+id,{n,e,p:300,c:'furn'}));def('fu_bloom',{n:'Bloom trophy',e:'🏵️',p:0,c:'furn'});def('flowers',{n:'Any flower',e:'💐'});
+CRAFT_FURN.forEach(([id,n,e])=>def('fu_'+id,{n,e,p:300,c:'furn'}));
+// Tidewater Tunes: Piper's Saturday-night songs [id,name,scaleIdx(SCALES),rootMidi,bpm,seed]; a record of each plays on a record player at home
+const SONGS=[['dawn','Driftwood Dawn',0,60,96,101],['kelp','Kelp Forest Waltz',2,57,84,202],['lantern','Lantern Lane',3,62,104,303],['tide','Low Tide Shuffle',1,55,112,404],
+ ['heron','Heron on One Leg',0,64,72,505],['sunroot','Sunroot Sunday',2,60,120,606],['puddle','Puddle Jumper',0,67,132,707],['rain','Rain on the Roof',1,57,68,808],
+ ['star','Starfall Serenade',2,62,76,909],['glass','Sea Glass Swing',3,59,100,1010],['tug','Tugboat Two-Step',0,55,116,1111],['mud','Midnight Mudflats',1,52,80,1212]];
+const SONG_BY={};SONGS.forEach(g=>{SONG_BY[g[0]]=g;def('rec_'+g[0],{n:'Record: '+g[1],e:'💿',p:250,c:'furn',rec:g[0]})});def('fu_bloom',{n:'Bloom trophy',e:'🏵️',p:0,c:'furn'});
+[['hallfish','Fish Hall statue','🐋'],['hallbug','Bug Hall statue','🦋'],['hallfossil','Fossil Hall statue','🦕'],['goldquill','Golden Quill trophy','🪶']].forEach(([id,n,e])=>def('fu_'+id,{n,e,p:0,c:'furn',desc:'A museum honor from Dr. Quillfeather.'}));def('flowers',{n:'Any flower',e:'💐'});
 [['f','🎣','Derby'],['b','🦋','Bug-Off']].forEach(([k,ic,ev])=>['Bronze','Silver','Gold'].forEach((m,i)=>def(`fu_dt${k}${i+1}`,{n:`${m} ${ev} trophy ${ic}`,e:['🥉','🥈','🥇'][i],p:[500,1200,3000][i],c:'furn'})));
 WALLS.forEach(([id,n,a,b,pat,pr])=>def('wl_'+id,{n,e:'🧱',p:Math.round(pr/4),buy:pr,c:'wall',a,b,pat,col:a}));
 FLOORS.forEach(([id,n,a,b,pat,pr])=>def('fl_'+id,{n,e:'🟫',p:Math.round(pr/4),buy:pr,c:'floor',a,b,pat,col:a}));
 const SHOP_WALLS=WALLS.filter(w=>!w[6]),SHOP_FLOORS=FLOORS.filter(f=>!f[6]);   // seasonal DIY patterns are never sold
+// Bramble's Catalog: every furniture/wall/floor ever held; themed series (built from FURN_RAW ids, missing ids skipped) pay Tide Points once
+const CATC={furn:1,wall:1,floor:1},CAT_SET_PTS=1000,CAT_MAXORD=5;
+const FURN_SETS=[['music','Music Room','🎵',['piano','guitar','drums','radio']],['bedroom','Cozy Bedroom','🛏️',['bed','lamp','teddy','clock']],
+ ['study','Scholar\'s Study','📚',['desk','books','globe','microscope','telescope']],['games','Game Night','🎲',['chess','dice','console','robot']],
+ ['bath','Bath Time','🛁',['tub','toilet','candle','mirror']],['retro','Retro Den','📺',['tv','phone','camera','hourglass']],
+ ['camp','Great Outdoors','⛺',['tent','umbrella','cactus','bell']],['parlor','Parlor','🛋️',['sofa','chair','frame','vase','plant']]]
+ .map(([id,n,e,L])=>({id,n,e,ids:L.map(x=>'fu_'+x).filter(x=>IT[x])})).filter(s=>s.ids.length);
+const CAT_SET_OF={};for(const s of FURN_SETS)for(const x of s.ids)(CAT_SET_OF[x]=CAT_SET_OF[x]||[]).push(s);
+const NO_ORDER=new Set([...CRAFT_FURN.map(f=>'fu_'+f[0]),'fu_photo','fu_tidesign',...WALLS.filter(w=>w[6]).map(w=>'wl_'+w[0]),...FLOORS.filter(f=>f[6]).map(f=>'fl_'+f[0])]);
+function isOrderable(id){const it=IT[id];return !!it&&!!CATC[it.c]&&it.p>0&&!it.ms&&!it.rec&&!it.ev&&!NO_ORDER.has(id)&&!/^fu_dt/.test(id)}
+const catPrice=id=>IT[id].buy||IT[id].p*4;
+let CAT_L=null;const catList=c=>{if(!CAT_L){CAT_L={furn:[],wall:[],floor:[]};for(const k in IT){const x=IT[k];if(CATC[x.c])CAT_L[x.c].push(k)}}return CAT_L[c]};
 // neighbor home styles by personality: furniture pools reuse existing items (validated against IT below)
 const VSTYLE={lazy:{wall:'wl_wlog',floor:'fl_fgrass',pool:'bed sofa tv console teddy plant logstool campfire basket mushlamp'},
   peppy:{wall:'wl_wrose',floor:'fl_fcarpet',pool:'mirror teddy radio camera dice frame starlamp flowerarch lamp'},
@@ -441,7 +464,7 @@ const RECIPES={
  r_basket:{out:'fu_basket',m:{softwood:3,weeds:4}},r_shelllamp:{out:'fu_shelllamp',m:{cowrie:3,wood:2}},r_lantern:{out:'fu_lantern',m:{iron:2,clay:1,softwood:2}},
  r_claypot:{out:'fu_claypot',m:{clay:4}},r_bench:{out:'fu_bench',m:{iron:4,hardwood:3}},r_starlamp:{out:'fu_starlamp',m:{star:5,iron:1}},
  r_mushlamp:{out:'fu_mushlamp',m:{mush:3,clay:1}},r_wreath:{out:'fu_wreath',m:{acorn:6,branch:2}},r_chair:{out:'fu_chair',m:{wood:4}},
- r_frame:{out:'fu_frame',m:{softwood:2,hardwood:1}},r_flag:{out:'fu_flag',m:{wood:2,weeds:3}},r_flowerarch:{out:'fu_flowerarch',m:{wood:4,flowers:3}},
+ r_frame:{out:'fu_frame',m:{softwood:2,hardwood:1}},r_flag:{out:'fu_flag',m:{wood:2,weeds:3}},r_flowerarch:{out:'fu_flowerarch',m:{wood:4,flowers:3}},r_phono:{out:'fu_phono',m:{iron:2,hardwood:3}},
  r_bike_frame:{out:'bike_frame',m:{iron:4,hardwood:2}},r_bike_wheel:{out:'bike_wheel',m:{iron:2,clay:1,softwood:1}},
  r_bike:{out:'t_bike',m:{bike_frame:1,bike_wheel:2}},r_bike_stunt:{out:'t_bike_stunt',m:{t_bike:1,gold:2,star:2}},
  r_blossomlamp:{out:'fu_blossomlamp',m:{petal:5,wood:2},ss:'petal'},r_petalrug:{out:'fl_fpetal',m:{petal:6},ss:'petal'},r_blossomwall:{out:'wl_wblossom',m:{petal:6,softwood:2},ss:'petal'},
@@ -449,12 +472,12 @@ const RECIPES={
  r_frostlamp:{out:'fu_frostlamp',m:{flake:5,iron:1},ss:'flake'},r_icechair:{out:'fu_icechair',m:{flake:6,wood:2},ss:'flake'},r_flakewreath:{out:'fu_flakewreath',m:{flake:6,branch:2},ss:'flake'},
  r_sunfountain:{out:'fu_sunfountain',m:{sunshell:5,stone:4},ss:'sunshell'},r_sunbench:{out:'fu_sunbench',m:{sunshell:4,wood:4},ss:'sunshell'},r_sandcastle:{out:'fu_sandcastle',m:{sunshell:3,clay:3},ss:'sunshell'}};
 for(const k in RECIPES){RECIPES[k].id=k}
-const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike'];
+const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike','r_phono'];
 // Seasonal forage: [material, months (effMonth), badge, events line]. Petals/leaves/flakes drift by and are caught with the net; sunshells wash up on the beach
 const FORAGE=[['petal','3-4','🌸','🌸 Blossom petals are drifting! Catch them with your net.'],['maple','10-11','🍂','🍁 Maple leaves are falling! Catch them with your net.'],
  ['flake','12-2','❄️','❄️ Snowflakes drift by on snowy and cloudy days. Catch them with your net!'],['sunshell','6-8','☀️','🐚 Sunshells are washing up on the beach!']].map(([id,ms,b,ev])=>({id,mo:parseRanges(ms),ms,b,ev}));
 const SS_RECIPES=Object.keys(RECIPES).filter(k=>RECIPES[k].ss);
-const BOTTLE_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_starlamp','r_mushlamp','r_wreath','r_frame','r_flag','r_med','r_chair','r_bike_frame','r_bike_wheel','r_bike','r_bike_stunt'];
+const BOTTLE_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_starlamp','r_mushlamp','r_wreath','r_frame','r_flag','r_med','r_chair','r_bike_frame','r_bike_wheel','r_bike','r_bike_stunt','r_phono'];
 
 // Neighbors (original characters)
 const VPOOL=[
@@ -502,7 +525,7 @@ const ACH=[
  ['days','Island Regular','Play on different days',[2,7,30,100]],['wishes','Wishful Thinking','Wish on shooting stars',[1,10,40]],
  ['gifts','Generous Neighbor','Give gifts',[1,10,40]],['sunProfit','Root of All Profit','Profit from sunroots',[1000,20000,200000]],
  ['tours','Island Hopper','Take mystery tours',[1,5,20]],['furnPlaced','Interior Designer','Place furniture at home',[1,10,30]],
- ['requests','Helping Paw','Finish neighbor requests',[1,5,20,50]],['visits','Come On In','Visit neighbors at home',[1,10,40]],['forage','Seasonal Forager','Collect seasonal materials',[5,30,100,300]],['bloom','Island Star','Raise the island rating',[1,2,3,4,5]],['derby','Contest Regular','Finish derby rounds',[1,5,20]],['stung','Ouch!','Get stung by wasps',[1]]];
+ ['requests','Helping Paw','Finish neighbor requests',[1,5,20,50]],['visits','Come On In','Visit neighbors at home',[1,10,40]],['forage','Seasonal Forager','Collect seasonal materials',[5,30,100,300]],['bloom','Island Star','Raise the island rating',[1,2,3,4,5]],['derby','Contest Regular','Finish derby rounds',[1,5,20]],['catalog','Cataloguer','Catalog new items',[10,40,80,120]],['gigs','Front Row Regular','Hear Saturday concerts',[1,5,20,50]],['stung','Ouch!','Get stung by wasps',[1]]];
 const ACH_PTS=[300,500,1000,2000,3000];
 const DAILY_POOL=[['fish',3,'Catch 3 fish',200],['bugs',2,'Catch 2 bugs',200],['weeds',5,'Pull 5 weeds',150],['sold',3,'Sell 3 items',150],['shakes',3,'Shake 3 trees',150],
  ['watered',5,'Water 5 flowers',150],['rocks',4,'Hit rocks 4 times',150],['talks',4,'Talk to 4 neighbors',200],['crafts',1,'Craft something',150],['donated',1,'Donate to the museum',200],
@@ -528,7 +551,7 @@ let S=null;            // persistent save state
 let ISLE=null;         // home island world
 let W=null;            // world currently shown (island or tour)
 const G={scene:'island',px:0,py:0,fx:0,fy:1,moving:false,run:false,step:0,swing:0,cast:null,busy:false,lastSave:0,tr:null,
-  faint:0,stung:0,tour:null,cam:{x:0,y:0},t:0,dt:0,shake:0,flash:null};
+  faint:0,stung:0,tour:null,cam:{x:0,y:0},t:0,dt:0,shake:0,flash:null,lastGround:{x:0,y:0,w:null},saveOk:null,savedAt:0};
 // Reduce motion: Settings Auto (follow the OS) / On / Off, stored in S.set.rm (null = Auto)
 const RMQ=matchMedia('(prefers-reduced-motion: reduce)');
 const calm=()=>S&&S.set.rm!=null?!!S.set.rm:RMQ.matches;
@@ -559,6 +582,7 @@ function meteorNight(){const c=clk();if(!(c.h>=19||c.h<4))return false;if(weathe
 function fireworksNight(){const c=clk();return effMonth()===8&&c.dow===0&&c.h>=19||(c.mo===12&&c.dd===31&&c.h>=20)||(c.mo===1&&c.dd===1&&c.h<2)}
 function rosieHere(){const c=clk();return W===ISLE&&c.dow===0&&c.h>=5&&c.h<12}
 function derbyKind(){const c=clk();return W===ISLE&&c.dow===6&&c.h>=9&&c.h<18?derbyWeek():null}
+function buskerHere(){const c=clk();return W===ISLE&&c.dow===6&&c.h>=20}
 const derbyWeek=()=>weekOf(dayIdx())%2?'bug':'fish';
 const DERBY_N={fish:'🏆 Fishing Derby',bug:'🏆 Bug-Off'};
 function shopOpen(){const h=clk().h;return h>=8&&h<22}
@@ -577,6 +601,7 @@ function events(){
   if(c.dow===0&&c.h>=5&&c.h<12)out.push('🥔 Rosie is selling sunroots in the plaza until noon.');
   if(c.dow===6&&c.h>=9&&c.h<18)out.push(`${DERBY_N[derbyWeek()]} in the plaza until 6 PM! Talk to Marlowe.`);
   else if(c.dow===5)out.push(`${DERBY_N[derbyWeek()]} tomorrow from 9 AM in the plaza!`);
+  if(c.dow===6)out.push(c.h>=20?'🎵 Piper the heron is playing guitar in the plaza until midnight. Request a song!':'🎵 Tonight from 8 PM, Piper the heron plays guitar in the plaza.');
   {const f=forageNow();if(f)out.push(f.ev)}
   if(meteorNight())out.push('🌠 Meteor shower! Look up and make a wish (Y).');
   return out;
@@ -731,7 +756,7 @@ function addItem(id,q=1,extra){
   const it=IT[id];if(!it)return 0;let left=q;
   if(it.s>1)for(const s of S.inv){if(left<=0)break;if(s&&s.id===id&&s.q<it.s&&sameMeta(s,extra)){const k=Math.min(left,it.s-s.q);s.q+=k;left-=k}}
   for(let i=0;i<S.inv.length&&left>0;i++){if(!S.inv[i]){const k=Math.min(left,it.s);S.inv[i]=Object.assign({id,q:k},extra||{});if(it.dur&&S.inv[i].d==null)S.inv[i].d=it.dur;left-=k}}
-  if(left<q)uiDirty();return q-left;
+  if(left<q){uiDirty();if(CATC[it.c]&&!S.cat[id])catMark(id)}return q-left;
 }
 // wildcard materials ('flowers') use the cheapest matching items first so rare hybrids are kept
 function removeItem(id,q=1){const ix=[];for(let i=S.inv.length-1;i>=0;i--)if(S.inv[i]&&isMat(S.inv[i],id))ix.push(i);if(id==='flowers')ix.sort((a,b)=>IT[S.inv[a].id].p-IT[S.inv[b].id].p);
@@ -752,7 +777,7 @@ function giveOrDrop(id,q=1,extra){const left=q-addItem(id,q,extra);if(left<=0)re
   else if(stash(id,left,extra))toast('📦 Pockets full, so it was sent to home storage');
   else{mail('Lost & Found',`Your pockets and storage were full, so we kept this safe for you: ${IT[id].n}${left>1?' ×'+left:''}.`,id,left,extra);toast('📬 Pockets and storage full, so it was mailed to you')}}
 function stash(id,q=1,x){const it=IT[id];if(!it)return false;const ex=it.s>1&&S.stor.find(s=>s.id===id&&sameMeta(s,x)&&s.q+q<=it.s*10);if(ex){ex.q+=q;return true}
-  if(S.stor.length>=S.storSize)return false;const o=Object.assign({id,q},x||{});if(it.dur&&o.d==null)o.d=it.dur;S.stor.push(o);return true}
+  if(S.stor.length>=S.storSize)return false;const o=Object.assign({id,q},x||{});if(it.dur&&o.d==null)o.d=it.dur;S.stor.push(o);if(CATC[it.c]&&!S.cat[id])catMark(id);return true}
 function dropNear(id,q,extra){
   const [tx,ty]=playerTile();
   for(let r=0;r<4;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const x=tx+dx,y=ty+dy;
@@ -766,6 +791,13 @@ function stat(k,n=1){S.stats[k]=(S.stats[k]||0)+n;
   const a=ACH.find(a=>a[0]===k);if(a){const got=S.ach[k]||0;if(got<a[3].length&&S.stats[k]>=a[3][got]){S.ach[k]=got+1;const p=ACH_PTS[Math.min(got,4)];S.pts+=p;toast(`🌊 Tide Points: “${a[1]}” tier ${got+1} (+${fmt(p)})`,'big');sfx('points')}}
   uiDirty();
 }
+// Bramble's Catalog: first time an item is held it is cataloged (+stat); finishing a furniture series pays CAT_SET_PTS once
+function catMark(id,quiet){S.cat[id]=1;if(quiet)S.stats.catalog=(S.stats.catalog||0)+1;else{stat('catalog');if(!S.flags.catTip){S.flags.catTip=1;toast('📒 Added to your Catalog! Re-order it anytime at Bramble\'s.')}}
+  const L=CAT_SET_OF[id];if(L)for(const s of L)catSetChk(s)}
+function catSetChk(s){if(S.catSets[s.id])return;for(const x of s.ids)if(!S.cat[x])return;S.catSets[s.id]=1;S.pts+=CAT_SET_PTS;toast(`${s.e} Catalog series complete: ${s.n}! (+${fmt(CAT_SET_PTS)} pts)`,'big');sfx('points');uiDirty()}
+function backfillCat(){if(S.flags.catBF)return;S.flags.catBF=1;const m=id=>{const it=IT[id];if(it&&CATC[it.c]&&!S.cat[id])catMark(id,1)};
+  for(const s of S.inv)if(s)m(s.id);for(const s of S.stor)if(s)m(s.id);for(const f of S.house.items)if(f)m(f.id);m(S.house.wall);m(S.house.floor);
+  for(const o of ISLE.obj)if(o&&o.k==='furn')m(o.id);for(const v of S.vill)if(Array.isArray(v.gifts))for(const g of v.gifts)m(g)}
 function earn(n,silent){S.coins+=n;if(!silent)sfx('coins');uiDirty()}
 // Isle Bloom Rating: Hazel rates the island 0-5 stars; each new star mails a one-time reward (granted through the S.bloom.best watermark)
 // a new island (4 residents + full-grown trees) scores ~2700, so star 1 needs real work; max possible is ~9600
@@ -848,7 +880,8 @@ function dailyRefresh(today){
   const sp1=pick(r,FLOWER_SP)[0],sp2=pick(r,FLOWER_SP.filter(f=>f[0]!==sp1))[0];
   S.dly={day:today,money:rocks.length?pick(r,rocks):-1,bag:trees.length?trees[0]:-1,furn:trees.slice(1,3),wasp:trees.slice(3,5),
     shop:{furn:shuffle(r,pool).slice(0,5),wall:'wl_'+pick(r,SHOP_WALLS)[0],floor:'fl_'+pick(r,SHOP_FLOORS)[0],recipe:unknown.length?pick(r,unknown):null,
-      seeds:[sp1,sp2].flatMap(sp=>['red','white','yellow'].map(cc=>`sd_${sp}_${cc}`)),hot:pick(r,Object.values(RECIPES).filter(x=>IT[x.out].c==='furn'&&!x.ss)).out,bought:{}}};
+      seeds:[sp1,sp2].flatMap(sp=>['red','white','yellow'].map(cc=>`sd_${sp}_${cc}`)),hot:pick(r,Object.values(RECIPES).filter(x=>IT[x.out].c==='furn'&&!x.ss)).out,bought:{}},ord:0};
+  if(S.orders.length){for(const id of S.orders)if(IT[id])mail("Bramble's Catalog",`Here's your catalog order, ${S.name}: the ${IT[id].n.toLowerCase()}. Thanks for shopping with Bramble's!`,id);S.orders=[]}
   S.tasks=shuffle(r,DAILY_POOL.slice()).slice(0,5).map(([k,n,t,pts])=>({k,n,t,pts,prog:0,done:0}));
   for(const v of S.vill)v.req=r()<.4?makeRequest(r,v):null;
   const wk=weekOf(today);if(!S.sun||S.sun.week!==wk)rollSun(wk);
@@ -907,11 +940,11 @@ function newState(o){
     coins:1500,pts:0,bank:0,loan:0,houseLv:0,upgradeDay:null,invSize:20,inv:new Array(20).fill(null),eq:-1,stor:[],storSize:200,
     house:{wall:'wl_wcream',floor:'fl_fwood',items:[]},recipes:Object.keys(RECIPES).filter(k=>RECIPES[k].start),
     pedia:{fish:{},bug:{},fossil:{}},don:{fish:{},bug:{},fossil:{}},stats:{},ach:{},dly:null,tasks:[],lastDay:null,vill:[],mail:[],sun:null,
-    flags:{},timeOff:0,set:{music:.45,sfx:.7,rm:null},wishes:0,objs:null,pos:null,moveIn:null,lastMonth:null,met:{},
-    derby:{best:{fish:0,bug:0},last:{fish:-1,bug:-1},rounds:0},bloom:{stars:0,best:0,score:0,day:-1}};
+    flags:{},timeOff:0,set:{music:.45,sfx:.7,rm:null,radar:0},wishes:0,objs:null,pos:null,moveIn:null,lastMonth:null,met:{},
+    derby:{best:{fish:0,bug:0},last:{fish:-1,bug:-1},rounds:0},bloom:{stars:0,best:0,score:0,day:-1},cat:{},orders:[],catSets:{},gig:{last:-1,heard:{}},musRw:{fish:0,bug:0,fossil:0}};
 }
 function newGame(o){
-  S=newState(o);ISLE=genWorld(S.seed,'island');W=ISLE;G.tr=null;G.vh=null;G.evK=-1;
+  S=newState(o);ISLE=genWorld(S.seed,'island');W=ISLE;G.tr=null;G.gig=null;G.vh=null;G.evK=-1;backfillCat();
   const r=rngFor(S.seed,'vill'),picks=shuffle(r,VPOOL.map((_,i)=>i)).slice(0,4),vhs=ISLE.B.map((b,i)=>b.t==='vh'?i:-1).filter(i=>i>=0);
   S.vill=picks.map((p,k)=>({p,h:vhs[k],fr:5,td:-1,gd:-1,req:null,gifts:[]}));
   S.inv[0]={id:'t_net0',q:1,d:10};S.inv[1]={id:'t_rod0',q:1,d:10};S.inv[2]={id:'branch',q:4};
@@ -923,27 +956,32 @@ function newGame(o){
   save();
 }
 function serialize(){const objs=[];ISLE.obj.forEach((o,i)=>{if(o)objs.push([i,o])});S.objs=objs;
-  S.pos=G.scene==='tour'?null:{scene:G.scene,px:Math.round(G.px),py:Math.round(G.py)};
+  S.pos=isTour()?null:{scene:G.scene,px:Math.round(G.px),py:Math.round(G.py)};
   const json=JSON.stringify(S,(k,v)=>k.startsWith('_')?undefined:v);S.objs=null;return json}
-function save(){if(!S)return;try{localStorage.setItem(SAVE_KEY,serialize())}catch(e){}G.lastSave=performance.now()}
+// save health lives in transient G fields (saveOk/savedAt); the first failure in a row warns once
+function save(){if(!S)return;let ok=true;try{localStorage.setItem(SAVE_KEY,serialize())}catch(e){ok=false;S.objs=null}G.lastSave=performance.now();
+  if(ok){G.saveOk=true;G.savedAt=Date.now();G.saveWarn=0}else{G.saveOk=false;if(!G.saveWarn){G.saveWarn=1;toast("Couldn't save in this browser. Use Settings > Export save.")}}}
+const hmTxt=t=>{const d=new Date(t),h=d.getHours();return `${h%12||12}:${String(d.getMinutes()).padStart(2,'0')} ${h<12?'AM':'PM'}`};
 function loadFrom(json){
   const s=JSON.parse(json);
   if(!s||s.v!==1||typeof s.seed!=='number'||!Array.isArray(s.inv)||!Array.isArray(s.vill))throw new Error('Not a Puddlewick Isle save');
   const base=newState({name:s.name,island:s.island,hemi:s.hemi,look:s.look});
   for(const k in base)if(!(k in s))s[k]=base[k];
-  const dd=s.derby=Object.assign({},base.derby,s.derby);dd.best=Object.assign({fish:0,bug:0},dd.best);dd.last=Object.assign({fish:-1,bug:-1},dd.last);s.bloom=Object.assign({},base.bloom,s.bloom);s.set=Object.assign({},base.set,s.set||{});
+  const dd=s.derby=Object.assign({},base.derby,s.derby);dd.best=Object.assign({fish:0,bug:0},dd.best);dd.last=Object.assign({fish:-1,bug:-1},dd.last);s.bloom=Object.assign({},base.bloom,s.bloom);s.gig=Object.assign({},base.gig,s.gig);s.musRw=Object.assign({},base.musRw,s.musRw&&typeof s.musRw==='object'?s.musRw:{});for(const k in base.musRw)s.musRw[k]=clamp(s.musRw[k]|0,0,4);if(!s.gig.heard||typeof s.gig.heard!=='object')s.gig.heard={};s.set=Object.assign({},base.set,s.set||{});
+  for(const k of ['cat','catSets','flags'])if(!s[k]||typeof s[k]!=='object'||Array.isArray(s[k]))s[k]={};s.orders=Array.isArray(s.orders)?s.orders.filter(id=>IT[id]):[];
   s.inv=s.inv.map(x=>x&&IT[x.id]?x:null);while(s.inv.length<s.invSize)s.inv.push(null);
   s.stor=s.stor.filter(x=>x&&IT[x.id]);s.recipes=s.recipes.filter(k=>RECIPES[k]);
   s.name=String(s.name||'Islander').slice(0,12);s.island=String(s.island||'Puddlewick').slice(0,14);
   S=s;ISLE=genWorld(S.seed,'island');
   if(Array.isArray(S.objs)){ISLE.obj.fill(null);for(const e of S.objs){if(Array.isArray(e)&&e[0]>=0&&e[0]<ISLE.obj.length&&e[1]&&typeof e[1].k==='string')ISLE.obj[e[0]]=e[1]}}
-  S.objs=null;W=ISLE;G.scene='island';G.vact=null;G.tr=null;G.evK=-1;
+  S.objs=null;W=ISLE;G.scene='island';G.vact=null;G.tr=null;G.gig=null;G.evK=-1;
   const home=ISLE.B.find(b=>b.t==='home');
   S.vill.forEach(v=>{if(!Array.isArray(v.gifts))v.gifts=[]});G.vh=null;
+  if(!S.flags.catBF){backfillCat();mail("Bramble's Catalog",`Hello, ${S.name}! Your ShellPhone now has a Catalog app that remembers every piece of furniture, wallpaper and flooring you've owned. Re-order any of it from the Catalog tab at my store, and finish a furniture series for Tide Points!`)}
   if(S.pos&&(S.pos.scene==='island'||S.pos.scene==='house')){G.scene=S.pos.scene;G.px=S.pos.px;G.py=S.pos.py}
   else{G.px=(home.door.x+.5)*TS;G.py=(home.door.y+1.6)*TS}
   if(G.scene==='island'&&blockedTile(Math.floor(G.px/TS),Math.floor(G.py/TS))){G.px=(home.door.x+.5)*TS;G.py=(home.door.y+1.6)*TS}
-  processDays();
+  processDays();musCheck();
 }
 
 /* =============================== ENTITIES =============================== */
@@ -955,6 +993,7 @@ const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+
 const angLerp=(a,b,t)=>a+angDiff(a,b)*Math.min(1,t);
 const playerTile=()=>[Math.floor(G.px/TS),Math.floor(G.py/TS)];
 const inHouse=()=>G.scene==='house'||G.scene==='vhouse';
+const isTour=()=>!!(W&&W.kind&&W.kind.startsWith('tour'));   // classic tour and both expeditions ('tour_atoll', 'tour_caldera')
 function frontDir(){const ax=G.fx,ay=G.fy;if(Math.abs(ax)>Math.abs(ay)*1.4)return [Math.sign(ax),0];if(Math.abs(ay)>Math.abs(ax)*1.4)return [0,Math.sign(ay)];return [Math.sign(ax),Math.sign(ay)]}
 function frontCands(){
   const [tx,ty]=playerTile(),[dx,dy]=frontDir(),c=[[tx+dx,ty+dy]];
@@ -974,7 +1013,7 @@ function pickFishTarget(o){for(let k=0;k<8;k++){const x=o.home[0]+(Math.random()
 function manageFish(){
   if(inHouse()){fishes.length=0;return}
   const [px,py]=playerTile();prune(fishes,o=>o.st!=='gone'&&Math.abs(o.x/TS-px)<20&&Math.abs(o.y/TS-py)<15);
-  const tour=W.kind==='tour',want={S:(isRaining()?6:4)+(tour?2:0),R:3,P:tour?3:2},have={S:0,R:0,P:0};
+  const tour=isTour(),want={S:(isRaining()?6:4)+(tour?2:0),R:3,P:tour?3:2},have={S:0,R:0,P:0};
   for(const o of fishes)have[o.loc]++;
   for(const loc of ['S','R','P']){if(have[loc]>=want[loc])continue;
     for(let k=0;k<30;k++){const x=px+rint(Math.random,-13,13),y=py+rint(Math.random,-10,10);
@@ -1015,7 +1054,7 @@ function manageBugs(){
   if(inHouse()){bugs.length=0;return}
   const [px,py]=playerTile();
   prune(bugs,o=>o.st!=='gone'&&(o.sp==='wasp'||(Math.abs(o.x/TS-px)<20&&Math.abs(o.y/TS-py)<15&&G.t-o.born<180)));
-  if(bugs.filter(o=>o.sp!=='wasp').length>=(W.kind==='tour'?9:6))return;
+  if(bugs.filter(o=>o.sp!=='wasp').length>=(isTour()?9:6))return;
   const sp=wpick(Math.random,[['fly',5],['flower',2],['tree',3],['ground',2],['beach',1.2],['pond',.8]],x=>x[1])[0];
   for(let k=0;k<25;k++){const x=px+rint(Math.random,-12,12),y=py+rint(Math.random,-8,8);if(Math.hypot(x-px,y-py)<4)continue;const t=terAt(x,y),o=objAt(x,y);
     if(sp==='fly'&&t===T_GRASS&&!o){spawnBug('fly',x,y);return}
@@ -1031,7 +1070,7 @@ function updateBugs(dt){
   for(const o of bugs){o.t+=dt;const dx=o.x-G.px,dy=o.y-G.py,d=Math.hypot(dx,dy);
     if(o.st==='flee'){o.x+=o.vx*dt;o.y+=o.vy*dt;o.z+=26*dt;o.al-=dt*.8;if(o.al<=0)o.st='gone';continue}
     if(o.sp==='wasp'){const a=Math.atan2(-dy,-dx);o.x+=Math.cos(a)*108*dt;o.y+=Math.sin(a)*108*dt;o.z=16+Math.sin(G.t*22)*2;
-      if(d<15&&G.faint<=0&&!G.busy){sting();o.st='gone'}if(G.t-o.born>22||G.scene!=='island'&&G.scene!=='tour')o.st='gone';continue}
+      if(d<15&&G.faint<=0&&!G.busy){sting();o.st='gone'}if(G.t-o.born>22||inHouse())o.st='gone';continue}
     if(o.b.chase){
       if(o.st==='idle'&&d<3*TS&&G.faint<=0){o.st='threat';o.t=0}
       if(o.st==='threat'&&o.t>1.4)o.st=pm>0?'chase':'idle';
@@ -1090,13 +1129,15 @@ function updateVill(dt){
         if(!blockedTile(Math.floor(nx/TS),Math.floor(ny/TS))){a.x=nx;a.y=ny}else{a.st='idle';a.t=1}}}}
 }
 const ROSIE={P:{n:'Rosie',e:'🐗',col:'#c98a7a',pitch:1.35,cp:'oink'},rosie:true,x:0,y:0,fx:0,fy:1,st:'idle',step:0};
+const BUSKER={P:{n:'Piper',e:'🪶',col:'#8fa7b8',pitch:1.2,cp:'tra-la'},busker:true,x:0,y:0,fx:0,fy:1,st:'idle',step:0};
 const TOURNEY={P:{n:'Marlowe',e:'🦦',col:'#9a7a5a',pitch:1.1,cp:'splish'},derby:true,x:0,y:0,fx:0,fy:1,st:'idle',step:0};
 // a neighbor is home for a 2-hour window each day (start 9-19, seeded) and on half of rainy hours
 function indoorNow(v){const h=clk().h;if(h>=22||h<6)return false;const d=dayIdx(),s=9+Math.floor(rngFor(S.seed,'vin',d,v.p)()*11);
   return (h>=s&&h<s+2)||(isRaining()&&rngFor(S.seed,'vinr',d,h,v.p)()<.5)}
 function npcs(){const L=[];if(G.scene==='vhouse'){L.push(G.vh.a);return L}if(G.scene==='house')return L;
   if(W===ISLE){for(const a of villActors())if(!a.home)L.push(a);if(rosieHere()){ROSIE.x=(ISLE.plaza.x+2.5)*TS;ROSIE.y=(ISLE.plaza.y+1.6)*TS;L.push(ROSIE)}
-    if(derbyKind()){TOURNEY.x=(ISLE.plaza.x-2.5)*TS;TOURNEY.y=(ISLE.plaza.y+1.6)*TS;L.push(TOURNEY)}}
+    if(derbyKind()){TOURNEY.x=(ISLE.plaza.x-2.5)*TS;TOURNEY.y=(ISLE.plaza.y+1.6)*TS;L.push(TOURNEY)}
+    if(buskerHere()){BUSKER.x=(ISLE.plaza.x+.5)*TS;BUSKER.y=(ISLE.plaza.y-1.5)*TS;L.push(BUSKER)}}
   if(W.camper)L.push(W.camper);return L}
 function npcInFront(){let best=null,bd=1e9;const fa=Math.atan2(G.fy,G.fx);
   for(const a of npcs()){const dx=a.x-G.px,dy=a.y-G.py,d=Math.hypot(dx,dy);if(d>TS*1.5)continue;if(d>18&&Math.abs(angDiff(fa,Math.atan2(dy,dx)))>1.2)continue;if(d<bd){bd=d;best=a}}return best}
@@ -1114,16 +1155,13 @@ function inputVec(){
   let m=1;if(G.joy&&G.joy.m>.12){x=G.joy.x;y=G.joy.y;m=G.joy.m}
   const n=Math.hypot(x,y);return n<.01?null:{x:x/n,y:y/n,m};
 }
+// feet probe offsets (module-level: no per-call arrays). Airborne (bike hop, outdoors only) may cross water and small objects, never tall ones or the map edge
+const CS_OFF=[[8,0],[-8,0],[0,4],[0,-6],[5.6,3],[-5.6,3],[5.6,-5],[-5.6,-5]];
 function canStand(x,y,hopping=false){
-  const r=8;
-  for(const [ox,oy] of [[r,0],[-r,0],[0,4],[0,-6],[r*.7,3],[-r*.7,3],[r*.7,-5],[-r*.7,-5]]){
-    const tx=Math.floor((x+ox)/TS),ty=Math.floor((y+oy)/TS);
-    if(hopping){
-      const tt=terAt(tx,ty),o=objAt(tx,ty);
-      if(o&&['bld','tree','palm','rock'].includes(o.k))return false;
-      if(tt===T_CLIFF)return false;
-    }else if(blockedTile(tx,ty))return false;
-  }
+  const air=hopping&&!inHouse();
+  for(let k=0;k<8;k++){const q=CS_OFF[k],tx=Math.floor((x+q[0])/TS),ty=Math.floor((y+q[1])/TS);
+    if(air){if(!inb(tx,ty))return false;const o=objAt(tx,ty);if(o&&(o.k==='bld'||o.k==='tree'||o.k==='palm'||o.k==='rock'))return false}
+    else if(blockedTile(tx,ty))return false}
   return true;
 }
 function hopBike(){
@@ -1147,8 +1185,11 @@ function updatePlayer(dt){
   if(G.hopZ>0||G.hopVy){
     G.hopZ=(G.hopZ||0)+(G.hopVy||0)*dt;
     G.hopVy=(G.hopVy||0)-380*dt;
-    if(G.hopZ<=0){G.hopZ=0;G.hopVy=0;sfx('land');dust(G.px,G.py)}
+    if(G.hopZ<=0){G.hopZ=0;G.hopVy=0;sfx('land');dust(G.px,G.py);
+      // landed in water / on a blocked tile: back to the last solid ground in this world
+      const LG=G.lastGround;if(!inHouse()&&LG.w===W&&!canStand(G.px,G.py,false)){G.px=LG.x;G.py=LG.y;splash(G.px,G.py-6,6)}}
   }
+  if(!(G.hopZ>0)&&!inHouse()&&canStand(G.px,G.py,false)){const LG=G.lastGround;LG.x=G.px;LG.y=G.py;LG.w=W}
   const v=(G.busy||G.pose>0||G.swing>0||panelOpen())?null:inputVec();G.moving=false;
   if(!v){G.step=0;return}
   if(G.cast)cancelCast();
@@ -1188,7 +1229,7 @@ const cv=$('cv'),ctx=cv.getContext('2d');
 let CW=innerWidth,CH=innerHeight,DPR=1,Z=1,P=null,LIGHTS=[];
 const EMOJI_FONT='"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
 const UIF='ui-rounded,"Segoe UI Rounded","Arial Rounded MT Bold","Segoe UI",system-ui,sans-serif';
-function resize(){DPR=Math.min(2,devicePixelRatio||1);CW=innerWidth;CH=innerHeight;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);Z=clamp(Math.min(CW/(13*TS),CH/(9*TS)),1,2.1);EMO.clear();G.snapCam=true}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);CW=innerWidth;CH=innerHeight;cv.width=Math.round(CW*DPR);cv.height=Math.round(CH*DPR);{const r=$('radarMap'),n=Math.round(110*DPR);if(r&&r.width!==n){r.width=r.height=n;RD.last=-9}}Z=clamp(Math.min(CW/(13*TS),CH/(9*TS)),1,2.1);EMO.clear();G.snapCam=true}
 const EMO=new Map();
 function emo(ch,size){const sc=Math.min(4,Math.ceil(DPR*Z*2)/2),k=ch+'|'+size+'|'+sc;let c=EMO.get(k);
   if(!c){if(EMO.size>700)EMO.clear();const p=Math.ceil(size*sc*1.3);c=document.createElement('canvas');c.width=c.height=p;const g=c.getContext('2d');
@@ -1201,7 +1242,7 @@ const isNightLight=()=>{const h=clk().h;return h>=18||h<6};
 function palette(){const m=effMonth(),snow=m===12||m<=2;
   const g=snow?['#eef4f6','#e1ebf0','#b8c8d2']:m>=3&&m<=5?['#86d06a','#7bc45f','#5b9c47']:m>=6&&m<=8?['#62bd52','#57b04a','#3f8a3b']:m===9?['#80bf55','#75b34c','#548c3c']:m===10?['#a2bd52','#96b14b','#6f8a3a']:['#b7aa58','#aa9d50','#857a3d'];
   return {deep:'#3a8fc7',sea:'#5bbfe6',surf:'#8fdcf2',sand:'#f1dfa6',sand2:'#e3cc8a',grass:g[0],grass2:g[1],lip:g[2],river:'#69c8ec',dirt:snow?'#e2d7c6':'#dcbf8c',dirt2:snow?'#d3c6b2':'#c9a870',snow,m}}
-const groundSig=()=>palette().grass+'|'+(W.kind==='tour'?'t':'i');
+const groundSig=()=>palette().grass+'|'+(isTour()?'t':'i');
 function blob(g,w,test,color,rad,oy=0){g.fillStyle=color;const R=rad*TS;g.beginPath();
   for(let y=0;y<w.H;y++)for(let x=0;x<w.W;x++){if(!test(w.ter[y*w.W+x]))continue;const cx=(x+.5)*TS,cy=(y+.5)*TS+oy;g.moveTo(cx+R,cy);g.arc(cx,cy,R,0,6.2832);
     const rt=x+1<w.W&&test(w.ter[y*w.W+x+1]),dn=y+1<w.H&&test(w.ter[(y+1)*w.W+x]);if(rt)g.rect(cx,cy-R,TS,2*R);if(dn)g.rect(cx-R,cy,2*R,TS);if(rt&&dn&&test(w.ter[(y+1)*w.W+x+1]))g.rect(cx,cy,TS,TS)}
@@ -1224,7 +1265,7 @@ function buildGround(w){
     if(t===T_BRIDGE){g.fillStyle='#b98250';g.fillRect(X-2,Y+5,TS+4,TS-10);g.fillStyle='#9a6a3e';for(let k=4;k<TS;k+=7)g.fillRect(X+k,Y+5,1.5,TS-10);g.fillStyle='#7a5230';g.fillRect(X-2,Y+3,TS+4,3);g.fillRect(X-2,Y+TS-6,TS+4,3)}}
   if(w.dock){const d=w.dock;for(let k=1;k<=5;k++){const x=d.door.x,y=d.door.y+k;if(y>=w.H||!isWaterT(w.ter[y*w.W+x]))continue;
       g.fillStyle='#b98250';g.fillRect(x*TS+3,y*TS,TS-6,TS);g.fillStyle='#9a6a3e';for(let j=4;j<TS;j+=7)g.fillRect(x*TS+3,y*TS+j,TS-6,1.5);g.fillStyle='#7a5230';g.fillRect(x*TS+1,y*TS+TS-4,4,8);g.fillRect(x*TS+TS-5,y*TS+TS-4,4,8)}}
-  if(w.kind!=='tour'&&w.plaza){const X=(w.plaza.x)*TS,Y=(w.plaza.y)*TS;g.fillStyle=p.dirt2;g.beginPath();g.arc(X,Y,TS*1.5,0,6.3);g.fill();g.fillStyle=p.dirt;g.beginPath();g.arc(X,Y,TS*1.2,0,6.3);g.fill();
+  if(!w.kind.startsWith('tour')&&w.plaza){const X=(w.plaza.x)*TS,Y=(w.plaza.y)*TS;g.fillStyle=p.dirt2;g.beginPath();g.arc(X,Y,TS*1.5,0,6.3);g.fill();g.fillStyle=p.dirt;g.beginPath();g.arc(X,Y,TS*1.2,0,6.3);g.fill();
     g.fillStyle=p.dirt2;for(let k=0;k<8;k++){const a=k/8*6.283;g.beginPath();g.arc(X+Math.cos(a)*TS*.8,Y+Math.sin(a)*TS*.8,4,0,6.3);g.fill()}}
   return c;
 }
@@ -1448,7 +1489,7 @@ function drawNpc(a){
   ctx.fillStyle=shade(P2.col,-40);E(x-4,y-2,3.5,2.2);E(x+4,y-2,3.5,2.2);
   ctx.fillStyle=P2.col;rrect(x-8,y-18-bob,16,15,7);ctx.fillStyle='rgba(255,255,255,.35)';rrect(x-4,y-15-bob,8,8,4);
   drawEmo(P2.e,x,y-28-bob,22);
-  if(a.rosie){drawEmo('🧺',x+11,y-10,12)}else if(a.derby)drawEmo('🏆',x+11,y-10,12)
+  if(a.rosie){drawEmo('🧺',x+11,y-10,12)}else if(a.derby)drawEmo('🏆',x+11,y-10,12);else if(a.busker)drawEmo('🎸',x+11,y-10,12)
   if(a.em&&a.emt>0){ctx.fillStyle='#fffaf0';rrect(x+6,y-56,20,17,8);drawEmo(a.em,x+16,y-47.5,11)}
   const d=Math.hypot(G.px-x,G.py-y);
   if(d<TS*2.4||a.st==='talk'){ctx.font=`800 9px ${UIF}`;const tw=ctx.measureText(P2.n).width+12;ctx.fillStyle='rgba(255,250,240,.95)';rrect(x-tw/2,y-54,tw,14,7);ctx.fillStyle='#4a3a28';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(P2.n,x,y-46.5)}
@@ -1467,16 +1508,21 @@ function drawFishShadow(o){ctx.save();ctx.translate(o.x,o.y);ctx.rotate(o.ang);c
   else{ctx.beginPath();ctx.ellipse(0,0,r,r*.55,0,0,6.283);ctx.fill();ctx.beginPath();ctx.moveTo(-r*.8,0);ctx.lineTo(-r*1.35,-r*.35);ctx.lineTo(-r*1.35,r*.35);ctx.fill();
     if(o.f.sz===7){ctx.fillStyle=`rgba(30,55,80,${.75*o.al})`;ctx.beginPath();ctx.moveTo(-4,0);ctx.lineTo(4,-1.5);ctx.lineTo(4,1.5);ctx.fill();ctx.fillRect(-1,-5,3,10)}}
   ctx.restore()}
-function tintNow(){const c=clk(),h=c.h+c.mi/60;
-  const K=[[0,[78,88,150]],[4.5,[78,88,150]],[5.6,[160,140,175]],[6.6,[255,228,200]],[7.6,[255,255,255]],[16.6,[255,255,255]],[18,[255,200,160]],[19.2,[130,118,175]],[20.4,[78,88,150]],[24,[78,88,150]]];
-  for(let i=0;i<K.length-1;i++)if(h>=K[i][0]&&h<K[i+1][0]){const t=(h-K[i][0])/(K[i+1][0]-K[i][0]);return K[i][1].map((v,j)=>Math.round(lerp(v,K[i+1][1][j],t)))}return [255,255,255]}
+// day tint keyframes [hour,[r,g,b]]; tintNow() writes into one reused array (callers must not keep it)
+const TINT_K=[[0,[78,88,150]],[4.5,[78,88,150]],[5.6,[160,140,175]],[6.6,[255,228,200]],[7.6,[255,255,255]],[16.6,[255,255,255]],[18,[255,200,160]],[19.2,[130,118,175]],[20.4,[78,88,150]],[24,[78,88,150]]],TINT=[255,255,255];
+function tintNow(){const c=clk(),h=c.h+c.mi/60,K=TINT_K;
+  for(let i=0;i<K.length-1;i++)if(h>=K[i][0]&&h<K[i+1][0]){const t=(h-K[i][0])/(K[i+1][0]-K[i][0]),a=K[i][1],b=K[i+1][1];for(let j=0;j<3;j++)TINT[j]=Math.round(lerp(a[j],b[j],t));return TINT}
+  TINT[0]=TINT[1]=TINT[2]=255;return TINT}
+// night-light glow: one pre-rendered warm radial sprite, drawn additively with globalAlpha (no per-light gradients)
+const GLOW=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(255,200,110,1)');gr.addColorStop(1,'rgba(255,200,110,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);return c})();
+function drawGlows(a){if(!LIGHTS.length||a<=0)return;ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a;
+  for(let i=0;i<LIGHTS.length;i++){const L=LIGHTS[i],r=L[2];ctx.drawImage(GLOW,L[0]-r,L[1]-r,r*2,r*2)}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over'}
 function overlays(){
   const vw=CW/Z,vh=CH/Z,x=G.cam.x,y=G.cam.y,wx=weather();
   if(wx!=='sunny'){ctx.fillStyle=wx==='cloudy'?'rgba(90,100,120,.12)':'rgba(70,80,110,.2)';ctx.fillRect(x,y,vw,vh)}
   const t=tintNow();if(t[0]<255||t[1]<255||t[2]<255){ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgb(${t[0]},${t[1]},${t[2]})`;ctx.fillRect(x,y,vw,vh);
-    ctx.globalCompositeOperation='lighter';const dark=1-(t[0]+t[1]+t[2])/765;
-    for(const [lx,ly,lr] of LIGHTS){const g=ctx.createRadialGradient(lx,ly,0,lx,ly,lr);g.addColorStop(0,`rgba(255,200,110,${.55*Math.min(1,dark*2.2)})`);g.addColorStop(1,'rgba(255,200,110,0)');ctx.fillStyle=g;ctx.fillRect(lx-lr,ly-lr,lr*2,lr*2)}
-    ctx.globalCompositeOperation='source-over'}
+    ctx.globalCompositeOperation='source-over';const dark=1-(t[0]+t[1]+t[2])/765;drawGlows(.55*Math.min(1,dark*2.2))}
   // fireworks
   if(calm()){for(const b of bursts){ctx.globalAlpha=Math.max(0,1-b.t/b.l)*.35;ctx.fillStyle=b.c;circ(b.x,b.y,b.r*.7)}ctx.globalAlpha=1}
   else for(const b of bursts){const k=b.t/b.l;for(let i=0;i<b.n;i++){const a=i/b.n*6.283,r=b.r*Math.sqrt(k);ctx.fillStyle=b.c;ctx.globalAlpha=Math.max(0,1-k);circ(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r+k*k*14,2)}ctx.globalAlpha=1}
@@ -1556,44 +1602,38 @@ function renderHouse(room=null){
   hdPush(G.py,3,null);hdSort();for(let i=0;i<HN;i++)hdDraw(HOUSE_DRAW[i],L);
   if(G.hintTile&&!G.busy){const [hx,hy]=G.hintTile;ctx.strokeStyle='rgba(255,250,240,.8)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.ellipse((hx+.5)*TS,(hy+.8)*TS,12,5,0,0,6.283);ctx.stroke();ctx.setLineDash([])}
   for(const p of parts){ctx.globalAlpha=clamp(p.l/p.ml,0,1);if(p.txt)drawEmo(p.txt,p.x,p.y,10);else{ctx.fillStyle=p.c;circ(p.x,p.y,p.r)}}ctx.globalAlpha=1;
-  ctx.globalCompositeOperation='lighter';for(const [lx,ly,lr] of LIGHTS){const g=ctx.createRadialGradient(lx,ly,0,lx,ly,lr);g.addColorStop(0,'rgba(255,200,110,.28)');g.addColorStop(1,'rgba(255,200,110,0)');ctx.fillStyle=g;ctx.fillRect(lx-lr,ly-lr,lr*2,lr*2)}ctx.globalCompositeOperation='source-over';
+  drawGlows(.28);
 }
-function renderRadar(){
-  const c=$('radarMap');if(!c||c.hidden)return;
-  const g=c.getContext('2d'),w=W,rw=c.width,rh=c.height;
-  g.clearRect(0,0,rw,rh);
-  g.save();
-  g.beginPath();g.arc(rw/2,rh/2,rw/2-3,0,6.283);g.clip();
-  g.fillStyle='rgba(15,23,42,0.85)';g.fillRect(0,0,rw,rh);
-  g.strokeStyle='rgba(56,189,248,0.2)';g.lineWidth=1;
-  [20,40,60].forEach(r=>{g.beginPath();g.arc(rw/2,rh/2,r,0,6.283);g.stroke()});
-  g.beginPath();g.moveTo(rw/2,0);g.lineTo(rw/2,rh);g.moveTo(0,rh/2);g.lineTo(rw,rh/2);g.stroke();
-  const swp=(G.t*2)%6.283;
-  g.strokeStyle='rgba(56,189,248,0.45)';g.lineWidth=1.5;
-  g.beginPath();g.moveTo(rw/2,rh/2);g.lineTo(rw/2+Math.cos(swp)*(rw/2-4),rh/2+Math.sin(swp)*(rw/2-4));g.stroke();
-  const sx=rw/(w.W*TS),sy=rh/(w.H*TS),cx=rw/2,cy=rh/2;
-  for(const b of w.B||[]){
-    const bx=cx+(b.x*TS-G.px)*sx*2.2,by=cy+(b.y*TS-G.py)*sy*2.2;
-    if(bx>4&&bx<rw-4&&by>4&&by<rh-4){g.fillStyle='#fbbf24';g.fillRect(bx-2,by-2,5,5)}
-  }
-  for(const a of npcs()){
-    const ax=cx+(a.x-G.px)*sx*2.2,ay=cy+(a.y-G.py)*sy*2.2;
-    if(ax>4&&ax<rw-4&&ay>4&&ay<rh-4){g.fillStyle='#a855f7';g.beginPath();g.arc(ax,ay,2.5,0,6.283);g.fill()}
-  }
-  for(const f of fishes){
-    const fx=cx+(f.x-G.px)*sx*2.2,fy=cy+(f.y-G.py)*sy*2.2;
-    if(fx>4&&fx<rw-4&&fy>4&&fy<rh-4){g.fillStyle='#38bdf8';g.beginPath();g.arc(fx,fy,1.8,0,6.283);g.fill()}
-  }
-  for(const b of bugs){
-    const bx=cx+(b.x-G.px)*sx*2.2,by=cy+(b.y-G.py)*sy*2.2;
-    if(bx>4&&bx<rw-4&&by>4&&by<rh-4){g.fillStyle='#4ade80';g.beginPath();g.arc(bx,by,1.8,0,6.283);g.fill()}
-  }
-  g.fillStyle='#ef4444';g.strokeStyle='#ffffff';g.lineWidth=1.5;
-  g.beginPath();g.arc(cx,cy,4,0,6.283);g.fill();g.stroke();
-  g.strokeStyle='#ef4444';g.lineWidth=2;
-  g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+G.fx*7,cy+G.fy*7);g.stroke();
+// radar HUD: cached canvas/context, 110*DPR backing store, redrawn at 15 Hz, plain loops (no per-frame arrays); sweep frozen under reduce motion
+const RD={c:null,g:null,last:-9,swp:-1.5708,on:null};
+function radarDot(g,x,y,r,col){if(x>4&&x<106&&y>4&&y<106){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,6.283);g.fill()}}
+function renderRadar(force){
+  const c=RD.c||(RD.c=$('radarMap'));if(!c||c.hidden||!S||inHouse())return;
+  if(!force&&G.t-RD.last<1/15&&G.t>=RD.last)return;RD.last=G.t;
+  const g=RD.g||(RD.g=c.getContext('2d')),w=W,R=55,k=c.width/110;
+  g.setTransform(k,0,0,k,0,0);g.clearRect(0,0,110,110);g.save();
+  g.beginPath();g.arc(R,R,R-3,0,6.283);g.clip();
+  g.fillStyle='rgba(15,23,42,0.85)';g.fillRect(0,0,110,110);
+  g.strokeStyle='rgba(56,189,248,0.2)';g.lineWidth=1;g.beginPath();for(let r=18;r<R;r+=18){g.moveTo(R+r,R);g.arc(R,R,r,0,6.283)}
+  g.moveTo(R,0);g.lineTo(R,110);g.moveTo(0,R);g.lineTo(110,R);g.stroke();
+  if(!calm())RD.swp=(G.t*2)%6.283;const swp=RD.swp;
+  g.strokeStyle='rgba(56,189,248,0.45)';g.lineWidth=1.5;g.beginPath();g.moveTo(R,R);g.lineTo(R+Math.cos(swp)*(R-4),R+Math.sin(swp)*(R-4));g.stroke();
+  const sx=110/(w.W*TS)*2.2,sy=110/(w.H*TS)*2.2,px=G.px,py=G.py;
+  g.fillStyle='#fbbf24';for(let i=0;i<w.B.length;i++){const b=w.B[i],bx=R+(b.x*TS-px)*sx,by=R+(b.y*TS-py)*sy;if(bx>4&&bx<106&&by>4&&by<106)g.fillRect(bx-2,by-2,5,5)}
+  if(w===ISLE){const A=villActors();for(let i=0;i<A.length;i++){const a=A[i];if(!a.home)radarDot(g,R+(a.x-px)*sx,R+(a.y-py)*sy,2.5,'#a855f7')}
+    if(rosieHere())radarDot(g,R+(ROSIE.x-px)*sx,R+(ROSIE.y-py)*sy,2.5,'#a855f7');if(derbyKind())radarDot(g,R+(TOURNEY.x-px)*sx,R+(TOURNEY.y-py)*sy,2.5,'#a855f7');
+    if(buskerHere())radarDot(g,R+(BUSKER.x-px)*sx,R+(BUSKER.y-py)*sy,2.5,'#a855f7')}
+  if(w.camper)radarDot(g,R+(w.camper.x-px)*sx,R+(w.camper.y-py)*sy,2.5,'#a855f7');
+  for(let i=0;i<fishes.length;i++){const f=fishes[i];radarDot(g,R+(f.x-px)*sx,R+(f.y-py)*sy,1.8,'#38bdf8')}
+  for(let i=0;i<bugs.length;i++){const b=bugs[i];radarDot(g,R+(b.x-px)*sx,R+(b.y-py)*sy,1.8,'#4ade80')}
+  g.fillStyle='#ef4444';g.strokeStyle='#ffffff';g.lineWidth=1.5;g.beginPath();g.arc(R,R,4,0,6.283);g.fill();g.stroke();
+  g.strokeStyle='#ef4444';g.lineWidth=2;g.beginPath();g.moveTo(R,R);g.lineTo(R+G.fx*7,R+G.fy*7);g.stroke();
   g.restore();
 }
+// radar toggle lives in S.set.radar; hidden indoors (photo mode hides the whole HUD it sits in)
+function syncRadar(){const c=RD.c||(RD.c=$('radarMap')),on=!!(S&&S.set.radar),hid=!on||inHouse();if(c.hidden!==hid){c.hidden=hid;RD.last=-9;document.body.classList.toggle('radarOn',!hid)}
+  if(RD.on!==on){RD.on=on;const b=$('bRadar');b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))}}
+function toggleRadar(){if(!S)return;S.set.radar=S.set.radar?0:1;syncRadar();sfx('tool');save()}
 function render(){
   if(!S)return;if(!P||G.t-(G.pT||-9)>2){P=palette();G.pT=G.t}
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=inHouse()?'#2e2418':P.deep;ctx.fillRect(0,0,cv.width,cv.height);
@@ -1682,7 +1722,7 @@ function sting(){
 }
 function faint(msg){if(G.faint>0)return;cancelCast();derbyCancel();G.faint=2.4;sfx('faint');toast(msg);vibrate(200)}
 function wakeUp(){S.flags.stung=0;G.stung=0;prune(bugs,b=>b.sp!=='wasp'&&!b.b.chase);
-  if(G.scene==='tour'){const d=W.dock;G.px=(d.door.x+.5)*TS;G.py=(d.door.y+.6)*TS}else{const h=ISLE.B.find(b=>b.t==='home');G.px=(h.door.x+.5)*TS;G.py=(h.door.y+.75)*TS}
+  if(isTour()){const d=W.dock;G.px=(d.door.x+.5)*TS;G.py=(d.door.y+.6)*TS}else{const h=ISLE.B.find(b=>b.t==='home');G.px=(h.door.x+.5)*TS;G.py=(h.door.y+.75)*TS}
   G.fx=0;G.fy=1;G.snapCam=true;toast('...You woke up feeling much better.')}
 function swingNet(){
   G.swing=.32;sfx('swish');if(catchDrift())return;const reach=1.75*TS,fa=Math.atan2(G.fy,G.fx);let got=null,gd=1e9;
@@ -1821,6 +1861,7 @@ function placeSlot(i){
     toast('No room there. Face an empty spot on the floor (keep the doorway clear).');return false;
   }
   if(it.c==='furn'){
+    if(W!==ISLE||G.scene!=='island'){toast('Furniture can only be placed on your own island.');return false}   // tour worlds are discarded on returnHome
     for(const [x,y] of frontCands()){
       if(x<0||y<0||x>=W.W||y>=W.H||(x===px&&y===py))continue;
       if(!isLandT(terAt(x,y))||objAt(x,y)||blockedTile(x,y))continue;
@@ -1856,7 +1897,7 @@ function baitSlot(i){const n=Math.hypot(G.fx,G.fy)||1;
 /* ---------- conversations ---------- */
 function talkTo(a){return convo(async()=>{
   a.st='talk';const dx=G.px-a.x,dy=G.py-a.y,d=Math.hypot(dx,dy)||1;a.fx=dx/d;a.fy=dy/d;G.fx=-a.fx;G.fy=-a.fy;
-  try{if(a.derby)await talkDerby();else if(a.rosie)await talkRosie();else if(a.camper)await talkCamper(a);else await talkVillager(a)}finally{a.st='idle';a.t=1.5}})}
+  try{if(a.derby)await talkDerby();else if(a.busker)await talkBusker();else if(a.rosie)await talkRosie();else if(a.camper)await talkCamper(a);else await talkVillager(a)}finally{a.st='idle';a.t=1.5}})}
 async function talkVillager(a){
   const v=a.v,P=a.P,d=today(),c=clk(),T=s=>fillT(s,P);
   const first=v.td!==d;if(first){v.td=d;v.fr=Math.min(255,v.fr+1);stat('talks')}
@@ -1900,6 +1941,25 @@ async function talkRosie(){
   if(ch===1){await say(P,'Prices at Bramble\'s change every morning and afternoon, Monday to Saturday. Some weeks they spike sky-high, some weeks they only fall.');await say(P,'They spoil when next Sunday comes, so sell them before then. Track prices on your ShellPhone. Good luck, oink!');return}
   if(ch===0){closeDlg();openPanel('🐗','Rosie\'s sunroots',renderSunBuy,{kind:'sun'})}
 }
+/* ---------- Tidewater Tunes: Piper busks Saturdays 8 PM-midnight ---------- */
+const GIG_T=36;
+function startGig(id,pv){if(!SONG_BY[id])return false;G.gig={song:id,t:pv?12:GIG_T,pv:!!pv,nt:0,np:0};return true}
+function endGig(){const g=G.gig;G.gig=null;if(!g||g.pv)return;const sg=SONG_BY[g.song],G2=S.gig;G2.heard[g.song]=1;
+  if(G2.last!==today()){G2.last=today();giveOrDrop('rec_'+g.song);toast(`💿 Piper gave you a record: ${sg[1]}! Play it at home on a record player.`,'big');learn('r_phono')}
+  else toast(`🎵 Bravo! That was "${sg[1]}".`);stat('gigs');save()}
+// song playing now: a live gig or preview, else at home the last placed record when a record player is placed
+function songNow(){if(G.gig)return G.gig.song;if(G.scene!=='house')return null;let ph=false,r=null;
+  for(const f of S.house.items){if(f.id==='fu_phono')ph=true;else{const it=IT[f.id];if(it&&it.rec)r=it.rec}}return ph?r:null}
+function pickSong(){return new Promise(res=>openPanel('🎵','Request a song',()=>"<p class=\"mute\">Pick a song for Piper. Songs you haven't heard yet are a mystery!</p><div class=\"list\">"+
+  SONGS.map((g,i)=>{const hd=S.gig.heard[g[0]];return li(hd?'🎵':'❔',hd?esc(g[1]):'???',hd?`${g[4]} bpm`:"A song you haven't heard yet",`<button class="btn" data-a="pickg" data-i="${i}">Request</button>`)}).join('')+'</div>',{resolve:res,kind:'pick'}))}
+async function talkBusker(){const P=BUSKER.P;
+  if(G.gig&&!G.gig.pv){await say(P,`Shh, here comes the best part of "${SONG_BY[G.gig.song][1]}", ${P.cp}!`);return}
+  if(!S.flags.piperMet){S.flags.piperMet=1;await say(P,`Evening! I'm Piper. Every Saturday night I strum island songs in the plaza until midnight, ${P.cp}.`)}
+  const ch=await ask(P,S.gig.last===today()?"Another song? I'm out of blank records tonight, but I'll gladly play.":"Got a request? Stay for the whole song and I'll give you a record of it!",['Request a song','Surprise me','Just listening']);
+  let id=null;if(ch===0){closeDlg();const i=await pickSong();if(!(i>=0)){await say(P,'No rush. Take your time!');return}id=SONGS[i][0]}
+  else if(ch===1){const un=SONGS.filter(g=>!S.gig.heard[g[0]]);id=pick(Math.random,un.length?un:SONGS)[0]}
+  else{await say(P,`Pull up a rock and enjoy the night air, ${P.cp}.`);return}
+  startGig(id);await say(P,`This one's called "${SONG_BY[id][1]}". Here we go, ${P.cp}!`)}
 /* ---------- Saturday derby ---------- */
 const DTIME=180,derbyClock=t=>{t=Math.max(0,Math.ceil(t));return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`};
 function startDerby(k=derbyKind()){if(!k)return false;G.tr={k,t:DTIME,score:0};uiDirty();return true}
@@ -1930,6 +1990,23 @@ async function talkCamper(a){
   const ch=await ask(P,`Hmm... is there room for me on ${S.island}?`,['Move to my island!','Maybe later']);
   if(ch===0){S.moveIn=a.p;a.asked=1;hearts(a.x,a.y-40);await say(P,`Really?! I'll pack up and move in tomorrow! See you soon, ${P.cp}!`)}else await say(P,'No worries! Enjoy your trip.')
 }
+// museum hall milestones: S.musRw[c] = highest tier (1-4 = 25/50/75/100%) already rewarded; one curator letter per hall per check (no retro bursts)
+const MUS_T=[25,50,75,100],MUS_RW=['DIY recipe','Tour ticket','10,000 chimes','Hall statue'],MUS_L={fish:FISH,bug:BUGS,fossil:FOSSILS},MUS_N={fish:['fish','fish'],bug:['bug','bugs'],fossil:['fossil','fossils']};
+function musProg(c){const L=MUS_L[c];let n=0;for(const x of L)if(S.don[c][x.i])n++;return {n,t:L.length,left:L.length-n}}
+function musCheck(){let sent=0;
+  for(const c in MUS_L){const {n,t}=musProg(c);let tier=0;while(tier<4&&n*100>=MUS_T[tier]*t)tier++;if(tier<=S.musRw[c])continue;S.musRw[c]=tier;sent++;
+    const H=c[0].toUpperCase()+c.slice(1)+' Hall',pre=`Hoo! The ${H} is now ${MUS_T[tier-1]}% complete, thanks to you, ${S.name}!`;
+    if(tier===1){const k=pickRecipe(BOTTLE_RECIPES);if(k){S.recipes.push(k);mail(OWL.n,`${pre} As thanks, here is a DIY recipe from my notes: the ${IT[RECIPES[k].out].n}. It is in your DIY Recipes app now.`)}
+      else{mail(OWL.n,`${pre} As thanks, please accept these chimes for your research.`,'bag');S.mail[0].gv=3000}}
+    else if(tier===2)mail(OWL.n,`${pre} A tour ticket is enclosed. Who knows what you will find on a mystery island!`,'ticket');
+    else if(tier===3){mail(OWL.n,`${pre} The museum board voted you a research grant. Hoo hoo!`,'bag');S.mail[0].gv=10000}
+    else mail(OWL.n,`${pre} Every last specimen is on display! This plaque shall hang by the entrance: "The ${H}, completed by ${S.name} of ${S.island}." Please accept this statue for your home. Hoo... I may be a little misty-eyed.`,'fu_hall'+c)}
+  if(!S.flags.goldQuill&&S.musRw.fish>=4&&S.musRw.bug>=4&&S.musRw.fossil>=4){S.flags.goldQuill=1;sent++;
+    mail(OWL.n,`${S.name}... every hall is complete. In all my years I have never seen the like. The museum awards you its highest honor, the Golden Quill. Hoo hoo, bravo!`,'fu_goldquill')}
+  if(sent){sfx('points');toast('🦉 Dr. Quillfeather sent you a letter!','big')}return sent}
+function musLine(){let best=null;for(const c in MUS_L){const p=musProg(c);if(p.left&&(!best||p.left<best.left)){best=p;p.c=c}}
+  if(!best)return 'Every hall is complete. What an honor, hoo!';const N=MUS_N[best.c];
+  return best.left<=5?`Only ${best.left} ${N[best.left===1?0:1]} left for the ${best.c} hall!`:`The ${best.c} hall is ${Math.floor(best.n*100/best.t)}% complete.`}
 function openShop(){return convo(async()=>{
   if(!shopOpen()){await say(SYS,'Bramble\'s is closed (open 8 AM to 10 PM). There\'s a drop-off box out front: items sell for 80% of their price.');closeDlg();openPanel('📦','Drop-off box',()=>renderSellList(.8),{kind:'shop'});return}
   const pr=sunPriceNow();if(pr&&S.sun){const c=clk();S.sun.seen[(c.dow-1)*2+(c.h>=12?1:0)]=pr}
@@ -1939,7 +2016,7 @@ function openMuseum(){return convo(async()=>{
   if(!S.flags.museum){S.flags.museum=1;await say(OWL,'Hoo! Welcome, welcome! I am Dr. Quillfeather, curator of this humble museum.');
     await say(OWL,'Bring me fish, bugs and fossils, and together we shall build a collection worthy of the ages! Hoo hoo!');
     await say(OWL,'Ah, and you will need a shovel to unearth fossils. Here is the recipe for one!');learn('r_sho0')}
-  else await say(OWL,pick(Math.random,['Hoo! What wonders have you brought me today?','Hoo hoo! Ah, it\'s you. I do hope you didn\'t bring any... bugs. *shudder* ...But I will accept them, for science.','Hoo! Did you know some fish only appear when it rains?']));
+  else await say(OWL,pick(Math.random,['Hoo! What wonders have you brought me today?','Hoo hoo! Ah, it\'s you. I do hope you didn\'t bring any... bugs. *shudder* ...But I will accept them, for science.','Hoo! Did you know some fish only appear when it rains?'])+' '+musLine());
   closeDlg();openPanel('🦉','Museum',renderMuseum,{tab:'donate',kind:'museum'})})}
 function openHall(){return convo(async()=>{
   if(!S.flags.hall){S.flags.hall=1;await say(CLERK,`Hi, ${S.name}! Welcome to Resident Services. You can craft at our workbench, redeem Tide Points, take out a home loan, or use the bank.`)}
@@ -1957,7 +2034,9 @@ function openDock(){return convo(async()=>{
 function tween(fn,a,b,dur){return new Promise(res=>{const t0=performance.now();const tick=()=>{const k=Math.min(1,(performance.now()-t0)/(dur*1000));fn(lerp(a,b,k));if(k<1)requestAnimationFrame(tick);else res()};tick()})}
 async function fly(fn){sfx('plane');const d=calm()?.15:.7;await tween(v=>{G.fade=v},0,1,d);fn();G.snapCam=true;updateCam(1);save();await tween(v=>{G.fade=v},1,0,d);G.fade=0}
 function startTour(kind='tour'){derbyCancel();
-  const seed=(Math.random()*2**31)>>>0,w=genWorld(seed,kind),r=mulberry(seed^99);
+  // expedition shapes can fail generation for a seed family: retry with fresh seeds, then fall back to a classic tour (never strand the flight)
+  let seed=0,w=null;for(let k=0;k<6&&!w;k++){seed=(Math.random()*2**31)>>>0;try{w=genWorld(seed,kind)}catch(e){}}
+  if(!w){kind='tour';w=genWorld(seed,kind)}const r=mulberry(seed^99);
   const taken=new Set(S.vill.map(v=>v.p));if(S.moveIn!=null)taken.add(S.moveIn);const pool=VPOOL.map((_,i)=>i).filter(i=>!taken.has(i));
   if(pool.length&&r()<.65){const p=pick(r,pool),t=randTile(w,r,(x,y,tt,o)=>tt===T_GRASS&&!o&&Math.hypot(x-w.plaza.x,y-w.plaza.y)>5);if(t)w.camper={P:VPOOL[p],p,camper:true,x:(t[0]+.5)*TS,y:(t[1]+.5)*TS,fx:0,fy:1,st:'idle',step:0}}
   const put=(pred,o)=>{const t=randTile(w,r,pred);if(t)w.obj[t[1]*w.W+t[0]]=o};
@@ -2008,7 +2087,7 @@ function updateDlg(dt){if(!DLG.on||DLG.shown>=DLG.full.length)return;DLG.acc+=dt
   DLG.shown=Math.min(DLG.full.length,DLG.shown+n);$('dText').textContent=DLG.full.slice(0,DLG.shown);
   const ch=DLG.full[DLG.shown-1];if(DLG.who&&DLG.who.n&&/[a-z]/i.test(ch)&&(DLG.blipN=(DLG.blipN||0)+1)%2===0)blip(ch,DLG.who.pitch||1);
   if(DLG.shown>=DLG.full.length)dlgDone()}
-function dlgDone(){$('dText').textContent=DLG.full;if(DLG.choices)$('dCh').innerHTML=DLG.choices.map((c,i)=>`<button type="button" data-i="${i}" class="${i===DLG.sel?'sel':''}">${esc(c)}</button>`).join('');else $('dNext').hidden=false}
+function dlgDone(){$('dText').textContent=DLG.full;if(DLG.choices)$('dCh').innerHTML=DLG.choices.map((c,i)=>`<button type="button" role="option" aria-selected="${i===DLG.sel}" data-i="${i}" class="${i===DLG.sel?'sel':''}">${!isTouch&&i<4?`<span class="num">${i+1}</span> `:''}${esc(c)}</button>`).join('');else $('dNext').hidden=false}
 function dlgAdvance(){if(!DLG.on)return;if(DLG.shown<DLG.full.length){DLG.shown=DLG.full.length;dlgDone();return}if(DLG.choices){choose(DLG.sel);return}
   const r=DLG.res;DLG.res=null;DLG.on=false;$('dlg').hidden=true;sfx('blip2');r&&r()}
 function choose(i){if(!DLG.on)return;const r=DLG.res;DLG.res=null;DLG.on=false;$('dlg').hidden=true;sfx('blip2');r&&r(i)}
@@ -2016,12 +2095,18 @@ function closeDlg(){if(!DLG.on)$('dlg').hidden=true}
 $('dlgBox').addEventListener('click',()=>{if(!DLG.choices||DLG.shown<DLG.full.length)dlgAdvance()});
 $('dCh').addEventListener('click',e=>{const b=e.target.closest('button');if(b)choose(+b.dataset.i)});
 
-const PAN={open:false,render:null,tab:null,sel:-1,resolve:null,kind:'',after:null,moving:null,arg:null};
+const PAN={open:false,render:null,tab:null,sel:-1,resolve:null,kind:'',after:null,moving:null,arg:null,opener:null,op:null};
 const panelOpen=()=>PAN.open;
-function openPanel(icon,title,render,o={}){Object.assign(PAN,{open:true,bl:null,render,tab:o.tab||null,sel:-1,resolve:o.resolve||null,kind:o.kind||'',after:null,moving:null,arg:o.arg||null,confirm:null});
-  $('pIcon').textContent=icon;$('pTitle').textContent=title;$('panel').hidden=false;$('pBody').scrollTop=0;refreshPanel();sfx('open');setTimeout(()=>{if(PAN.open)$('pClose').focus({preventScroll:true})},30)}
+function openPanel(icon,title,render,o={}){const wasOpen=PAN.open;Object.assign(PAN,{open:true,bl:null,render,tab:o.tab||null,sel:-1,resolve:o.resolve||null,kind:o.kind||'',after:null,moving:null,arg:o.arg||null,confirm:null});
+  $('pIcon').textContent=icon;$('pTitle').textContent=title;$('panel').hidden=false;$('pBody').scrollTop=0;refreshPanel();sfx('open');
+  if(!wasOpen){const a=document.activeElement;PAN.opener=PAN.op||(a&&a!==document.body&&!$('panel').contains(a)?a:null)}const f=panelFocusables()[0];if(f)f.focus({preventScroll:true})}
+// keyboard focus: kept inside #pWin while a panel is open, returned to the control that opened it
+function panelFocusables(){const L=$('pWin').querySelectorAll('button,input,select,textarea,[tabindex]'),out=[];
+  for(const el of L)if(!el.disabled&&el.tabIndex>=0&&!el.hidden&&el.offsetParent!==null)out.push(el);return out}
+function trapTab(back){const L=panelFocusables();if(!L.length)return;const i=L.indexOf(document.activeElement);L[i<0?(back?L.length-1:0):(i+(back?L.length-1:1))%L.length].focus({preventScroll:true})}
 function refreshPanel(){if(!PAN.open)return;const b=$('pBody'),st=b.scrollTop;PAN.after=null;b.innerHTML=PAN.render();b.scrollTop=st;if(PAN.after)PAN.after()}
-function closePanel(){if(!PAN.open)return;PAN.open=false;$('panel').hidden=true;const r=PAN.resolve;PAN.resolve=null;if(r)r(-1);sfx('close');cv.focus({preventScroll:true})}
+function closePanel(){if(!PAN.open)return;PAN.open=false;$('panel').hidden=true;const r=PAN.resolve;PAN.resolve=null;if(r)r(-1);sfx('close');
+  const o=PAN.opener;PAN.opener=null;(o&&o.isConnected&&o.offsetParent!==null?o:cv).focus({preventScroll:true})}
 $('pClose').onclick=closePanel;
 $('panel').addEventListener('pointerdown',e=>{if(e.target.id==='panel')closePanel()});
 $('pBody').addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const f=PA[el.dataset.a];if(f){const keep=f(el.dataset,el);if(PAN.open&&keep!==false)refreshPanel();uiDirty()}});
@@ -2071,6 +2156,7 @@ const PA={
   release:d=>{const s=S.inv[+d.i];takeSlot(+d.i,1);PAN.sel=-1;toast(`Bye-bye, ${IT[s.id].n.toLowerCase()}! Take care!`);sfx('pluck')},
   drop:d=>{if(dropSlot(+d.i))PAN.sel=-1},
   // shop
+  order:d=>{orderCat(d.id)},
   buy:d=>{const id=d.id,pr=+d.p;if(d.rc){if(S.coins<pr){toast('You don\'t have enough chimes.');return}S.coins-=pr;S.dly.shop.bought[d.k]=1;learn(d.rc);sfx('coins');return}
     if(buy(id,pr,d.k))toast(`Bought: ${IT[id].n}!`)},
   sell1:d=>sellSlot(+d.i,false,+d.m||1),
@@ -2084,10 +2170,10 @@ const PA={
     if(!canAdd('sunroot',q,{wk:S.sun.week})){toast('Not enough room in your pockets for that many.');return}
     S.coins-=cost;addItem('sunroot',q,{wk:S.sun.week});S.sun.spent+=cost;S.sun.bought+=q;sfx('coins');toast(`🥔 Bought ${q} sunroots for ${fmt(cost)} chimes. Sell them before next Sunday!`)},
   // museum
-  donate:d=>{const s=S.inv[+d.i];if(!s)return;const it=IT[s.id],cat=it.c,idx=+s.id.slice(2);S.don[cat][idx]=today();takeSlot(+d.i,1);stat('donated');sfx('learn');
+  donate:d=>{const s=S.inv[+d.i];if(!s)return;const it=IT[s.id],cat=it.c,idx=+s.id.slice(2);S.don[cat][idx]=today();takeSlot(+d.i,1);stat('donated');sfx('learn');musCheck();
     toast(pick(Math.random,[`🦉 Hoo! A splendid ${it.n.toLowerCase()}! I shall display it at once.`,`🦉 Marvelous! The ${it.n.toLowerCase()} is a fine addition!`,`🦉 Hoo hoo! Science thanks you for this ${it.n.toLowerCase()}!`]))},
   donall:()=>{let n=0;for(let i=0;i<S.inv.length;i++){const s=S.inv[i];if(!s)continue;const it=IT[s.id];if(['fish','bug','fossil'].includes(it.c)&&!S.don[it.c][+s.id.slice(2)]){S.don[it.c][+s.id.slice(2)]=today();takeSlot(i,1);stat('donated');n++}}
-    if(n){sfx('learn');toast(`🦉 Hoo! ${n} new exhibit${n>1?'s':''} for the museum!`)}},
+    if(n){sfx('learn');toast(`🦉 Hoo! ${n} new exhibit${n>1?'s':''} for the museum!`);musCheck()}},
   assess:()=>{let n=0;for(let i=0;i<S.inv.length;i++){const s=S.inv[i];if(s&&s.id==='fossilU'){const und=FOSSILS.filter(f=>!S.don.fossil[f.i]&&!S.inv.some(q=>q&&q.id===f.id)),f=und.length&&Math.random()<.65?pick(Math.random,und):pick(Math.random,FOSSILS);S.inv[i]={id:f.id,q:1};S.pedia.fossil[f.i]=1;n++}}
     if(n){sfx('fanfare');toast(`🦉 Assessed ${n} fossil${n>1?'s':''}!`)}},
   // hall
@@ -2103,11 +2189,15 @@ const PA={
   stOut:d=>{const s=S.stor[+d.i];if(!s)return;const it=IT[s.id],take=Math.min(s.q,it.s);if(!canAdd(s.id,take,s)){toast('Your pockets are full!');return}
     addItem(s.id,take,s.wk?{wk:s.wk}:s.d!=null?{d:s.d}:null);s.q-=take;if(s.q<=0)S.stor.splice(+d.i,1);sfx('pick')},
   // mail
-  take:d=>{const m=S.mail[+d.i];if(!m||!m.gift)return;if(m.gift==='bag'){earn(m.gv||100);toast(`💰 +${fmt(m.gv||100)} chimes`);m.gift=null;return}const q=m.q||1;if(!canAdd(m.gift,q,m.gx)){toast('Your pockets are full!');return}addItem(m.gift,q,m.gx);toast(`Got the ${IT[m.gift].n.toLowerCase()}${q>1?' ×'+q:''}!`);m.gift=null;sfx('pick')},
+  take:d=>{const m=S.mail[+d.i];if(!m||!m.gift)return;const g=m.gift,v=m.gv||100,q=m.q||1,r=takeMail(m);if(r<0){toast('Your pockets are full!');return}
+    if(g==='bag'){sfx('coins');toast(`💰 +${fmt(v)} chimes`)}else if(r){toast(`Got the ${IT[g].n.toLowerCase()}${q>1?' ×'+q:''}!`);sfx('pick')}},
+  takeall:()=>{let n=0,c=0,full=false;for(const m of S.mail){if(!m.gift)continue;const v=m.gift==='bag'?m.gv||100:0,r=takeMail(m);if(r<0){full=true;break}if(r){n++;c+=v;m.read=1}}
+    if(n)sfx(c?'coins':'pick');if(full)toast(`Your pockets are full! Took ${n} attachment${n===1?'':'s'}${c?` (+${fmt(c)} chimes)`:''}.`);else if(n)toast(`📬 Took ${n} attachment${n===1?'':'s'}${c?` (+${fmt(c)} chimes)`:''}.`)},
   readm:d=>{PAN.sel=PAN.sel===+d.i?-1:+d.i;const m=S.mail[+d.i];if(m)m.read=1},
   clearm:()=>{S.mail=S.mail.filter(m=>!m.read||m.gift)},
   // phone
   app:d=>{PAN.tab=d.t;PAN.sub=null;$('pBody').scrollTop=0},
+  songpv:d=>{if(G.gig&&!G.gig.pv){toast('🎵 Piper is playing for you right now. Listen to the end!');return}if(startGig(d.id,1))toast(`🎵 Previewing "${SONG_BY[d.id][1]}"`)},
   sub:d=>{PAN.sub=d.s},
   pf:d=>{PAN.pf=d.f},
   rm:d=>{S.set.rm=d.v==='auto'?null:d.v==='1';applyCalm()},
@@ -2116,6 +2206,7 @@ const PA={
   ttReset:()=>timeTravel(0),
   photo:()=>{closePanel();G.photo=true;document.body.classList.add('photo');$('hud').hidden=true;$('touch').hidden=true;toast('📷 Photo mode: press any key or tap to return.');setTimeout(()=>{const t=$('toasts');if(t)t.innerHTML=''},1800);return false},
   exp:()=>exportSave(),
+  savenow:()=>{save();if(G.saveOk)toast('💾 Saved!')},
   imp:()=>$('fileIn').click(),
   reset:()=>{if(PAN.confirm!=='reset'){PAN.confirm='reset';return}try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload();return false},
 };
@@ -2147,7 +2238,7 @@ function renderInv(){
   if(it.c==='tool')acts.push(S.eq===i?['unequip','Put away']:['equip','Equip']);
   if(['fruit','flower','seed','sapling'].includes(it.c)&&out)acts.push(['plant','Plant']);
   if(it.c==='fruit'||s.id==='choco')acts.push(['eat','Eat']);
-  if((inH&&['furn','fish','bug','fossil','flower','shell','fruit','mat','sapling'].includes(it.c))||(out&&it.c==='furn'))acts.push(['place','Place']);
+  if((inH&&['furn','fish','bug','fossil','flower','shell','fruit','mat','sapling'].includes(it.c))||(out&&W===ISLE&&it.c==='furn'))acts.push(['place','Place']);
   if(inH&&(it.c==='wall'||it.c==='floor'))acts.push(['apply','Apply']);
   if(it.c==='bait'&&out)acts.push(['bait','Toss in water']);
   if(it.c==='med')acts.push(['med','Take']);if(it.c==='bottle')acts.push(['read','Read note']);if(it.c==='present')acts.push(['open','Open']);
@@ -2162,7 +2253,7 @@ function openInv(){if(PAN.open&&PAN.kind==='inv'){closePanel();return}if(PAN.ope
 const SHOP_TOOLS=[['t_net0',400],['t_rod0',400],['t_sho0',800],['t_axe0',800],['t_can0',500],['t_sli',900]];
 function buyBtn(id,price,key,extra=''){const sold=key&&S.dly.shop.bought[key];return `<button class="btn" data-a="buy" data-id="${id}" data-p="${price}"${key?` data-k="${key}"`:''}${extra} ${sold||S.coins<price?'disabled':''}>${sold?'Sold out':`🎐 ${fmt(price)}`}</button>`}
 function renderShop(){
-  let h=tabs([['buy','Buy'],['sell','Sell'],['sun','Sunroots']]);const sh=S.dly.shop;
+  let h=tabs([['buy','Buy'],['sell','Sell'],['sun','Sunroots'],['cat','📒 Catalog']]);const sh=S.dly.shop;
   if(PAN.tab==='buy'){
     h+='<h3>Today\'s furniture</h3><div class="list">';for(const id of sh.furn)h+=li(IT[id].e,esc(IT[id].n),'Furniture',buyBtn(id,IT[id].buy,id));
     h+=li('🧱',esc(IT[sh.wall].n),'Wallpaper',buyBtn(sh.wall,IT[sh.wall].buy,sh.wall))+li('🟫',esc(IT[sh.floor].n),'Flooring',buyBtn(sh.floor,IT[sh.floor].buy,sh.floor))+'</div>';
@@ -2172,9 +2263,19 @@ function renderShop(){
     h+=li('🌱','Sapling','Grows into a hardwood tree in 4 days',buyBtn('sapling',640))+'</div>';
     h+='<h3>Supplies</h3><div class="list">'+li('💊','Medicine','Soothes wasp stings',buyBtn('med',400));if(effMonth()===10||clk().mo===10)h+=li('🍬','Candy','For Spooky Night',buyBtn('candy',120));h+='</div>';
   }else if(PAN.tab==='sell'){h+=renderSellList(1)}
+  else if(PAN.tab==='cat')h+=renderCatShop();
   else{const p=sunPriceNow(),c=clk();h+=`<p>${p?`Bramble buys sunroots for <b>${p}</b> chimes each this ${c.h>=12?'afternoon':'morning'}.`:'No sunroot trading today. Rosie sells them on Sunday mornings in the plaza.'}</p>`+sunChart()}
   return h;
 }
+// Catalog tab: re-order anything cataloged and orderable; arrives in tomorrow's mail
+function renderCatShop(){const n=S.dly.ord||0,left=CAT_MAXORD-n;let h=`<p>Order anything from your Catalog for delivery in <b>tomorrow's mail</b>. Orders today: <b>${n}/${CAT_MAXORD}</b>${S.orders.length?` · on the way: ${S.orders.map(id=>IT[id]?IT[id].e:'').join('')}`:''}</p>`,any=0;
+  for(const [c,t] of [['furn','Furniture'],['wall','Wallpaper'],['floor','Flooring']]){const L=catList(c).filter(id=>S.cat[id]&&isOrderable(id));if(!L.length)continue;any=1;
+    h+=`<h3>${t}</h3><div class="list">`+L.map(id=>{const p=catPrice(id);return li(IT[id].e,esc(IT[id].n),c==='furn'?'Furniture':t,`<button class="btn" data-a="order" data-id="${id}" ${left<=0||S.coins<p?'disabled':''}>🎐 ${fmt(p)}</button>`)}).join('')+'</div>'}
+  return h+(any?'':'<p class="mute">Nothing to order yet. Furniture, wallpaper and flooring you get are added to your Catalog (see the ShellPhone).</p>')}
+function orderCat(id){if(!S.cat[id]||!isOrderable(id)){toast('That can\'t be ordered from the catalog.');return false}
+  if((S.dly.ord||0)>=CAT_MAXORD){toast(`Bramble only takes ${CAT_MAXORD} catalog orders a day. Try again tomorrow!`);return false}
+  const p=catPrice(id);if(S.coins<p){toast('You don\'t have enough chimes.');return false}
+  S.coins-=p;S.dly.ord=(S.dly.ord||0)+1;S.orders.push(id);sfx('coins');toast(`📦 Ordered the ${IT[id].n.toLowerCase()}. It arrives in tomorrow's mail!`);uiDirty();return true}
 function renderSellList(mult){
   const sh=S.dly.shop,hot=IT[sh.hot];let h=mult<1?'<p class="mute">The drop-off box pays 80%. Sunroots can only be sold at the counter.</p>':'';
   h+=`<div class="li" style="background:#fff0c8"><span class="e">🔥</span><div class="grow"><b>Hot item: ${esc(hot.n)}</b><small>Sells for double today. Craft it at a workbench!</small></div></div>`;
@@ -2190,12 +2291,13 @@ function sunChart(){const s=S.sun;if(!s)return '';const c=clk(),cur=c.dow>0?(c.d
 function renderSunBuy(){const s=S.sun,max=Math.max(0,Math.floor(S.coins/(s.base*10)));
   return `<p>Rosie's price this Sunday: <b>${s.base}</b> chimes per sunroot (bundles of 10 = ${fmt(s.base*10)} chimes).</p><div class="row"><label>Bundles <input type="number" id="sunN" min="1" max="99" value="${Math.min(1,max)}" style="width:90px"></label><button class="btn" data-a="sunbuy" ${max?'':'disabled'}>Buy</button><span class="mute">You can afford ${max}.</span></div>`+sunChart()}
 function renderMuseum(){
-  let h=tabs([['donate','Donate'],['assess','Assess fossils'],['fish','Fish hall'],['bug','Bug hall'],['fossil','Fossil hall']]);
+  const dn=c=>musProg(c).left?'':' ✔';let h=tabs([['donate','Donate'],['assess','Assess fossils'],['fish','Fish hall'+dn('fish')],['bug','Bug hall'+dn('bug')],['fossil','Fossil hall'+dn('fossil')]]);
   if(PAN.tab==='donate'){const list=S.inv.map((s,i)=>[s,i]).filter(([s])=>s&&['fish','bug','fossil'].includes(IT[s.id].c)&&!S.don[IT[s.id].c][+s.id.slice(2)]);
     h+=list.length?`<div class="row" style="margin-bottom:10px"><button class="btn" data-a="donall">Donate everything new</button></div><div class="list">${list.map(([s,i])=>li(IT[s.id].e,esc(IT[s.id].n),'Not yet in the collection',`<button class="btn" data-a="donate" data-i="${i}">Donate</button>`)).join('')}</div>`:'<p class="mute">Nothing new to donate. Hoo! Bring me creatures and assessed fossils the museum doesn\'t have yet.</p>'}
   else if(PAN.tab==='assess'){const n=invCount('fossilU');h+=n?`<p>You have <b>${n}</b> unidentified fossil${n>1?'s':''}.</p><button class="btn" data-a="assess">Assess all</button>`:'<p class="mute">Dig up the star-shaped cracks around the island, then bring the fossils here to be assessed.</p>'}
   else{const cat=PAN.tab,L=cat==='fish'?FISH:cat==='bug'?BUGS:FOSSILS,n=L.filter(x=>S.don[cat][x.i]).length;
-    h+=`<p><b>${n}/${L.length}</b> donated</p><div class="bar"><i style="width:${n/L.length*100}%"></i></div><div class="ped" style="margin-top:12px">${L.map(x=>`<div class="${S.don[cat][x.i]?'':'no'}" title="${S.don[cat][x.i]?esc(x.n):'???'}">${x.e}</div>`).join('')}</div>`}
+    h+=`<p><b>${n}/${L.length}</b> donated${n===L.length?' · ✔ Hall complete!':''}</p><div class="bar tk"><i style="width:${n/L.length*100}%"></i>${MUS_T.map(t=>`<b class="tick${n*100>=t*L.length?' on':''}" style="left:calc(${t}% - ${t===100?2:1}px)"></b>`).join('')}</div>
+      <p class="mute">Milestones: ${MUS_T.map((t,i)=>`${S.musRw[cat]>i?'✔':'○'} ${t}% ${MUS_RW[i]}`).join(' · ')}</p><div class="ped" style="margin-top:12px">${L.map(x=>`<div class="${S.don[cat][x.i]?'':'no'}" title="${S.don[cat][x.i]?esc(x.n):'???'}">${x.e}</div>`).join('')}</div>`}
   return h;
 }
 function renderCraft(){const fn=forageNow(),L=S.recipes.map(k=>RECIPES[k]).filter(Boolean).sort((a,b)=>(canCraft(b)-canCraft(a))||IT[a.out].n.localeCompare(IT[b.out].n));
@@ -2225,8 +2327,12 @@ function renderStorage(){let h=`<p class="mute">Tap a pocket item to store it, o
   S.stor.forEach((s,i)=>{const it=IT[s.id];h+=`<button class="slot" data-a="stOut" data-i="${i}" title="${esc(it.n)}"><span class="e">${it.e}</span>${s.q>1?`<span class="q">${s.q}</span>`:''}${it.col&&it.c!=='mat'?`<span class="dot" style="--c:${it.col}"></span>`:''}</button>`});
   return h+(S.stor.length?'':'<p class="mute">Empty.</p>')+'</div>'}
 function openStorage(){openPanel('📦','Storage',renderStorage,{kind:'stor'})}
-function renderMail(){if(!S.mail.length)return '<p class="mute">No letters right now.</p>';
-  let h=`<div class="row" style="margin-bottom:10px"><button class="btn alt" data-a="clearm">Throw away read letters</button></div><div class="list">`;
+// one attachment from a letter: chime bags pay out, items need pocket room. 1 = taken, -1 = pockets full, 0 = nothing
+function takeMail(m){if(!m||!m.gift)return 0;if(!IT[m.gift]){m.gift=null;return 0}
+  if(m.gift==='bag'){earn(m.gv||100,1);m.gift=null;return 1}const q=m.q||1;if(!canAdd(m.gift,q,m.gx))return -1;addItem(m.gift,q,m.gx);m.gift=null;return 1}
+const unreadMail=()=>{let n=0;for(const m of S.mail)if(!m.read)n++;return n};
+function renderMail(){if(!S.mail.length)return '<p class="mute">No letters right now.</p>';const ng=S.mail.filter(m=>m.gift).length;
+  let h=`<div class="row" style="margin-bottom:10px">${ng>1?`<button class="btn" data-a="takeall">Take all attachments (${ng})</button>`:''}<button class="btn alt" data-a="clearm">Throw away read letters</button></div><div class="list">`;
   S.mail.forEach((m,i)=>{h+=`<div class="li" style="flex-wrap:wrap;cursor:pointer" data-a="readm" data-i="${i}"><span class="e">${m.read?'📭':'✉️'}</span><div class="grow"><b>From ${esc(m.from)}</b><small>${m.gift?`Attached: ${esc(IT[m.gift].n)}${m.q>1?' ×'+m.q:''}`:'No attachment'}</small></div>${m.gift?`<button class="btn" data-a="take" data-i="${i}">Take ${IT[m.gift].e}</button>`:''}
     ${PAN.sel===i?`<p style="width:100%;margin:8px 4px 2px;font-weight:600;user-select:text">${esc(m.text)}</p>`:''}</div>`});
   return h+'</div>'}
@@ -2239,7 +2345,7 @@ function openBoard(){openPanel('📌','Bulletin board',()=>{const c=clk(),ev=eve
 
 /* ---------- ShellPhone ---------- */
 const APPS=[['tasks','🌊','Tide Points','#d6ecfa'],['pedia','📖','Critterpedia','#d8f1e0'],['diy','📜','DIY Recipes','#fbe0c8'],['map','🗺️','Map','#e8f3d0'],
-  ['sun','🥔','Sunroots','#f6e3c4'],['neigh','🏡','Neighbors','#fbe0e6'],['cal','📅','Calendar','#e8e0f8'],['cam','📷','Camera','#e2e8ef'],['set','⚙️','Settings','#ece6d8'],['help','❔','Guide','#fff0c8']];
+  ['sun','🥔','Sunroots','#f6e3c4'],['neigh','🏡','Neighbors','#fbe0e6'],['cal','📅','Calendar','#e8e0f8'],['cam','📷','Camera','#e2e8ef'],['cat','📒','Catalog','#efe4d0'],['songs','🎵','Songbook','#e6f0ff'],['set','⚙️','Settings','#ece6d8'],['help','❔','Guide','#fff0c8']];
 function openPhone(app){if(PAN.open&&PAN.kind==='phone'){closePanel();return}if(PAN.open||DLG.on||G.busy)return;openPanel('📱','ShellPhone',renderPhone,{kind:'phone',tab:app||null})}
 function renderPhone(){
   const back='<button class="btn alt" data-a="app" data-t="" style="margin-bottom:12px">← Apps</button>';
@@ -2261,6 +2367,14 @@ function renderPhone(){
         const sz=sub==='fish'?` · shadow ${x.sz===7?'with fin':x.sz===8?'narrow':x.sz}`:'';
         h+=`<div class="li" data-pi="${x.i}"${now?' style="box-shadow:inset 0 0 0 3px #6dbb5a"':''}><span class="e" style="${c?'':'filter:grayscale(1) brightness(.4);opacity:.5'}">${x.e}</span><div class="grow"><b>${c?esc(x.n):'???'}</b><small>${c?`🎐 ${fmt(x.p)} · ${where}${sz}${sub!=='fossil'?` · ${x.ms==='all'?'All year':monthsText(x.ms)} · ${x.hs==='all'?'All day':hoursText(x.hs)}${x.rain?' · rain only':''}`:''}${S.don[sub][x.i]?' · 🏛 donated':''}`:sub==='fossil'?'Not found yet':`${where}${now?' · around now!':''}`}${gone?' · <b style="color:#c45656">⏳ leaving</b>':''}</small></div></div>`}
       return h+'</div>'}
+    case 'cat':{const sub=CATC[PAN.sub]?PAN.sub:'furn',L=catList(sub);let all=0,got=0;for(const c in CATC)for(const id of catList(c)){all++;if(S.cat[id])got++}
+      let h=back+`<div class="tabs">${[['furn','Furniture'],['wall','Walls'],['floor','Floors']].map(([k,l])=>`<button class="${sub===k?'on':''}" data-a="sub" data-s="${k}">${l}</button>`).join('')}</div>`;
+      h+=`<p><b>${got}/${all}</b> cataloged · this page ${L.filter(id=>S.cat[id]).length}/${L.length}. Re-order cataloged items from the Catalog tab at Bramble's.</p>`;
+      if(sub==='furn'){h+='<h3>Furniture series</h3><div class="list">';for(const s of FURN_SETS){const n=s.ids.filter(id=>S.cat[id]).length,dn=!!S.catSets[s.id];
+        h+=li(dn?'🏅':s.e,esc(s.n),`${n}/${s.ids.length} · ${s.ids.map(id=>S.cat[id]?IT[id].e:'❔').join(' ')}${dn?' · complete!':` · +${fmt(CAT_SET_PTS)} pts when complete`}`,`<div style="width:70px" class="bar"><i style="width:${n/s.ids.length*100}%"></i></div>`)}h+='</div><h3>All furniture</h3>'}
+      h+='<div class="list">';for(const id of L){const it=IT[id],c=S.cat[id];
+        h+=`<div class="li"><span class="e" style="${c?'':'filter:grayscale(1) brightness(.4);opacity:.5'}">${it.e}</span><div class="grow"><b>${c?esc(it.n):'???'}</b><small>${c?(isOrderable(id)?`Orderable · 🎐 ${fmt(catPrice(id))}`:'Not sold in the catalog'):'Not cataloged yet'}</small></div></div>`}
+      return h+'</div>'}
     case 'diy':return back+renderCraft().replace(/<button class="btn" data-a="craft"[^>]*>Craft<\/button>/g,'')+'<p class="mute">Craft at the workbench in your home or in Town Hall.</p>';
     case 'map':PAN.after=drawMinimap;return back+`<canvas id="mm" class="map" width="${ISLE.W*4}" height="${ISLE.H*4}" aria-label="Island map"></canvas><p class="mute">🔴 You · 🟣 Neighbors · 🟡 Buildings</p>`;
     case 'sun':return back+sunChart()+(S.sun?`<p class="mute">You hold ${invCount('sunroot')} sunroots. ${invCount('sunroot')?'Sell them at Bramble\'s before Sunday morning!':''}</p>`:'');
@@ -2271,18 +2385,21 @@ function renderPhone(){
       const hol={10:{31:'🎃'},12:{24:'🎄',31:'🎆'},1:{1:'🎉'},2:{14:'💝'}}[mo]||{};
       let h=back+`<p><b>${MONTHS[mo-1]} ${c.y}</b> · ${seasonOf(effMonth())} in the ${S.hemi==='N'?'north':'south'}</p><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">`;
       h+=DOWS.map(d=>`<b class="mute" style="font-size:11px">${d.slice(0,2)}</b>`).join('');for(let i=0;i<first;i++)h+='<span></span>';
-      for(let d=1;d<=days;d++){const wd=(first+d-1)%7,sunday=wd===0;h+=`<div style="padding:6px 0;border-radius:10px;background:${d===c.dd?'#fff0c8':'var(--paper2)'};font-size:13px">${d}<br><span class="e">${bds[d]||hol[d]||(sunday?'🥔':wd===6?'🏆':'')||'&nbsp;'}</span></div>`}
-      return h+'</div><p class="mute">🥔 = Rosie sells sunroots that morning · 🏆 = Saturday derby with Marlowe, 9 AM-6 PM</p>'+forageLine()}
+      for(let d=1;d<=days;d++){const wd=(first+d-1)%7,sunday=wd===0;h+=`<div style="padding:6px 0;border-radius:10px;background:${d===c.dd?'#fff0c8':'var(--paper2)'};font-size:13px">${d}<br><span class="e">${bds[d]||hol[d]||(sunday?'🥔':wd===6?'🏆🎵':'')||'&nbsp;'}</span></div>`}
+      return h+'</div><p class="mute">🥔 = Rosie sells sunroots that morning · 🏆 = Saturday derby with Marlowe, 9 AM-6 PM · 🎵 = Piper busks in the plaza, 8 PM-midnight</p>'+forageLine()}
+    case 'songs':{const own=id=>{const r='rec_'+id;return S.inv.some(s=>s&&s.id===r)||S.stor.some(s=>s.id===r)||S.house.items.some(f=>f.id===r)};let nh=0;for(const g of SONGS)if(S.gig.heard[g[0]])nh++;
+      return back+`<p><b>${nh}/${SONGS.length}</b> songs heard. Piper plays guitar in the plaza Saturdays 8 PM-midnight: hear a whole song to get its record (one a night). Place a record and a record player at home to play it.</p><div class="list">`+
+      SONGS.map(([id,nm,,,bpm])=>{const o=own(id),hd=S.gig.heard[id];return li(o?'💿':hd?'🎵':'❔',o||hd?esc(nm):'???',o?`Owned · ${bpm} bpm`:hd?'Heard at a Saturday concert':'Not heard yet',o?`<button class="btn alt" data-a="songpv" data-id="${id}">▶ Preview</button>`:'')}).join('')+'</div>'}
     case 'cam':return back+'<p>Photo mode hides all menus so you can take a screenshot of your island.</p><button class="btn" data-a="photo">📷 Start photo mode</button>';
     case 'set':{const local=new Date(nowMs()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
       return back+`<h3>Sound</h3><label class="row">Music <input type="range" min="0" max="1" step="0.05" value="${S.set.music}" data-set="music"></label><label class="row">Effects <input type="range" min="0" max="1" step="0.05" value="${S.set.sfx}" data-set="sfx"></label>
       <h3>Motion</h3><div class="row" role="group" aria-label="Reduce motion"><span>Reduce motion:</span>${[['auto','Auto',S.set.rm==null],['1','On',S.set.rm===true],['0','Off',S.set.rm===false]].map(([v,l,on])=>`<button class="btn ${on?'':'alt'}" data-a="rm" data-v="${v}" aria-pressed="${on}">${l}</button>`).join('')}</div><p class="mute">Auto follows your device setting. On turns off screen shake, tree wobble, big particle bursts and vibration.</p>
       <h3>Hemisphere</h3><div class="row"><button class="btn ${S.hemi==='N'?'':'alt'}" data-a="hemi" data-h="N">Northern</button><button class="btn ${S.hemi==='S'?'':'alt'}" data-a="hemi" data-h="S">Southern</button></div>
       <h3>Island clock</h3><p class="mute">The island follows your real clock. You can time travel, but sunroots spoil if you go backward.</p><div class="row"><input type="datetime-local" id="ttIn" value="${local}"><button class="btn" data-a="tt">Travel</button>${S.timeOff?'<button class="btn alt" data-a="ttReset">Back to real time</button>':''}</div>
-      <h3>Save data</h3><p class="mute">Saves automatically in this browser.</p><div class="row"><button class="btn" data-a="exp">Export save</button><button class="btn alt" data-a="imp">Import save</button><button class="btn warn" data-a="reset">${PAN.confirm==='reset'?'Tap again to erase everything':'Start over'}</button></div>`}
+      <h3>Save data</h3><p class="mute" id="saveSt">${G.saveOk===false?"⚠️ Couldn't save in this browser. Use Export save to keep your island safe.":G.savedAt?`Saves automatically in this browser. Last saved ${hmTxt(G.savedAt)}.`:'Saves automatically in this browser.'} · v${APP_VERSION}</p><div class="row"><button class="btn" data-a="savenow">Save now</button><button class="btn alt" data-a="exp">Export save</button><button class="btn alt" data-a="imp">Import save</button><button class="btn warn" data-a="reset">${PAN.confirm==='reset'?'Tap again to erase everything':'Start over'}</button></div>`}
     case 'help':return back+`<div class="list">${[['🕹️','Move','WASD or arrow keys. Hold Shift to run, Ctrl to tiptoe. On touch screens, use the stick.'],['🅰️','Action','Space or E: talk, pick up, shake trees, use your tool.'],['🔧','Tools','Q / R to switch, 1-6 for net, rod, shovel, axe, can, slingshot. F puts tools away.'],
         ['🎣','Fishing','Cast in front of a shadow. Wait through the nibbles. When the bobber sinks with a splash, press Action fast!'],['🦋','Bugs','Walk or tiptoe close, face the bug and swing your net. Running scares them off.'],['🦴','Fossils','Dig up star-shaped cracks with a shovel. The museum assesses them.'],
-        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['🌠','Wishes','On meteor nights, press Y (or the 🌠 button) when a star streaks by.']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
+        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['📒','Catalog','Every furniture, wallpaper and flooring item you get is cataloged on your ShellPhone. Order cataloged items at Bramble\'s (5 a day, delivered by mail tomorrow). Completing a furniture series pays 1,000 Tide Points.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies.'],['🎵','Saturday night music','Saturdays 8 PM-midnight, Piper the heron plays guitar in the plaza. Request a song and stay to the end for a record (one a night). Craft a record player and place it with a record at home to play it. Track songs in the Songbook app.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['🌠','Wishes','On meteor nights, press Y (or the 🌠 button) when a star streaks by.']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
     default:return `<p class="mute">${esc(S.name)} · ${esc(S.island)} · Day ${fmt(S.stats.days||1)}</p><div class="apps">${APPS.map(([k,e,n,c])=>`<button class="app" data-a="app" data-t="${k}"><span class="e" style="--c:${c}">${e}</span>${n}</button>`).join('')}</div>`;
   }
 }
@@ -2305,7 +2422,8 @@ function updateHUD(){
   const s=eqTool(),it=s?IT[s.id]:null;$('tIcon').textContent=it?it.e:'✋';$('tName').textContent=it?it.n:'Hands';$('durbar').hidden=!it;if(it)$('durfill').style.width=Math.max(4,s.d/it.dur*100)+'%';
   if(G.tr){$('evt').hidden=false;$('evt').textContent=`🏆 ${derbyClock(G.tr.t)} · ${G.tr.score} pts`}
   else{const ev=events();$('evt').hidden=!ev.length;if(ev.length)$('evt').textContent=ev[Math.floor(G.t/6)%ev.length]}
-  $('bWish').hidden=!(meteorNight()&&!inHouse());
+  $('bWish').hidden=!(meteorNight()&&!inHouse());syncRadar();
+  {const n=unreadMail();if(n!==G.mailN){G.mailN=n;const b=$('mailB');b.textContent=n>99?'99+':String(n);b.hidden=!n;$('bPhone').setAttribute('aria-label',n?`ShellPhone, ${n} unread letter${n>1?'s':''}`:'ShellPhone')}}   // written only when the count changes
   const hn=computeHint();G.hintTile=hn&&hn.tile;const el=$('hint');
   if(hn&&!DLG.on&&!PAN.open&&!G.busy){el.hidden=false;el.innerHTML=`<kbd>${isTouch?'A':'Space'}</kbd>${esc(hn.t)}`}else el.hidden=true;
 }
@@ -2321,7 +2439,7 @@ function computeHint(){
   for(const [x,y] of C){const o=objAt(x,y);if(!o)continue;
     if(o.k==='furn')return {t:`Pick up ${IT[o.id].n.toLowerCase()}`,tile:[x,y]};
     if(o.k==='bld'){const b=W.B[o.b],vv=b.t==='vh'&&W===ISLE&&S.vill.find(q=>q.h===o.b);return {t:vv&&indoorNow(vv)?`Visit ${VPOOL[vv.p].n} (home now)`:b.t==='vh'?'Knock on the door':b.t==='home'?'Go inside':`Enter ${BLD[b.t].n}`}}
-    if(o.k==='mail')return {t:S.mail.some(m=>!m.read)?'Check mail (new!)':'Check mail',tile:[x,y]};if(o.k==='board')return {t:'Read the bulletin board',tile:[x,y]}}
+    if(o.k==='mail'){const n=unreadMail();return {t:n?`Check mail (${n} new)`:'Check mail',tile:[x,y]}}if(o.k==='board')return {t:'Read the bulletin board',tile:[x,y]}}
   const s=eqTool(),t=s?IT[s.id].tool:null,first=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o),o=first&&first.o,tl=first?[first.x,first.y]:null;
   if(t==='bike')return {t:'Stunt Hop & Bell'};
   if(t==='rod'){const n=Math.hypot(G.fx,G.fy)||1;for(const d of [2.5,1.9,1.35])if(isWaterT(terAt(Math.floor((G.px+G.fx/n*d*TS)/TS),Math.floor((G.py+G.fy/n*d*TS)/TS))))return {t:'Cast'};return null}
@@ -2374,9 +2492,19 @@ function sfx(n){if(!AU.c||!S||S.set.sfx<=0)return;switch(n){
 function blip(ch,p){if(!AU.c||!S||S.set.sfx<=0)return;const k=(ch.toLowerCase().charCodeAt(0)-97+26)%26,f=(190+((k*7)%12)*18)*p;tone(f,.055,'triangle',.07,0,null,f*1.12)}
 const SCALES=[[0,2,4,7,9],[0,3,5,7,10],[0,2,4,5,7,9,11],[0,2,3,5,7,9,10]];
 function musicTick(){const c=AU.c;if(!c||!S||document.hidden||S.set.music<=0||!$('title').hidden)return;
-  const h=clk().h,bpm=h>=22||h<5?64:h<9?80:h<17?96:76,spb=60/bpm/2;
+  const h=clk().h,sid=songNow(),sg=sid&&SONG_BY[sid],bpm=sg?sg[4]:h>=22||h<5?64:h<9?80:h<17?96:76,spb=60/bpm/2;
   if(AU.next<c.currentTime)AU.next=c.currentTime+.05;
-  while(AU.next<c.currentTime+.3){playStep(AU.step,h,AU.next-c.currentTime,spb);AU.next+=spb;AU.step++}}
+  while(AU.next<c.currentTime+.3){if(sg)playSong(AU.step,sg,AU.next-c.currentTime,spb);else playStep(AU.step,h,AU.next-c.currentTime,spb);AU.next+=spb;AU.step++}}
+// songs: seeded 64-step melody built once per song (Int8Array, -1 = rest); per step only tone() nodes are created
+const SONG_MEL={},SPROG=[[0,3,4,0],[0,5,3,4],[0,4,5,3],[0,2,3,4]];
+function songMel(g){let m=SONG_MEL[g[0]];if(!m){m=SONG_MEL[g[0]]=new Int8Array(64);for(let i=0;i<64;i++){const r=rngFor('song',g[5],i%64)();m[i]=r<.3&&i%4?-1:Math.floor(r*997)%8}}return m}
+function sdeg(sc,root,i){const L=sc.length;return root+sc[((i%L)+L)%L]+12*Math.floor(i/L)}
+function playSong(st,g,t0,spb){
+  const sc=SCALES[g[2]],root=g[3],pr=SPROG[g[5]%4][Math.floor(st/8)%4],n=songMel(g)[st%64],v=inHouse()?.75:1;
+  if(st%8===0)tone(mtof(sdeg(sc,root,pr)-24),spb*5,'triangle',.08*v,t0,AU.m);
+  if(st%4===2)for(let k=0;k<3;k++)tone(mtof(sdeg(sc,root,pr+k*2)-12),spb*2.5,'triangle',.022*v,t0+k*.018,AU.m);
+  if(n>=0){const f=mtof(sdeg(sc,root,pr+n));tone(f,spb*1.5,'triangle',.06*v,t0,AU.m);tone(f*2,spb*.5,'sine',.012*v,t0,AU.m)}
+}
 function playStep(st,h,t0,spb){
   const sc=SCALES[h%4],root=[57,55,53,52,50,48,55,57][h%8]+(G.scene==='house'?0:0),bar=Math.floor(st/8)%4,prog=[0,3,4,2][(bar+(h%3))%4],deg=i=>root+sc[((i%sc.length)+sc.length)%sc.length]+12*Math.floor(i/sc.length);
   const soft=inHouse()?.7:1,rain=isRaining()?.75:1;
@@ -2407,21 +2535,24 @@ function endPhoto(){if(!G.photo)return;G.photo=false;document.body.classList.rem
 addEventListener('keydown',e=>{
   if(!$('title').hidden||!S)return;auInit();
   if(G.photo){endPhoto();return}
-  if(PAN.open){if(e.code==='Escape'||(e.code==='KeyI'&&PAN.kind==='inv')||(e.code==='KeyP'&&PAN.kind==='phone')){e.preventDefault();closePanel()}return}
+  if(PAN.open){if(e.key==='Tab'){e.preventDefault();trapTab(e.shiftKey);return}if(e.code==='Escape'||(e.code==='KeyI'&&PAN.kind==='inv')||(e.code==='KeyP'&&PAN.kind==='phone')){e.preventDefault();closePanel()}return}
   if(DLG.on){
     if(['Space','Enter','KeyE'].includes(e.code)){e.preventDefault();if(!e.repeat)dlgAdvance()}
     else if(DLG.choices&&DLG.shown>=DLG.full.length&&['ArrowDown','KeyS','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();const n=DLG.choices.length;DLG.sel=(DLG.sel+(e.code==='ArrowDown'||e.code==='KeyS'?1:n-1))%n;dlgDone();sfx('tool')}
+    else if(DLG.choices&&/^Digit[1-4]$/.test(e.code)&&+e.code[5]<=DLG.choices.length){e.preventDefault();choose(+e.code[5]-1)}
     else if(e.code==='Escape'&&DLG.choices&&DLG.shown>=DLG.full.length)choose(DLG.choices.length-1);
     return}
-  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
+  // a focused HUD button (reached via Tab / focus return) keeps native Space/Enter activation
+  if((e.code==='Enter'||e.code==='Space')&&document.activeElement&&document.activeElement!==cv&&document.activeElement.tagName==='BUTTON')return;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','Enter'].includes(e.code))e.preventDefault();
   keys.add(e.code);if(e.repeat)return;
   switch(e.code){
     case 'Space':case 'KeyE':case 'Enter':act();break;
     case 'KeyB':toggleBikeMount();break;case 'KeyH':hopBike();break;
     case 'KeyQ':cycleTool(-1);break;case 'KeyR':cycleTool(1);break;
     case 'KeyF':S.eq=-1;cancelCast();uiDirty();break;
-    case 'KeyI':case 'Tab':e.preventDefault();openInv();break;
-    case 'KeyP':openPhone();break;case 'KeyM':openPhone('map');break;case 'KeyY':wish();break;
+    case 'KeyI':openInv();break;case 'Tab':e.preventDefault();openInv();break;
+    case 'KeyP':openPhone();break;case 'KeyM':openPhone('map');break;case 'KeyN':toggleRadar();break;case 'KeyY':wish();break;
     default:if(TOOL_KEYS[e.code]&&!G.busy){const t=TOOL_KEYS[e.code];let best=-1;S.inv.forEach((s,i)=>{if(s&&IT[s.id].tool===t&&(best<0||s.id>S.inv[best].id))best=i});
       if(best>=0){S.eq=S.eq===best?-1:best;cancelCast();sfx(t==='bike'?'bell':'tool');uiDirty()}else toast(`You don't have a ${t==='can'?'watering can':t==='sling'?'slingshot':t==='bike'?'bicycle':t}.`)}
   }
@@ -2430,8 +2561,9 @@ addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',()=>{keys.clear();G.joy=null;if(S)save()});
 addEventListener('resize',resize);
 addEventListener('pointerdown',e=>{auInit();if(G.photo&&!e.target.closest('#panel'))endPhoto()});
-$('toolchip').onclick=()=>cycleTool(1);$('bBag').onclick=openInv;$('bPhone').onclick=()=>openPhone();$('bWish').onclick=wish;
-$('bRadar').onclick=()=>{const c=$('radarMap');c.hidden=!c.hidden;$('bRadar').classList.toggle('on',!c.hidden);sfx('tool')};
+$('toolchip').onclick=()=>cycleTool(1);$('bWish').onclick=wish;
+for(const [id,fn] of [['bBag',openInv],['bPhone',()=>openPhone()]])$(id).onclick=e=>{PAN.op=e.currentTarget;try{fn()}finally{PAN.op=null}};
+$('bRadar').onclick=toggleRadar;
 $('bBike').onclick=toggleBikeMount;
 {const stick=$('stick'),knob=$('knob');let jid=null;
   const moveJ=e=>{const r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),R=r.width/2-12,d=Math.hypot(dx,dy),m=Math.min(1,d/R),nx=d?dx/d:0,ny=d?dy/d:0;
@@ -2464,6 +2596,7 @@ function step(dt){
   updateVill(dt);updateParts(dt);updateSky(dt);
   if(G.shake>0)G.shake-=dt;
   if(G.tr&&!frozen&&!(G.fade>0)&&G.faint<=0&&(G.tr.t-=dt)<=0)endDerby();
+  if(G.gig&&!frozen){const g=G.gig;if(!calm()&&(g.nt-=dt)<=0){g.nt=1;g.np++;const b=G.scene==='island'&&buskerHere();floatIcon(g.np%2?'🎵':'🎶',b?BUSKER.x:G.px,(b?BUSKER.y:G.py)-44)}if((g.t-=dt)<=0)endGig()}
   acc1+=dt;if(acc1>1){acc1=0;if(!frozen){manageFish();manageBugs();manageDrifts()}}
   acc5+=dt;if(acc5>5){acc5=0;if(processDays()){toast(`☀️ A new day has begun on ${S.island}!`,'big');G.vact=null;notes()}}
   hudT-=dt;if(hudT<=0||uiD){hudT=.2;uiD=false;updateHUD()}
@@ -2499,7 +2632,7 @@ function startGame(isNew){
   else{toast(`Welcome back to ${S.island}, ${S.name}!`);notes()}
 }
 function boot(){
-  swatches('swSkin',SKINS,'skin');swatches('swHair',HAIRS,'hair');swatches('swShirt',SHIRTS,'shirt');drawPreview();resize();
+  $('tVer').textContent=`v${APP_VERSION} · `;swatches('swSkin',SKINS,'skin');swatches('swHair',HAIRS,'hair');swatches('swShirt',SHIRTS,'shirt');drawPreview();resize();
   let saved=null;try{saved=localStorage.getItem(SAVE_KEY)}catch(e){}
   if(saved){try{const s=JSON.parse(saved);$('tContinue').hidden=false;$('btnCont').textContent=`▶ Continue on ${s.island||'your island'}`}catch(e){saved=null}}
   $('btnCont').onclick=()=>{try{loadFrom(saved);startGame(false)}catch(e){console.error(e);alertBox('That save could not be loaded.')}};
@@ -2512,9 +2645,10 @@ function boot(){
 }
 function alertBox(msg){if($('title').hidden)toast(msg);else{const p=document.querySelector('#title .foot');p.textContent=msg;p.style.color='#c45656'}}
 window.PW={get S(){return S},get W(){return W},get ISLE(){return ISLE},G,act,IT,FISH,BUGS,FOSSILS,RECIPES,stat,processDays,save,addItem,newGame,startGame,loadFrom,openPhone,openInv,openShop,openMuseum,openHall,
-  fishes:()=>fishes,bugs:()=>bugs,spawnFishAt,spawnBug,craft,learn,timeTravel,bloomScore,updBloom,BLOOM_STARS,openMail,openBoard,frontCands,computeHint,enterHouse,exitHouse,enterVHouse,exitVHouse,indoorNow,vRoom,knock,renderHouse,HOUSE_DRAW,LIGHT_IDS,VSTYLE,startTour,returnHome,sellSlot,PAN,PA,DLG,dlgAdvance,choose,closePanel,talkTo,villActors,render,step,APP_VERSION,
-  derbyKind,get tr(){return G.tr},startDerby,events,npcs,landFish,catchBug,TOURNEY,
+  fishes:()=>fishes,bugs:()=>bugs,spawnFishAt,spawnBug,craft,learn,timeTravel,bloomScore,updBloom,BLOOM_STARS,openMail,openBoard,frontCands,computeHint,enterHouse,exitHouse,enterVHouse,exitVHouse,indoorNow,vRoom,knock,renderHouse,HOUSE_DRAW,LIGHT_IDS,VSTYLE,startTour,returnHome,sellSlot,orderCat,isOrderable,catPrice,backfillCat,FURN_SETS,renderCatShop,renderPhone,renderShop,PAN,PA,DLG,dlgAdvance,choose,closePanel,talkTo,villActors,render,step,APP_VERSION,
+  derbyKind,get tr(){return G.tr},SONGS,talkBusker,songNow,get gig(){return G.gig},buskerHere,BUSKER,startDerby,events,npcs,landFish,catchBug,TOURNEY,
   hopBike,toggleBikeMount,renderRadar,drawPerson,eqTool,placeSlot,genWorld,
+  isTour,isRaining,canStand,wakeUp,faint,serialize,manageFish,manageBugs,updateHUD,ask,say,toggleRadar,syncRadar,RD,tintNow,GLOW,LIGHTS:()=>LIGHTS,renderMail,renderInv,renderMuseum,musCheck,musProg,musLine,takeMail,unreadMail,openPanel,panelFocusables,
   notes,giveOrDrop,mail,giftFlow,drifts,manageDrifts,updateDrifts,swingNet,netTip,forageNow,dailyRefresh,openPresent,pickRecipe,FORAGE,SS_RECIPES,calm,wob,puff,parts:()=>parts,balloons:()=>balloons,stars:()=>stars,bursts:()=>bursts,toast,sellPrice,invCount,VPOOL};
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 boot();

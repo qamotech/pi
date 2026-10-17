@@ -24,6 +24,9 @@ PY
 if command -v node >/dev/null 2>&1; then node --check "$TMP/app.js" || { echo "FAIL syntax error in index.html"; exit 1; }; echo "ok   syntax"; fi
 
 status=0
+# 2) the service-worker cache name must track APP_VERSION so returning PWA players get the new build
+VER="$(grep -o "const APP_VERSION='[0-9.]*'" index.html | grep -o "[0-9][0-9.]*")"
+if [ -n "$VER" ] && grep -q "'pi-v$VER'" sw.js; then echo "ok   sw.js VERSION matches APP_VERSION ($VER)"; else echo "FAIL sw.js VERSION does not match APP_VERSION '$VER' (expected 'pi-v$VER')"; status=1; fi
 for H in tests/*.harness.html; do
   name="$(basename "$H" .harness.html)"
   python - "$ROOT/index.html" "$ROOT/$H" "$TMP/$name.html" <<'PY'

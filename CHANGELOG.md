@@ -2,6 +2,31 @@
 
 All notable changes to Puddlewick Isle. New releases are added at the top.
 
+## v1.5.0 (2026-10-17 18:50)
+**New features**
+- **Bramble's Catalog**: your ShellPhone Catalog remembers every furniture, wallpaper and flooring item you've owned. Re-order cataloged items from Bramble's new Catalog tab (up to 5 a day, mailed the next morning), and earn 1,000 Tide Points for each of 8 themed furniture series you complete.
+- **Tidewater Tunes**: every Saturday from 8 PM to midnight, Piper the heron busks in the plaza. Request one of 12 original island songs (or ask for a surprise), stay to the end, and take home its record, one a night. Your first record teaches the Record player DIY, and the new Songbook app tracks every song.
+
+**Improvements**
+- Bike hops no longer freeze the game. You can hop over water and small objects outdoors, a landing in the sea returns you to shore, and indoor hops never pass through furniture.
+- Furniture can no longer be lost on tour islands. The Coral Atoll and Ancient Caldera now behave like other tours, and a failed expedition falls back to a classic tour.
+- The radar sits under your wallet, stays sharp on high-DPI screens, hides indoors and in photo mode, remembers its setting, respects Reduce motion and toggles with N.
+- Night-time lamp and window glows are drawn from a cached sprite, which keeps phones closer to 60 fps after dark.
+- Keyboard play is better: menus trap and restore focus, number keys 1-4 pick dialog answers, and touch buttons have labels and 44px tap targets.
+- The game and its offline cache now share one version number. You get one clear warning if saving fails, and Settings shows the last save time with a Save now button.
+- A mailbox Take all button collects every attachment that fits, and an unread-mail badge shows what's waiting.
+- Dr. Quillfeather mails rewards as each museum hall reaches 25, 50, 75 and 100%, plus a Golden Quill for finishing all three halls. Saves with halls already complete get their letters on load.
+
+## v1.4.0 (2026-10-17 16:26)
+_Manual release (entry backfilled by the v1.5.0 run; APP_VERSION was not bumped at the time)._
+- **Neighbor home visits**: step inside residents' homes, see rooms styled by personality, and find your gifted furniture on display.
+- **Seasonal forage**: drifting petals and other seasonal pickups you can net, with seasonal DIY recipes, an in-season badge, and a once-per-season letter.
+- **Expedition islands**: two large new tour islands, an atoll and a caldera.
+- **Craftable bicycles**: craft a frame and wheels into a cruiser or a stunt hopper bicycle that can hop.
+- **Radar HUD**: a minimap radar on screen.
+- **Outdoor decor**: place furniture on the island grass.
+- **Character redesign**: refreshed player and resident art with smaller eyebrows.
+
 ## v1.2.0 (2026-10-17 13:36)
 **New features**
 - **Saturday Derby**: every Saturday from 9 AM to 6 PM, Marlowe the otter runs a 3-minute Fishing Derby or Bug-Off in the plaza. The two alternate weekly. Points pay Tide Points and win bronze, silver and gold trophies.

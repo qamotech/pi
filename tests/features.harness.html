@@ -233,7 +233,7 @@ try{
     const tn=document.getElementById('tName');ok(tn&&!/display:\s*none/.test(document.querySelector('style').textContent.match(/#tName\{[^}]*\}/)[0]),'bloomfix: tool name stays in accessibility tree');
     S.island='Z';P.openHall();await adv(12);click('[data-a="tab"][data-t="bloom"]');await wait(5);const st=document.querySelector('#pBody [aria-label$="of 5 stars"]');
     ok(st&&st.getAttribute('role')==='img','bloomfix: stars have role=img');P.closePanel();
-    ok(P.APP_VERSION==='1.2.0','bloomfix: version bumped to 1.2.0',P.APP_VERSION);
+    ok(P.APP_VERSION.split('.').map(Number).reduce((a,v)=>a*1000+v,0)>=1002000,'bloomfix: version is at least 1.2.0',P.APP_VERSION);
   }catch(e){ok(false,'bloomfix block threw',e.stack)}
 
   // v1.3.0 Come On In: neighbor home visits
@@ -434,6 +434,245 @@ try{
     const woodCount=S.inv.filter(s=>s&&s.id==='wood').length;
     ok(woodCount===1&&S.inv.find(s=>s&&s.id==='wood').q===7,'inventory: auto-sort stacks matching materials');
   }catch(e){ok(false,'v1.4.0 block threw',e.stack)}
+
+  // v1.5.0 Bramble's Catalog and Furniture Series
+  try{
+    await fresh();const S=P.S,G=P.G;
+    const ns=JSON.stringify([S.cat,S.orders,S.catSets].map(x=>Array.isArray(x)?'A':typeof x));
+    ok(ns==='["object","A","object"]'&&S.flags.catBF===1,'catalog: newState has cat, orders, catSets',ns);
+    // old v1.4 save: no catalog fields, furniture in pockets/storage/house/outdoors/gifts
+    P.save();
+    const raw=JSON.parse(localStorage.getItem('puddlewick-isle.v1'));delete raw.cat;delete raw.orders;delete raw.catSets;delete raw.flags.catBF;
+    raw.inv[5]={id:'fu_sofa',q:1};raw.stor.push({id:'fu_tv',q:1});raw.house.items.push({id:'fu_globe',x:1,y:1});raw.vill[0].gifts=['fu_drums'];
+    const fi=P.ISLE.obj.findIndex((q,i)=>!q&&P.ISLE.ter[i]===3);raw.objs=(raw.objs||[]).concat([[fi,{k:'furn',id:'fu_tent'}]]);
+    P.loadFrom(JSON.stringify(raw));const S2=P.S;
+    ok(S2.cat&&Array.isArray(S2.orders)&&S2.catSets&&S2.flags.catBF===1,'catalog: v1.4 save loads with defaults');
+    ok(['fu_sofa','fu_tv','fu_globe','fu_drums','fu_tent'].every(id=>S2.cat[id]===1),'catalog: backfill marks pockets, storage, house, outdoors, gifts',Object.keys(S2.cat).join(','));
+    ok(S2.mail.some(m=>m.from==="Bramble's Catalog"),'catalog: old save gets an intro letter');
+    await fresh();const S3=P.S;S3.inv.fill(null);
+    const c0=S3.stats.catalog||0;P.addItem('fu_piano');
+    ok(S3.cat.fu_piano===1&&S3.stats.catalog===c0+1,'catalog: addItem catalogs + stat once',S3.stats.catalog);
+    P.addItem('fu_piano');ok(S3.stats.catalog===c0+1,'catalog: re-adding does not raise stat');
+    P.addItem('wood',3);ok(!S3.cat.wood&&S3.stats.catalog===c0+1,'catalog: materials are not cataloged');
+    // phone app
+    P.closePanel();P.openPhone('cat');let body=document.getElementById('pBody').innerHTML;
+    ok(/cataloged/.test(body)&&/\?\?\?/.test(body)&&!S3.cat.fu_crown,'catalog: phone app renders with ??? for unknown');
+    ok(/Furniture series/.test(body),'catalog: phone shows furniture series');P.closePanel();
+    // shop tab: only cataloged + orderable
+    ['fu_bloom','fu_dtf1','fu_logstool','fu_pumpkin','wl_wblossom','fu_photo','fu_chair','wl_wsky'].forEach(id=>{S3.cat[id]=1});
+    P.PAN.tab='cat';const sh=P.renderShop();
+    ok(/fu_chair/.test(sh)&&/wl_wsky/.test(sh)&&/fu_piano/.test(sh),'catalog: shop tab lists cataloged orderable items');
+    ok(!/data-id="(fu_bloom|fu_dt\w*|fu_logstool|fu_pumpkin|wl_wblossom|fu_photo|rec_\w*)"/.test(sh)&&!/data-id="fu_sofa"/.test(sh),'catalog: shop excludes unorderable and uncataloged');
+    ok(!P.isOrderable('fu_bloom')&&!P.isOrderable('fu_dtb3')&&!P.isOrderable('fu_campfire')&&P.isOrderable('fu_piano'),'catalog: isOrderable rules');
+    // ordering
+    S3.coins=1e6;S3.mail.length=0;const pr=P.catPrice('fu_piano');
+    ok(P.orderCat('fu_piano')&&S3.coins===1e6-pr&&S3.orders[0]==='fu_piano','catalog: order deducts price and queues',pr);
+    for(let k=0;k<4;k++)P.orderCat('fu_chair');const cB=S3.coins,oB=S3.orders.length;
+    ok(!P.orderCat('fu_chair')&&S3.coins===cB&&S3.orders.length===oB&&oB===5,'catalog: sixth order refused, free');
+    P.timeTravel(S3.timeOff+864e5);
+    ok(S3.mail.some(m=>m.gift==='fu_piano'&&m.from==="Bramble's Catalog")&&S3.orders.length===0,'catalog: orders mailed next day',S3.mail.length);
+    ok(S3.dly.ord===0,'catalog: daily order limit resets');
+    // series reward
+    const st=P.FURN_SETS.find(s=>s.ids.every(id=>!S3.cat[id]));const p0=S3.pts;
+    st.ids.forEach(id=>{const q=S3.inv.findIndex(x=>!x);P.addItem(id);if(q>=0)S3.inv[q]=null});
+    const ach=S3.pts-p0;ok(S3.catSets[st.id]===1&&ach>=1000&&ach<1000+300*2,'catalog: completing a series pays +1000 once',st.id+' '+ach);
+    const p1=S3.pts;P.addItem(st.ids[0]);P.backfillCat();ok(S3.pts===p1,'catalog: series not paid twice');
+    ok(P.FURN_SETS.length>=6&&P.FURN_SETS.every(s=>s.ids.every(id=>P.IT[id])),'catalog: series built from real ids');
+  }catch(e){ok(false,'catalog block threw',e.stack)}
+
+  // v1.5.0 Tidewater Tunes (Piper busks Saturday nights, records, record player, Songbook)
+  try{
+    await fresh();const S=P.S,G=P.G;
+    const at=h=>{const d=new Date();d.setDate(d.getDate()+((6-d.getDay()+7)%7)+7);d.setHours(h,0,0,0);P.timeTravel(d.getTime()-Date.now())};
+    const nRec=()=>S.inv.filter(s=>s&&/^rec_/.test(s.id)).reduce((n,s)=>n+s.q,0)+P.ISLE.obj.filter(o=>o&&/^rec_/.test(o.id||'')).length;
+    const talk=async(c0,pi)=>{const b=P.npcs().find(a=>a.busker);G.px=b.x;G.py=b.y+24;P.talkTo(b);let g=0;
+      while(g++<80){await wait(5);if(P.PAN.open&&P.PAN.kind==='pick')P.PA.pickg({i:String(pi)});else if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();P.choose(c0)}else if(P.DLG.on)P.dlgAdvance();else if(!G.busy)break}};
+    const run=(sec,dt=.1)=>{for(let i=0;i<sec/dt;i++)P.step(dt)};
+    if(G.scene!=='island')P.exitHouse();
+    ok(P.SONGS.length===12&&P.SONGS.every(g=>P.IT['rec_'+g[0]]&&P.IT['rec_'+g[0]].rec===g[0]),'tunes: 12 songs with record items');
+    ok(P.IT.fu_phono&&P.RECIPES.r_phono&&P.RECIPES.r_phono.out==='fu_phono'&&Object.keys(P.RECIPES.r_phono.m).every(k=>P.IT[k]),'tunes: record player recipe');
+    at(21);ok(P.npcs().some(a=>a.busker===true),'tunes: Piper busks Saturday 9 PM');
+    ok(P.events().some(e=>/Piper/.test(e)),'tunes: events has a Piper line',P.events().join('|'));
+    at(17);ok(!P.npcs().some(a=>a.busker),'tunes: no busker Saturday 5 PM');
+    at(21);S.set.rm=false;const r0=nRec(),id=P.SONGS[3][0];
+    await talk(0,3);ok(P.gig&&P.gig.song===id&&P.gig.t<=36&&P.gig.t>35.5&&!G.busy,'tunes: request starts a 36s gig',JSON.stringify(P.gig));
+    ok(P.songNow()===id,'tunes: songNow is the gig song');
+    P.openPhone();run(5,.5);ok(P.gig&&P.gig.t>35.9,'tunes: gig paused while frozen');P.closePanel();
+    run(10);const np=P.gig.np;ok(np>=8&&np<=11,'tunes: about one note puff per second',np);
+    run(27);ok(!P.gig&&nRec()===r0+1&&S.gig.heard[id]===1,'tunes: finished gig gives exactly one record',nRec()-r0);
+    ok((S.ach.gigs||0)>=1&&S.stats.gigs===1,'tunes: gigs achievement tier 1');
+    ok(S.recipes.includes('r_phono'),'tunes: first record teaches record player DIY');
+    S.set.rm=true;await talk(1,0);ok(P.gig&&!P.gig.pv,'tunes: surprise me starts a gig');run(20);const np2=P.gig.np;
+    ok(np2===0&&!P.parts().some(p=>p.txt==='🎵'||p.txt==='🎶'),'tunes: no note puffs under reduce motion',np2);
+    run(17);ok(!P.gig&&nRec()===r0+1&&S.stats.gigs===2,'tunes: second gig same night gives no record',nRec()-r0);S.set.rm=null;
+    // songbook
+    P.closePanel();P.openPhone('songs');let body=document.getElementById('pBody').innerHTML;
+    ok((body.match(/class="li"/g)||[]).length===12&&/\?\?\?/.test(body)&&body.includes(P.SONGS[3][1]),'tunes: songbook lists 12 with ??? for unheard');
+    ok(/data-a="songpv"/.test(body),'tunes: owned record has preview');
+    document.querySelector('#pBody [data-a="songpv"]').click();ok(P.gig&&P.gig.pv&&Math.abs(P.gig.t-12)<.01,'tunes: preview starts 12s');P.closePanel();
+    run(13);ok(!P.gig&&nRec()===r0+1&&S.stats.gigs===2,'tunes: preview gives no reward');
+    // house record player
+    S.house.items.length=0;S.house.items.push({id:'rec_kelp',x:1,y:2});P.enterHouse();ok(P.songNow()===null,'tunes: no record player, no song');P.exitHouse();
+    S.house.items.push({id:'fu_phono',x:2,y:2});P.enterHouse();ok(P.songNow()==='kelp','tunes: record player plays placed record',P.songNow());P.exitHouse();
+    ok(P.songNow()===null,'tunes: outdoors no house song');
+    at(17);ok(P.npcs().every(a=>!a.busker),'tunes: Piper gone before 8 PM');
+    // old save
+    const o=JSON.parse(JSON.stringify(S));delete o.gig;P.loadFrom(JSON.stringify(o));
+    ok(P.S.gig&&P.S.gig.last===-1&&P.S.gig.heard&&!Object.keys(P.S.gig.heard).length&&P.gig===null,'tunes: old save gets gig defaults');
+  }catch(e){ok(false,'tunes block threw',e.stack)}
+
+  // v1.5.0 all-around improvements: bike hop, tour fixes, radar HUD, glow sprite, keyboard a11y, save health, mail Take all, museum milestones
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
+    const key=(code,o={})=>window.dispatchEvent(new KeyboardEvent('keydown',Object.assign({code,key:code,bubbles:true,cancelable:true},o)));
+    const keyup=code=>window.dispatchEvent(new KeyboardEvent('keyup',{code,bubbles:true}));
+    const W=P.W,land=t=>t===2||t===3||t===6||t===7,tile=()=>[Math.floor(G.px/32),Math.floor(G.py/32)];
+    // 1. bike hop: no ReferenceError, moves while airborne; sea landings snap back; indoor hops never clip furniture
+    S.inv.fill(null);S.inv[0]={id:'t_bike_stunt',q:1,d:500};S.eq=0;const e0=errs.length;
+    const free=(x,y)=>W.ter[y*W.W+x]===3&&!W.obj[y*W.W+x];let spot=null;
+    for(let y=5;y<W.H-5&&!spot;y++)for(let x=5;x<W.W-12;x++){let g=true;for(let dx=-1;dx<=4&&g;dx++)for(let dy=-1;dy<=1;dy++)if(!free(x+dx,y+dy)){g=false;break}if(g){spot=[x,y];break}}
+    G.px=(spot[0]+.5)*32;G.py=(spot[1]+.5)*32;G.hopZ=0;G.hopVy=0;P.step(.016);
+    const x0=G.px;P.hopBike();key('ArrowRight');let air=false,airMove=false;
+    for(let k=0;k<60;k++){const bx=G.px;P.step(.016);if(G.hopZ>4){air=true;if(G.px>bx)airMove=true}}keyup('ArrowRight');
+    ok(errs.length===e0&&air&&airMove&&G.px>x0,'hop: airborne movement works with no errors',`${errs.length-e0} errs, air ${air}, moved ${airMove}`);
+    let beach=null;for(let y=4;y<W.H-4&&!beach;y++)for(let x=4;x<W.W-6;x++){const i=y*W.W+x;if(W.ter[i]===2&&!W.obj[i]&&!W.obj[i-1]&&land(W.ter[i-1])&&W.ter[i+1]<=1&&W.ter[i+2]<=1&&W.ter[i+3]<=1&&W.ter[i+4]<=1&&W.ter[i-W.W]===2&&W.ter[i+W.W]===2){beach=[x,y];break}}
+    if(beach){G.px=(beach[0]+.3)*32;G.py=(beach[1]+.5)*32;G.hopZ=0;G.hopVy=0;P.step(.016);P.hopBike();key('ArrowRight');for(let k=0;k<90;k++)P.step(.016);keyup('ArrowRight');for(let k=0;k<5;k++)P.step(.016);
+      const [tx,ty]=tile();ok(G.hopZ===0&&land(W.ter[ty*W.W+tx]),'hop: hopping off the beach lands back on land',`${tx},${ty} ter ${W.ter[ty*W.W+tx]}`)}
+    else ok(false,'hop: found a beach edge to test');
+    S.house.items.length=0;S.house.items.push({id:'fu_chair',x:2,y:2});P.enterHouse();P.step(.016);let clip=false;P.hopBike();key('ArrowUp');
+    for(let k=0;k<70;k++){P.step(.016);const [tx,ty]=tile();if(tx===2&&ty===2)clip=true}keyup('ArrowUp');
+    ok(!clip&&G.scene==='house','hop: indoor hop does not pass through furniture',tile().join(','));P.exitHouse();S.eq=-1;
+    // 2. tours: no furniture placement off-island, expeditions treated as tours
+    S.inv.fill(null);P.addItem('fu_chair');const ci=S.inv.findIndex(s=>s&&s.id==='fu_chair');P.startTour('tour');
+    ok(P.isTour()&&P.placeSlot(ci)===false&&S.inv[ci]&&S.inv[ci].id==='fu_chair','tour: furniture cannot be placed on a tour island');
+    P.PAN.sel=ci;P.PAN.invCat='all';ok(!/data-a="place"/.test(P.renderInv()),'tour: item panel hides Place on tours');P.PAN.sel=-1;P.returnHome();
+    P.startTour('tour_atoll');ok(P.isTour(),'tour: atoll counts as a tour');P.faint('test');P.wakeUp();G.faint=0;
+    {const d=P.W.dock.door,[tx,ty]=tile();ok(Math.hypot(tx-d.x,ty-d.y)<=2&&land(P.W.ter[ty*P.W.W+tx]),'tour: waking up on the atoll returns to its dock',`${tx},${ty} vs ${d.x},${d.y}`)}
+    P.serialize();ok(P.S.pos===null,'tour: serialize on an expedition saves no position');
+    {const base=P.isRaining()?6:4,[tx,ty]=tile();P.fishes().length=0;for(let k=0;k<base;k++)P.spawnFishAt(tx+17,ty-3+k,'S');   // home cap reached, out of the spawn window
+     for(let k=0;k<30;k++)P.manageFish();const nS=P.fishes().filter(f=>f.loc==='S').length;ok(nS>base&&nS<=base+2,'tour: atoll gets the extra tour fish',nS+' vs home cap '+base)}P.returnHome();P.step(.05);
+    // 3. radar HUD
+    const rd=document.getElementById('radarMap'),bR=document.getElementById('bRadar');P.updateHUD();
+    ok(!S.set.radar&&rd.hidden&&bR.getAttribute('aria-pressed')==='false','radar: off by default');
+    key('KeyN');ok(S.set.radar===1&&!rd.hidden&&bR.getAttribute('aria-pressed')==='true','radar: KeyN toggles it on');
+    {const r=rd.getBoundingClientRect(),ix=b=>{const q=document.getElementById(b).getBoundingClientRect();return !(r.right<=q.left||q.right<=r.left||r.bottom<=q.top||q.bottom<=r.top)};
+     ok(r.width>0&&!ix('wallet')&&!ix('toolchip')&&rd.parentElement.classList.contains('tr'),'radar: sits below the wallet and tool chip',JSON.stringify([r.top,r.left]))}
+    ok(rd.width===Math.round(110*Math.min(2,devicePixelRatio||1)),'radar: 110*DPR backing store',rd.width);
+    P.PA.photo();ok(rd.offsetParent===null,'radar: hidden in photo mode');key('KeyZ');ok(rd.offsetParent!==null,'radar: back after photo mode');
+    P.enterHouse();P.updateHUD();ok(rd.hidden,'radar: hidden indoors');P.exitHouse();P.updateHUD();ok(!rd.hidden,'radar: shown again outdoors');
+    S.set.rm=true;G.t+=1;P.renderRadar(true);const a1=P.RD.swp;G.t+=1.3;P.renderRadar(true);ok(P.RD.swp===a1,'radar: sweep frozen under reduce motion');
+    S.set.rm=false;G.t+=1;P.renderRadar(true);const a2=P.RD.swp;G.t+=1.3;P.renderRadar(true);ok(P.RD.swp!==a2,'radar: sweep moves normally');S.set.rm=null;
+    ok(!/\(M\)/.test(bR.title)&&/\(N\)/.test(bR.title),'radar: title names the N key',bR.title);
+    P.save();P.loadFrom(localStorage.getItem('puddlewick-isle.v1'));P.updateHUD();ok(P.S.set.radar===1&&!rd.hidden,'radar: toggle survives save and load');
+    key('KeyN');ok(P.S.set.radar===0&&rd.hidden,'radar: KeyN toggles it off');
+  }catch(e){ok(false,'v1.5.0 improvements block A threw',e.stack)}
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
+    const key=(code,o={})=>window.dispatchEvent(new KeyboardEvent('keydown',Object.assign({code,key:code,bubbles:true,cancelable:true},o)));
+    // 4. night glows: one cached sprite, no per-frame gradients
+    {const d=new Date();d.setHours(22,0,0,0);P.timeTravel(d.getTime()-Date.now())}
+    const W=P.W,px=Math.floor(G.px/32),py=Math.floor(G.py/32);let lamp=null;
+    for(let r=2;r<6&&!lamp;r++)for(const [dx,dy] of [[r,0],[-r,0],[0,-r],[0,r]]){const i=(py+dy)*W.W+px+dx;if(W.ter[i]===3&&!W.obj[i]){W.obj[i]={k:'furn',id:'fu_lamp'};lamp=[dx,dy];break}}
+    const proto=CanvasRenderingContext2D.prototype,oDI=proto.drawImage;let gm=null,gc=null;
+    const lx=(px+lamp[0]+.5)*32,ly=(py+lamp[1]+.8)*32-6;
+    proto.drawImage=function(img,...a){if(img===P.GLOW&&!gm&&Math.abs(a[0]+a[2]/2-lx)<1&&Math.abs(a[1]+a[3]/2-ly)<1){gm=this.getTransform();gc=[lx,ly]}return oDI.call(this,img,...a)};
+    try{P.render()}finally{proto.drawImage=oDI}
+    ok(lamp&&gm,'glow: lamp glow drawn with the cached sprite');
+    if(gm){const cvs=document.getElementById('cv'),g2=cvs.getContext('2d'),cl=(v,m)=>Math.max(0,Math.min(m-1,v)),sx=Math.round(gm.a*gc[0]+gm.e),sy=Math.round(gm.d*gc[1]+gm.f);
+      const lum=(x,y)=>{const p=g2.getImageData(cl(x,cvs.width),cl(y,cvs.height),1,1).data;return p[0]+p[1]+p[2]};
+      const c=lum(sx,sy),far=[[80,0],[-80,0],[0,80],[0,-80],[57,57],[-57,57],[57,-57],[-57,-57]].map(([dx,dy])=>lum(sx+dx,sy+dy)).sort((a,b)=>a-b)[4];
+      ok(c>far,'glow: lamp center brighter than 80px away (median of 8)',c+' vs '+far)}
+    for(let k=0;k<5;k++){const i=(py+6)*W.W+px-4+k*2;if(!W.obj[i]&&W.ter[i]===3)W.obj[i]={k:'furn',id:'fu_candle'}}
+    S.house.items.length=0;for(let k=0;k<5;k++)S.house.items.push({id:'fu_lamp',x:k%5,y:1+(k>>2)});
+    const oRG=proto.createRadialGradient;let nRG=0,nL=0;proto.createRadialGradient=function(...a){nRG++;return oRG.apply(this,a)};
+    try{for(let k=0;k<30;k++){P.render();nL+=P.LIGHTS().length}P.enterHouse();for(let k=0;k<30;k++){P.render();nL+=P.LIGHTS().length}P.exitHouse()}finally{proto.createRadialGradient=oRG}
+    ok(nRG===0&&nL>=60,'glow: 60 night renders with lamps create no gradients',`${nRG} gradients, ${nL} lights`);
+    ok(P.tintNow()===P.tintNow()&&P.tintNow().length===3,'glow: tintNow reuses one array');
+    // 5. keyboard accessibility
+    document.getElementById('cv').focus();key('Tab',{key:'Tab'});ok(P.PAN.open&&P.PAN.kind==='inv','kbd: Tab in play still opens pockets');P.closePanel();
+    P.openPhone();const pw=document.getElementById('pWin');ok(pw.contains(document.activeElement),'kbd: focus moves into the panel');
+    let inside=true;for(let k=0;k<20;k++){key('Tab',{key:'Tab'});if(!pw.contains(document.activeElement))inside=false}ok(inside,'kbd: Tab stays inside the panel');
+    {const F=P.panelFocusables();F[0].focus();key('Tab',{key:'Tab',shiftKey:true});ok(F.length>1&&document.activeElement===F[F.length-1],'kbd: Shift+Tab wraps to the last control')}
+    P.closePanel();click('#bBag');ok(P.PAN.open&&P.PAN.kind==='inv','kbd: bag button opens pockets');P.closePanel();
+    ok(document.activeElement===document.getElementById('bBag'),'kbd: focus returns to the opener',document.activeElement&&document.activeElement.id);
+    {const pr=P.ask({n:'Tester',pitch:1},'Pick one',['Apple','Banana','Cherry']);P.dlgAdvance();
+     const dc=document.getElementById('dCh');ok(dc.getAttribute('role')==='listbox'&&dc.querySelectorAll('[role=option]').length===3&&dc.querySelector('[aria-selected=true]'),'kbd: choices are a listbox with aria-selected');
+     ok(document.body.classList.contains('touch')||dc.querySelectorAll('.num').length===3,'kbd: number prefixes on choices');
+     key('Digit2');const r=await Promise.race([pr,wait(200).then(()=>'timeout')]);ok(r===1,'kbd: Digit2 picks the second choice',r)}
+    {const t=document.getElementById('touch'),wh=t.hidden;t.hidden=false;const bad=[];
+     for(const id of ['bA','bT','bX','bB','bHop','bRadar']){const b=document.getElementById(id),r=b.getBoundingClientRect();if(!(b.getAttribute('aria-label')||'').trim()||r.width<44||r.height<44)bad.push(id+' '+r.width+'x'+r.height)}
+     t.hidden=wh;ok(!bad.length,'kbd: touch buttons have labels and 44px targets',bad.join(';'))}
+    key('KeyI');ok(P.PAN.open&&P.PAN.kind==='inv','kbd: I opens pockets');key('KeyI');ok(!P.PAN.open,'kbd: I closes pockets');
+    // 6. version and save health
+    ok(P.APP_VERSION==='1.5.0','save: APP_VERSION is 1.5.0');
+    const tb=document.getElementById('toasts'),nWarn=()=>[...tb.children].filter(d=>/Couldn't save/.test(d.textContent)).length;tb.innerHTML='';
+    const oSI=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new Error('QuotaExceededError')};let thrown=false;
+    try{P.save();P.save();P.save()}catch(e){thrown=true}finally{Storage.prototype.setItem=oSI}
+    ok(!thrown&&G.saveOk===false&&nWarn()===1,'save: failures warn exactly once',`${thrown} ${G.saveOk} ${nWarn()}`);
+    P.openPhone('set');ok(/Couldn't save/.test(document.getElementById('pBody').innerHTML),'save: settings shows the warning');
+    click('[data-a="savenow"]');const sb=document.getElementById('pBody').innerHTML;
+    ok(G.saveOk===true&&/Last saved \d+:\d\d/.test(sb)&&/v1\.5\.0/.test(sb),'save: Save now recovers and shows Last saved + version');P.closePanel();
+    ok(/v1\.5\.0/.test(document.querySelector('#title .foot').textContent),'save: title footer shows the version');
+  }catch(e){ok(false,'v1.5.0 improvements block B threw',e.stack)}
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
+    // 7. mailbox Take all + unread badge
+    S.mail.length=0;S.inv.fill(null);for(let i=0;i<S.invSize-3;i++)S.inv[i]={id:'fu_bed',q:1};
+    for(let k=0;k<5;k++)P.mail('Tester','Gift '+k,'fu_piano');
+    P.openMail();ok(/data-a="takeall"/.test(document.getElementById('pBody').innerHTML),'mail: Take all button shown');
+    document.getElementById('toasts').innerHTML='';click('[data-a="takeall"]');
+    const got=S.inv.filter(s=>s&&s.id==='fu_piano').length,left=S.mail.filter(m=>m.gift==='fu_piano').length;
+    ok(got===3&&left===2,'mail: Take all fills free slots and keeps the rest',got+'/'+left);
+    ok([...document.getElementById('toasts').children].some(d=>/pockets are full/i.test(d.textContent)),'mail: full-pockets toast');
+    ok(S.mail.filter(m=>!m.gift).every(m=>m.read),'mail: emptied letters marked read');P.closePanel();
+    S.mail.length=0;P.mail('Tester','Chimes','bag');S.mail[0].gv=777;P.mail('Tester','More','bag');S.mail[0].gv=223;const c0=S.coins;P.PA.takeall();
+    ok(S.coins===c0+1000&&S.mail.every(m=>!m.gift),'mail: chime bags pay their value',S.coins-c0);
+    S.mail.length=0;for(let k=0;k<3;k++)P.mail('Tester','Hi '+k);P.updateHUD();const bd=document.getElementById('mailB');
+    ok(!bd.hidden&&bd.textContent==='3'&&P.unreadMail()===3,'mail: badge shows unread count',bd.textContent);
+    {const mi=P.ISLE.obj.findIndex(o=>o&&o.k==='mail'),mx=mi%P.ISLE.W,my=(mi/P.ISLE.W)|0;G.px=(mx+.5)*32;G.py=(my+1.5)*32;G.fx=0;G.fy=-1;
+     const h=P.computeHint();ok(h&&/Check mail \(3 new\)/.test(h.t),'mail: mailbox hint has the count',h&&h.t)}
+    let nm=0;const mo=new MutationObserver(r=>{nm+=r.length});mo.observe(bd,{childList:true,attributes:true,characterData:true,subtree:true});
+    for(let k=0;k<10;k++)P.updateHUD();await wait(0);mo.disconnect();ok(nm===0,'mail: badge not rewritten when count unchanged',nm);
+    S.mail.forEach(m=>{m.read=1});P.updateHUD();ok(bd.hidden,'mail: badge hidden at 0');
+    // 8. museum hall milestones
+    S.mail.length=0;const cm=()=>P.S.mail.filter(m=>m.from==='Dr. Quillfeather').length,nT=Math.ceil(P.FISH.length*.25);
+    S.inv.fill(null);for(let i=0;i<nT-1;i++)S.don.fish[i]=1;P.musCheck();ok(cm()===0,'museum: no mail below 25%');
+    S.inv[0]={id:P.FISH[nT-1].id,q:1};P.PA.donate({i:'0'});ok(cm()===1&&S.musRw.fish===1,'museum: reaching 25% fish sends one curator letter',cm());
+    P.save();P.loadFrom(localStorage.getItem('puddlewick-isle.v1'));const S2=P.S;S2.inv[0]={id:P.FISH[nT].id,q:1};P.PA.donate({i:'0'});
+    ok(cm()===1&&S2.musRw.fish===1,'museum: reward not resent after save/load',cm());
+    const L=P.FISH.length;for(let i=0;i<L-1;i++)S2.don.fish[i]=1;S2.inv[0]={id:P.FISH[L-1].id,q:1};P.PA.donate({i:'0'});
+    const hf=()=>S2.mail.filter(m=>m.gift==='fu_hallfish').length;ok(cm()===2&&hf()===1&&S2.musRw.fish===4,'museum: last fish mails the hall statue once',cm()+'/'+hf());
+    S2.inv[0]={id:P.FISH[0].id,q:1};P.PA.donate({i:'0'});P.musCheck();ok(hf()===1&&cm()===2,'museum: statue not repeated');
+    P.PAN.tab='fish';const mh=P.renderMuseum();ok(/Fish hall ✔/.test(mh)&&!/Bug hall ✔/.test(mh),'museum: complete hall tab shows ✔');
+    ok((mh.match(/class="tick/g)||[]).length===4,'museum: hall bar has 4 tick marks');
+    for(const b of P.BUGS.slice(0,-3))S2.don.bug[b.i]=1;ok(/Only 3 bugs left/.test(P.musLine()),'museum: greeting mentions progress',P.musLine());
+    for(const b of P.BUGS)S2.don.bug[b.i]=1;for(const f of P.FOSSILS)S2.don.fossil[f.i]=1;P.musCheck();P.musCheck();
+    const gq=S2.mail.filter(m=>m.gift==='fu_goldquill').length;ok(gq===1&&S2.flags.goldQuill===1,'museum: all halls mail one Golden Quill',gq);
+    ok(P.IT.fu_hallfish.p===0&&!P.isOrderable('fu_hallfish')&&!P.isOrderable('fu_goldquill'),'museum: statues are not in the catalog shop');
+    // old save without musRw: zeros, then at most one letter per hall
+    await fresh();const S3=P.S;for(let i=0;i<Math.ceil(P.FISH.length*.8);i++)S3.don.fish[i]=1;for(let i=0;i<12;i++)S3.don.bug[i]=1;
+    const raw=JSON.parse(P.serialize());delete raw.musRw;P.loadFrom(JSON.stringify(raw));const S4=P.S;
+    ok(cm()===2&&S4.musRw&&S4.musRw.fish===3&&S4.musRw.bug===1&&S4.musRw.fossil===0,'museum: old save gets one letter per hall on load, not a burst',cm()+' '+JSON.stringify(S4.musRw));
+    S4.mail.length=0;S4.inv.fill(null);S4.inv[0]={id:P.FOSSILS[0].id,q:1};P.PA.donate({i:'0'});
+    ok(cm()===0&&S4.musRw.fish===3,'museum: no repeat letters after the load check',cm());
+  }catch(e){ok(false,'v1.5.0 improvements block C threw',e.stack)}
+
+  // review fixes: hop landing footprint, completed-hall rewards on load, Tab/Enter keys, radar vs toasts, badge contrast
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
+    const key=(code,o={})=>window.dispatchEvent(new KeyboardEvent('keydown',Object.assign({code,key:code,bubbles:true,cancelable:true},o)));
+    const W=P.W;let bad=null;
+    for(let ty=2;ty<W.H-2&&!bad;ty++)for(let tx=2;tx<W.W-2;tx++){const x=tx*32+3,y=(ty+.5)*32;if(!P.canStand(x,y,false)&&P.canStand(x+12,y,false)){bad=[x,y];break}}
+    ok(bad,'hop: found a half-over-water landing spot');
+    if(bad){const gx=G.px,gy=G.py;G.lastGround.x=gx;G.lastGround.y=gy;G.lastGround.w=W;G.px=bad[0];G.py=bad[1];G.hopZ=.001;G.hopVy=-50;P.step(.016);
+      ok(G.px===gx&&G.py===gy&&P.canStand(G.px,G.py,false),'hop: landing with feet over water snaps back to solid ground',G.px+','+G.py);
+      G.hopZ=0;G.hopVy=0;G.px=bad[0];G.py=bad[1];P.step(.016);ok(!(G.lastGround.x===bad[0]&&G.lastGround.y===bad[1]),'hop: last ground never records a half-in-water spot');G.px=gx;G.py=gy}
+    P.closePanel();key('Tab');ok(P.PAN.open&&P.PAN.kind==='inv','keys: Tab still opens Pockets');key('Escape');ok(!P.PAN.open,'keys: Escape closes Pockets');
+    const bb=document.getElementById('bBag');bb.focus();const ev=new KeyboardEvent('keydown',{code:'Enter',key:'Enter',bubbles:true,cancelable:true});window.dispatchEvent(ev);
+    ok(!ev.defaultPrevented,'keys: Enter on a focused HUD button keeps native activation');P.closePanel();document.querySelector('canvas').focus();
+    S.set.radar=1;P.syncRadar();ok(document.body.classList.contains('radarOn'),'radar: body class set when shown');S.set.radar=0;P.syncRadar();ok(!document.body.classList.contains('radarOn'),'radar: body class cleared when hidden');
+    S.mail.length=0;P.mail('Tester','Hi');P.updateHUD();const bg=getComputedStyle(document.getElementById('mailB')).backgroundColor;ok(bg==='rgb(181, 72, 72)','mail: badge uses the AA-contrast fill',bg);
+  }catch(e){ok(false,'review fixes block threw',e.stack)}
 
   // ---- feature tests: append new blocks above this line (END marker) ----
 }catch(e){errs.push('EXC '+e.stack)}

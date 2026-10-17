@@ -33,6 +33,8 @@ No install, no account, no ads. Works on desktop and phones, and plays offline o
 | 📱 **ShellPhone** | Map, Critterpedia, DIY recipes, sunroot chart, neighbors, calendar, camera mode, settings (including time travel) and a guide. |
 | 🏆 **Saturday Derby** | Every Saturday from 9 AM to 6 PM, Marlowe the otter runs 3-minute Fishing Derby and Bug-Off rounds in the plaza, alternating weekly. Win Tide Points and bronze, silver and gold trophies. |
 | 🏵️ **Isle Bloom rating** | Hazel at Town Hall rates your island from 0 to 5 stars and suggests improvements. Each new star mails a one-time reward. |
+| 📒 **Catalog** | The ShellPhone Catalog remembers every furniture, wallpaper and flooring item you've owned. Re-order up to 5 a day from Bramble's (delivered by mail the next morning) and complete 8 themed furniture series for Tide Points. |
+| 🎵 **Tidewater Tunes** | Saturdays from 8 PM to midnight, Piper the heron busks in the plaza. Request one of 12 original songs, take home its record, and play it at home on a crafted record player. |
 | ✨ **Island life** | Shake trees, break rocks, pop balloons with a slingshot, wish on shooting stars, watch Sunday fireworks in August, trick-or-treat on Halloween. |
 
 <p align="center">
@@ -54,6 +56,8 @@ No install, no account, no ads. Works on desktop and phones, and plays offline o
 | Put tool away | F | ✋ |
 | Pockets / ShellPhone / Map | I / P / M | 🎒 / 📱 |
 | Wish on a shooting star | Y | 🌠 |
+| Pick a dialog answer | 1–4 | Tap the answer |
+| Toggle the radar | N | 🧭 |
 
 Progress saves automatically in your browser. Use **ShellPhone → Settings** to export or import a save file.
 
