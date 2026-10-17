@@ -2,6 +2,18 @@
 
 All notable changes to Puddlewick Isle. New releases are added at the top.
 
+## v1.1.0 (2026-10-17)
+**PWA & deployment release**: installable progressive web app with offline support, full metadata for search and social sharing, and a headless-Chrome test suite.
+
+- **Progressive Web App**: service worker (network-first caching), web manifest, and app icons so the game installs on phones and desktops and works offline.
+- **SEO & social**: meta description, Open Graph and Twitter Card tags, canonical URL, robots index/follow, and a 1200×630 OG image.
+- **Content-Security-Policy update**: added `img-src 'self'`, `manifest-src 'self'` and `worker-src 'self'` so PWA assets load under the strict CSP.
+- **APP_VERSION constant**: exposed on `window.PW.APP_VERSION` for tests and upgrade automation.
+- **Test suite**: three headless-Chrome harnesses (smoke, gameplay, features) with ~60 assertions and a `tests/run.sh` runner.
+- **Fishing test fix**: corrected beach-spot facing direction so the rod-cast assertion passes reliably.
+- **README**: features table, screenshot grid, controls, install-as-app instructions, and changelog link.
+- **404 redirect**: GitHub Pages 404 page redirects to the game.
+
 ## v1.0.0 (2026-10-17)
 **Initial release**: a single-file, Animal Crossing-inspired island life sim with original characters and art.
 - **Real-time world**: real-time clock with a 5 AM day reset, Northern and Southern hemispheres, four seasons with matching visuals, weather seeded per day, and night lighting.
