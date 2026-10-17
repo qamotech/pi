@@ -1,0 +1,78 @@
+<script>
+(async()=>{
+const out=[];const log=(...a)=>out.push('info '+a.join(' '));const errs=[];const ok=(c,l,x='')=>out.push(`${c?'ok  ':'FAIL'} ${l}${x!==''?' :: '+x:''}`);window.addEventListener('unhandledrejection',e=>errs.push('REJ '+(e.reason&&e.reason.stack||e.reason)));
+window.addEventListener('error',e=>errs.push('ERR '+e.message+' @'+e.lineno));
+console.error=(...a)=>errs.push('CE '+a.map(x=>x&&x.stack||x).join(' '));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const click=sel=>{const b=document.querySelector(sel);if(b){b.click();return true}return false};
+const P=window.PW;
+const adv=async(n=10)=>{for(let k=0;k<n;k++){P.dlgAdvance();await wait(5)}};
+try{
+  const d=new Date();d.setHours(10,0,0,0);
+  P.newGame({name:'Tess',island:'Testa',hemi:'N',look:{skin:'#fbe0c8',hair:'#3b2a1e',shirt:'#3f9fd2'}});
+  P.S.timeOff=d.getTime()-Date.now();
+  P.startGame(true);await adv(12);
+  const S=P.S,G=P.G,ISLE=P.ISLE;
+  const stand=(x,y,fx,fy)=>{G.px=(x+.5)*32;G.py=(y+.5)*32;G.fx=fx;G.fy=fy;G.pose=0;G.swing=0;G.cast=null};
+  const findObj=(k,pred=()=>true)=>{for(let i=0;i<ISLE.obj.length;i++){const o=ISLE.obj[i];if(o&&o.k===k&&pred(o,i))return [i%ISLE.W,(i/ISLE.W)|0,o,i]}return null};
+  const freeAt=(x,y)=>{const t=ISLE.ter[y*ISLE.W+x];return (t===2||t===3||t===6||t===7)&&!ISLE.obj[y*ISLE.W+x]};
+  const approach=(x,y)=>{for(const [dx,dy,fx,fy] of [[0,1,0,-1],[0,-1,0,1],[1,0,-1,0],[-1,0,1,0]])if(freeAt(x+dx,y+dy)){stand(x+dx,y+dy,fx,fy);return true}return false};
+  const tr=findObj('tree',o=>o.ft&&o.f>0);approach(tr[0],tr[1]);S.eq=-1;P.act();await wait(5);
+  const fruitDrops=ISLE.obj.filter(o=>o&&o.k==='it'&&o.id===ISLE.native.fruit).length;log('shake: fruit on ground',fruitDrops,'tree f',tr[2].f,'stat',S.stats.shakes);
+  let picked=0;for(let i=0;i<ISLE.obj.length&&picked<3;i++){const o=ISLE.obj[i];if(o&&o.k==='it'&&o.id===ISLE.native.fruit){const x=i%ISLE.W,y=(i/ISLE.W)|0;stand(x,y,0,1);P.act();picked++}}
+  log('fruit in pockets',S.inv.filter(s=>s&&s.id===ISLE.native.fruit).reduce((a,s)=>a+s.q,0));
+  const wd=findObj('weed');approach(wd[0],wd[1]);P.act();log('weeds',S.stats.weeds||0);
+  P.openMuseum();await adv(12);log('museum flag',S.flags.museum,'knows shovel',S.recipes.includes('r_sho0'));P.closePanel();
+  P.addItem('hardwood',5);P.craft('r_sho0');const sh=S.inv.findIndex(s=>s&&s.id==='t_sho0');log('shovel idx',sh);
+  S.eq=sh;const fd=findObj('dig',o=>o.t==='fossil');approach(fd[0],fd[1]);P.act();log('fossil dug',S.stats.fossils||0,'fossilU',S.inv.some(s=>s&&s.id==='fossilU'));
+  P.openMuseum();await adv(6);
+  click('[data-a="tab"][data-t="assess"]');click('[data-a="assess"]');click('[data-a="tab"][data-t="donate"]');const before=S.stats.donated||0;click('[data-a="donall"]');
+  log('donated',S.stats.donated||0,'(was',before+')');click('[data-a="tab"][data-t="fossil"]');log('fossil hall html ok',document.querySelector('#pBody .ped')!=null);P.closePanel();
+  const rk=findObj('rock');approach(rk[0],rk[1]);for(let k=0;k<3;k++){G.pose=0;G.swing=0;P.act()}log('rock hits',S.stats.rocks||0,'drops near',ISLE.obj.filter(o=>o&&o.k==='it'&&['stone','clay','iron','gold','bag'].includes(o.id)).length);
+  P.addItem('branch',5);P.addItem('stone',1);P.craft('r_axe0');S.eq=S.inv.findIndex(s=>s&&s.id==='t_axe0');const t2=findObj('tree',o=>o.g>=4);approach(t2[0],t2[1]);P.act();log('chops',S.stats.chops||0);
+  P.addItem('fw_rose_red',1);S.eq=-1;let spot=null;for(let i=0;i<ISLE.obj.length&&!spot;i++){const x=i%ISLE.W,y=(i/ISLE.W)|0;if(x>2&&y>2&&ISLE.ter[i]===3&&freeAt(x,y)&&freeAt(x,y+1))spot=[x,y]}
+  stand(spot[0],spot[1]+1,0,-1);P.openInv();const fi=S.inv.findIndex(s=>s&&s.id==='fw_rose_red');click(`.slot[data-i="${fi}"]`);click('[data-a="plant"]');
+  const pl=ISLE.obj[spot[1]*ISLE.W+spot[0]];log('planted',pl&&pl.k,pl&&pl.c);
+  P.addItem('softwood',5);P.craft('r_can0');S.eq=S.inv.findIndex(s=>s&&s.id==='t_can0');G.swing=0;P.act();log('watered',S.stats.watered||0);
+  P.openShop();await adv(6);log('shop open',P.PAN.open);const c0=S.coins;click('[data-a="buy"][data-id="t_sli"]');log('bought slingshot',S.inv.some(s=>s&&s.id==='t_sli'),c0-S.coins);
+  click('[data-a="tab"][data-t="sell"]');const c1=S.coins;click('[data-a="sell1"]');log('sold for',S.coins-c1);click('[data-a="tab"][data-t="sun"]');log('sun tab',!!document.querySelector('#pBody .chart'));P.closePanel();
+  const a=P.villActors()[0];a.home=false;a.x=G.px;a.y=G.py+24;
+  P.talkTo(a);await wait(5);let guard=0;
+  while(guard++<60){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();await wait(2);const gi=P.DLG.choices.indexOf('Give a gift');P.choose(gi>=0?gi:P.DLG.choices.length-1);await wait(5)}
+    else if(P.PAN.open&&P.PAN.kind==='pick'){click('[data-a="pickg"]')}else if(P.DLG.on)P.dlgAdvance();else break}
+  log('talked',S.stats.talks||0,'gifts',S.stats.gifts||0,'fr',S.vill[0].fr,'busy',G.busy);
+  P.addItem('fu_tv',1);P.addItem('wl_wmint',1);P.enterHouse();for(let k=0;k<5;k++)P.step(1/60);
+  G.fx=0;G.fy=-1;G.py-=40;P.openInv();click(`.slot[data-i="${S.inv.findIndex(s=>s&&s.id==='fu_tv')}"]`);click('[data-a="place"]');log('placed',S.house.items.length);
+  P.openInv();click(`.slot[data-i="${S.inv.findIndex(s=>s&&s.id==='wl_wmint')}"]`);click('[data-a="apply"]');log('wall',S.house.wall,'old back',S.inv.some(s=>s&&s.id==='wl_wcream'));P.closePanel();
+  P.exitHouse();
+  S.pts=9000;P.openHall();await adv(6);click('[data-a="tab"][data-t="pts"]');click('[data-a="redeem"][data-id="ticket"]');click('[data-a="redeem"][data-id="pocket1"]');log('ticket',S.inv.some(s=>s&&s.id==='ticket'),'invSize',S.invSize,'pts',S.pts);
+  click('[data-a="tab"][data-t="home"]');click('[data-a="upgrade"]');log('loan',S.loan,'upgradeDay',S.upgradeDay);
+  click('[data-a="tab"][data-t="bank"]');document.getElementById('bankN').value='500';click('[data-a="dep"]');log('bank',S.bank);P.closePanel();
+  const mb=findObj('mail');approach(mb[0],mb[1]);P.act();log('mail panel',P.PAN.kind);click('[data-a="take"]');log('gifts left',S.mail.filter(m=>m.gift).length);P.closePanel();
+  P.timeTravel(S.timeOff+86400000);for(let k=0;k<5;k++)P.step(1/60);log('houseLv',S.houseLv,'mail count',S.mail.length);
+  const sun=new Date(Date.now()+S.timeOff);while(sun.getDay()!==0)sun.setDate(sun.getDate()+1);sun.setHours(9,0,0,0);P.timeTravel(sun.getTime()-Date.now());
+  log('sun week',S.sun.week,'base',S.sun.base);
+  S.coins=50000;const ro={P:{n:'Rosie',pitch:1},rosie:true,x:G.px,y:G.py,fx:0,fy:1,st:'idle'};
+  P.talkTo(ro);guard=0;while(guard++<30){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();P.choose(0)}else if(P.DLG.on)P.dlgAdvance();else if(P.PAN.open)break}
+  if(P.PAN.open){document.getElementById('sunN').value='3';click('[data-a="sunbuy"]')}log('sunroots',S.inv.filter(s=>s&&s.id==='sunroot').reduce((a,s)=>a+s.q,0));P.closePanel();await wait(5);
+  const mon=new Date(sun);mon.setDate(mon.getDate()+1);mon.setHours(10,0,0,0);P.timeTravel(mon.getTime()-Date.now());
+  P.openShop();await adv(6);click('[data-a="tab"][data-t="sell"]');const si=S.inv.findIndex(s=>s&&s.id==='sunroot');const c2=S.coins;click(`[data-a="sellall"][data-i="${si}"]`);log('sold sunroots for',S.coins-c2,'seen',JSON.stringify(S.sun.seen));P.closePanel();
+  P.addItem('sunroot',10,{wk:S.sun.week});const nsun=new Date(mon);nsun.setDate(nsun.getDate()+6);nsun.setHours(9,0,0,0);P.timeTravel(nsun.getTime()-Date.now());log('rotten',S.inv.some(s=>s&&s.id==='rotten'));
+  const tr3=findObj('tree',o=>o.g>=4);approach(tr3[0],tr3[1]);
+  S.dly.wasp=[tr3[3]];S.eq=-1;tr3[2].sk=-1;G.pose=0;P.act();log('wasp spawned',P.bugs().some(b=>b.sp==='wasp'));for(let k=0;k<240;k++)P.step(1/60);log('stung',S.flags.stung,'stat',S.stats.stung);
+  const cmTry=[];for(let k=0;k<6&&!P.W.camper;k++){if(P.W.kind==='tour')P.returnHome();P.startTour()}const cm=P.W.camper;log('camper',cm&&cm.P.n);
+  if(cm){G.px=cm.x;G.py=cm.y-24;G.fx=0;G.fy=1;P.talkTo(cm);guard=0;while(guard++<30){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();P.choose(0)}else if(P.DLG.on)P.dlgAdvance();else break}log('moveIn',S.moveIn)}
+  P.returnHome();P.timeTravel(S.timeOff+86400000);for(let k=0;k<5;k++)P.step(1/60);log('villagers now',S.vill.length);
+  for(let k=0;k<60;k++){P.step(1/60);P.render()}
+  log('ach',JSON.stringify(S.ach),'pts',S.pts);
+  ok((S.stats.shakes||0)>=1,'tree shakes');ok((S.stats.weeds||0)>=1,'weed pulled');ok((S.stats.fossils||0)>=1,'fossil dug');
+  ok((S.stats.donated||0)>=1,'museum donation');ok((S.stats.rocks||0)>=1,'rock hit');ok((S.stats.chops||0)>=1,'wood chopped');
+  ok((S.stats.watered||0)>=1,'flower watered');ok((S.stats.gifts||0)>=1,'gift given');ok(S.house.items.length>=1,'furniture placed');
+  ok(S.house.wall==='wl_wmint','wallpaper applied');ok(S.invSize===30,'pocket upgrade redeemed');ok(S.houseLv===1,'house upgraded next day');
+  ok(S.bank>=500,'bank deposit');ok(S.inv.some(s=>s&&s.id==='rotten'),'sunroots spoil after a week');ok(S.flags.stung===1||(S.stats.stung||0)>=1,'wasp sting');
+  ok(S.vill.length===5,'camper moved in');ok(!G.busy,'not stuck busy');
+
+}catch(e){errs.push('EXC '+e.stack)}
+const pre=document.createElement('pre');pre.id='RESULT';pre.textContent=out.join('\n')+'\n--ERRORS--\n'+errs.slice(0,20).join('\n');document.body.appendChild(pre);
+})();
+</script>
