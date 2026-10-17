@@ -17,6 +17,225 @@ try{
   const S=P.S,G=P.G;
   ok(typeof P.APP_VERSION==='string'&&/^\d+\.\d+\.\d+$/.test(P.APP_VERSION),'APP_VERSION is exposed',P.APP_VERSION);
 
+  // v1.2.0 Saturday Derby
+  try{
+    await fresh();const S=P.S,G=P.G;
+    const at=(days,h)=>{const d=new Date();d.setDate(d.getDate()+((6-d.getDay()+7)%7)+7+days);d.setHours(h,0,0,0);P.timeTravel(d.getTime()-Date.now())};
+    const hasTrophy=id=>S.inv.some(s=>s&&s.id===id)||P.ISLE.obj.some(o=>o&&o.id===id);
+    const nTrophies=()=>S.inv.filter(s=>s&&/^fu_dt/.test(s.id)).length+P.ISLE.obj.filter(o=>o&&/^fu_dt/.test(o.id||'')).length;
+    const land=sz=>{const f=P.FISH.find(q=>q.sz===sz),mr=Math.random;Math.random=()=>.5;try{P.landFish({f,st:'bite'})}finally{Math.random=mr}};
+    const run=async()=>{P.closePanel();for(let i=0;i<370&&P.tr;i++)P.step(.5);await adv(10)};
+    if(G.scene!=='island')P.exitHouse();
+    at(0,11);const k1=P.derbyKind();
+    ok(k1==='fish'||k1==='bug','derby: Saturday 11 AM has a kind',k1);
+    ok(P.events().some(e=>/Derby|Bug-Off/.test(e)),'derby: events line on Saturday',P.events().join('|'));
+    ok(P.npcs().some(a=>a.P&&a.P.n==='Marlowe'),'derby: Marlowe is in the plaza');
+    at(0,19);ok(P.derbyKind()===null&&!P.npcs().some(a=>a.derby),'derby: closed at 7 PM');
+    at(1,11);ok(P.derbyKind()===null&&!P.npcs().some(a=>a.derby),'derby: closed on Sunday');
+    at(-1,12);ok(P.events().some(e=>/tomorrow/.test(e)),'derby: Friday tomorrow line');
+    at(7,11);const k2=P.derbyKind();ok(k2&&k2!==k1,'derby: consecutive Saturdays alternate',k1+'/'+k2);
+    const fw=k1==='fish'?0:7,bw=7-fw;
+    at(fw,11);ok(P.startDerby()&&P.tr.k==='fish'&&Math.abs(P.tr.t-180)<1,'derby: fish round starts at 180s');
+    land(6);ok(P.tr.score===4,'derby: size-6 fish scores 4',P.tr.score);
+    P.catchBug(P.BUGS[0]);ok(P.tr.score===4,'derby: bug scores 0 on fish week',P.tr.score);
+    land(6);const pts0=S.pts,sc=P.tr.score;
+    await run();
+    ok(P.tr===null,'derby: round ends after 180s');
+    ok(S.derby.best.fish>=4&&S.derby.rounds===1,'derby: best and rounds recorded',JSON.stringify(S.derby));
+    ok(S.pts-pts0>=sc*50,'derby: Tide Points paid',S.pts-pts0);
+    ok(hasTrophy('fu_dtf1'),'derby: bronze trophy granted at 5+');
+    const nt=nTrophies();P.startDerby();land(6);land(6);land(6);await run();
+    ok(S.derby.best.fish===12&&nTrophies()===nt&&!hasTrophy('fu_dtf2'),'derby: replay raises best, no second trophy',S.derby.best.fish+'/'+nTrophies());
+    {const m=P.npcs().find(a=>a.derby);G.px=m.x;G.py=m.y+24;P.talkTo(m);let g=0;while(g++<40){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();P.choose(0)}else if(P.DLG.on)P.dlgAdvance();else if(!G.busy)break}
+     ok(P.tr&&P.tr.k==='fish'&&!G.busy,'derby: talking to Marlowe starts a round');}
+    P.enterHouse();ok(P.tr===null,'derby: entering house cancels round');P.exitHouse();
+    P.startDerby();P.startTour();ok(P.tr===null,'derby: starting a tour cancels round');P.returnHome();
+    at(bw,11);P.startDerby();const big=P.BUGS.find(b=>b.p>=1000);P.catchBug(big);ok(P.tr&&P.tr.k==='bug'&&P.tr.score===3,'derby: pricey bug scores 3 on bug week',P.tr&&P.tr.score);
+    land(6);ok(P.tr.score===3,'derby: fish scores 0 on bug week');P.enterHouse();P.exitHouse();
+    const o=JSON.parse(JSON.stringify(S));delete o.derby;P.loadFrom(JSON.stringify(o));
+    ok(P.S.derby&&P.S.derby.best.fish===0&&P.S.derby.last.bug===-1,'derby: v1.1 save gets defaults');
+    ok(P.IT.fu_dtb3&&P.IT.fu_dtf3.c==='furn','derby: trophy items defined');
+  }catch(e){ok(false,'derby block threw',e.stack)}
+
+  // v1.2.0 Isle Bloom Rating
+  try{
+    await fresh();let S=P.S;const I=P.ISLE;
+    const r0=P.bloomScore();
+    ok(r0&&typeof r0.score==='number'&&r0.score>=0&&Array.isArray(r0.parts)&&r0.parts.length>=6,'bloom: bloomScore returns score and 6+ parts',r0&&r0.parts.length);
+    ok(S.bloom&&S.bloom.day>=0&&typeof S.bloom.stars==='number','bloom: dailyRefresh stored rating',JSON.stringify(S.bloom));
+    {const o=JSON.parse(JSON.stringify(S));delete o.bloom;P.loadFrom(JSON.stringify(o));S=P.S;
+     ok(S.bloom&&S.bloom.best===0&&S.bloom.day===-1&&S.bloom.stars===0,'bloom: old save gets S.bloom defaults',JSON.stringify(S.bloom));}
+    {const s0=P.bloomScore().score;let n=0;for(let i=0;i<I.obj.length&&n<20;i++)if(!P.ISLE.obj[i]&&P.ISLE.ter[i]===3){P.ISLE.obj[i]={k:'weed',v:0};n++}
+     const s1=P.bloomScore().score;ok(n===20&&(s0>=500?s0-s1===500:s1===0),'bloom: 20 weeds lower score by 500',s0+'->'+s1);
+     ok(P.bloomScore().parts.some(p=>/Pull \d+ weeds|pull \d+ weeds/.test(p[2]||'')),'bloom: weeds tip names a count');}
+    // star 1 reward mailed once
+    await fresh();S=P.S;const W=P.ISLE;
+    for(let i=0;i<W.obj.length;i++){const o=W.obj[i];if(o&&(o.k==='flw'||o.k==='weed'||(o.k==='it'&&P.IT[o.id]&&/furn|junk/.test(P.IT[o.id].c))))W.obj[i]=null}
+    const base=P.bloomScore().score;let need=Math.ceil((P.BLOOM_STARS[1]+150-base)/12),added=0;
+    for(let i=0;i<W.obj.length&&added<need;i++)if(!W.obj[i]&&W.ter[i]===3){W.obj[i]={k:'flw',sp:'tulip',c:'red',st:3,w:-9};added++}
+    S.bloom.best=0;S.bloom.stars=0;S.ach.bloom=0;
+    const rs=()=>S.mail.filter(m=>m.from==='Resident Services'&&!m.read&&m.gift).length,m0=rs(),pts0=S.pts;
+    S.lastDay-=1;P.processDays();
+    ok(S.bloom.stars>=1&&S.bloom.stars<2&&S.bloom.best===1,'bloom: reaching star-1 threshold gives 1 star',base+' -> '+JSON.stringify(S.bloom));
+    ok(rs()===m0+1&&S.mail[0].gift==='bottle'&&/1-star/.test(S.mail[0].text),'bloom: one Resident Services reward mail',rs()-m0);
+    ok(S.ach.bloom===1&&S.pts>pts0,'bloom: Island Star achievement tier 1',S.ach.bloom);
+    S.lastDay-=1;P.processDays();
+    ok(rs()===m0+1&&S.bloom.best===1,'bloom: same star again adds no mail',rs()-m0);
+    {S.mail[0].gv=0;S.mail.unshift({from:'Resident Services',text:'t',gift:'bag',gv:20000,read:0,day:S.lastDay});const c0=S.coins;
+     P.openMail();click('[data-a="take"][data-i="0"]');await wait(5);ok(S.coins===c0+20000&&!S.mail[0].gift,'bloom: chime-bag reward pays 20,000',S.coins-c0);P.closePanel();S.mail.shift();}
+    ok(P.RECIPES.r_flowerarch&&P.IT.fu_flowerarch&&P.IT.fu_bloom&&P.IT.fu_bloom.c==='furn','bloom: flower arch recipe and trophy defined');
+    {S.inv.fill(null);P.addItem('wood',4);P.addItem('fw_rose_red',2);P.addItem('fw_tulip_pink',1);S.recipes.push('r_flowerarch');
+     P.craft('r_flowerarch');ok(S.inv.some(s=>s&&s.id==='fu_flowerarch')&&!S.inv.some(s=>s&&/^fw_|^wood$/.test(s.id)),'bloom: flower arch crafts from any 3 flowers');}
+    // Town Hall tab
+    S.island='<b>Hx</b>';P.openHall();await adv(12);
+    ok(click('[data-a="tab"][data-t="bloom"]'),'bloom: Island rating tab exists');await wait(5);
+    const pb=document.getElementById('pBody');
+    ok(pb&&pb.textContent.includes('★')&&S.bloom.stars>=1,'bloom: tab shows stars',S.bloom.stars);
+    ok(pb&&/Hazel's advice:/.test(pb.textContent)&&pb.querySelector('.advice'),'bloom: advice line shown',pb&&pb.querySelector('.advice')&&pb.querySelector('.advice').textContent);
+    ok(pb&&pb.textContent.includes('<b>Hx</b>')&&!pb.innerHTML.includes('<b>Hx</b>'),'bloom: island name escaped');
+    P.closePanel();
+    P.openBoard&&(P.openBoard(),ok(/Island rating: \d★/.test(document.getElementById('pBody').textContent),'bloom: bulletin board shows rating'),P.closePanel());
+  }catch(e){ok(false,'bloom block threw',e.stack)}
+
+  // v1.2.0 Mailbox trim keeps unclaimed gifts
+  try{
+    await fresh();const S=P.S;const ids=Object.keys(P.IT).filter(k=>/^fu_/.test(k)&&P.IT[k].s===1).slice(0,45);
+    S.stor=[];S.mail=[];for(let i=0;i<40;i++)S.mail.push({from:'T',text:'t'+i,gift:ids[i],read:0,day:1});
+    for(let i=40;i<45;i++)P.mail('T','new'+i,ids[i]);
+    const lost=ids.filter(id=>!S.mail.some(m=>m.gift===id)&&!S.stor.some(s=>s.id===id));
+    ok(!lost.length&&S.mail.length<=60,'mail: 45 gift letters lose no gift',lost.join(',')+' len '+S.mail.length);
+    ok(S.mail.some(m=>/sent to storage/.test(m.text))&&S.flags.mailFull===1,'mail: storage note and nearly-full flag');
+    S.stor=[];S.mail=[];for(let i=0;i<45;i++)S.mail.push(i%9===0?{from:'T',text:'g',gift:'fu_chair',read:i%2,day:1}:{from:'T',text:'x',gift:null,read:i%2,day:1});
+    const g0=S.mail.filter(m=>m.gift).length;P.mail('T','hello');
+    ok(S.mail.filter(m=>m.gift).length===g0&&S.mail.length===40&&!S.stor.length,'mail: giftless letters trimmed before gift letters',S.mail.length+'/'+g0);
+    S.mail=[];S.storSize=S.stor.length;for(let i=0;i<70;i++)P.mail('T','full'+i,'fu_chair');
+    ok(S.mail.length<=60&&S.mail.length>=55,'mail: never above 60 when storage is full',S.mail.length);S.storSize=200;
+  }catch(e){ok(false,'mail trim block threw',e.stack)}
+
+  // v1.2.0 Never silently lose items / collection progress
+  try{
+    await fresh();let S=P.S;const G=P.G;const full=()=>{for(let i=0;i<S.inv.length;i++)S.inv[i]={id:'wood',q:30}};
+    P.startTour();full();let s0=S.stor.length;P.giveOrDrop('fu_plant');ok(S.stor.length===s0+1,'lose: tour + full pockets sends to storage');P.returnHome();
+    P.enterHouse();full();s0=S.stor.length;P.giveOrDrop('fu_plant');ok(S.stor.length===s0+1,'lose: house + full pockets sends to storage');
+    S.storSize=S.stor.length;P.giveOrDrop('fu_lamp');ok(S.mail[0].from==='Lost & Found'&&S.mail[0].gift==='fu_lamp','lose: storage full mails Lost & Found');S.storSize=200;P.exitHouse();
+    ok(!P.giftFlow.toString().includes('||true'),'lose: dead ||true filter removed');
+    S.inv.fill(null);S.inv[0]={id:'t_net0',q:1,d:10};S.inv[1]={id:'t_rod0',q:1,d:10};S.eq=0;
+    const a=P.villActors()[0];a.home=false;const pr=P.giftFlow(a,false);await wait(5);
+    ok(P.PAN.kind==='pick'&&!document.querySelector('[data-a="pickg"][data-i="0"]')&&document.querySelector('[data-a="pickg"][data-i="1"]'),'lose: equipped slot not giftable');
+    click('[data-a="pickg"][data-i="1"]');await wait(5);
+    ok(P.DLG.on&&P.DLG.choices&&P.DLG.choices.includes('No, keep it'),'lose: tool gift asks to confirm');
+    if(P.DLG.on&&P.DLG.choices)P.choose(1);await wait(5);for(let g=0;g<20&&P.DLG.on;g++){await wait(5);P.dlgAdvance()}await Promise.race([pr,wait(300)]);
+    ok(S.inv[1]&&S.inv[1].id==='t_rod0'&&!(S.stats.gifts>0),'lose: No keeps the tool');
+    P.openShop();await adv(6);click('[data-a="tab"][data-t="sell"]');
+    const sb=P.FISH.find(f=>f.n==='Sea bass'),cp=P.FISH.find(f=>f.n==='Carp');S.inv.fill(null);S.eq=-1;S.inv[0]={id:sb.id,q:1};S.inv[1]={id:sb.id,q:1};S.inv[2]={id:cp.id,q:1};
+    delete S.don.fish[sb.i];S.don.fish[cp.i]=1;const exp=P.sellPrice(S.inv[2])+P.sellPrice(S.inv[0]),c0=S.coins;click('[data-a="tab"][data-t="sell"]');
+    click('[data-a="sellcat"][data-c="fish,bug"]:not([data-all])');
+    ok(P.invCount(sb.id)===1&&P.invCount(cp.id)===0&&S.coins-c0===exp,'lose: sell all keeps one undonated species',P.invCount(sb.id)+'/'+P.invCount(cp.id)+' '+(S.coins-c0)+' vs '+exp);
+    click('[data-a="sellcat"][data-all="1"]');ok(P.invCount(sb.id)===0,'lose: Sell everything anyway sells all');P.closePanel();
+  }catch(e){ok(false,'lose block threw',e.stack)}
+
+  // v1.2.0 Freeze hazards while menus/dialogs are open
+  try{
+    await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();S.flags.stung=0;G.stung=0;G.faint=0;P.closePanel();
+    const w={b:P.BUGS.find(b=>b.sp==='wasp'),sp:'wasp',x:G.px+20,y:G.py,ox:0,oy:0,z:16,st:'chase',born:G.t,t:0,al:1};P.bugs().push(w);
+    P.openInv();for(let i=0;i<40;i++)P.step(.05);
+    ok(!S.flags.stung&&P.bugs().includes(w),'freeze: wasp cannot sting inside Pockets');
+    P.closePanel();for(let i=0;i<40&&!S.flags.stung;i++)P.step(.05);ok(S.flags.stung===1,'freeze: wasp stings after closing');
+    S.flags.stung=0;G.stung=0;G.faint=0;const tb=P.BUGS.find(b=>b.chase);
+    P.openShop();await wait(5);ok(P.DLG.on,'freeze: dialog open');
+    P.bugs().push({b:tb,sp:tb.sp,x:G.px+8,y:G.py,ox:G.px,oy:G.py,st:'chase',t:0,al:1,born:G.t,z:0,hop:0});
+    for(let i=0;i<40;i++)P.step(.05);ok(G.faint<=0,'freeze: chasing tarantula cannot knock out during dialog');
+    await adv(6);P.closePanel();
+  }catch(e){ok(false,'freeze block threw',e.stack)}
+
+  // v1.2.0 No per-frame allocations / events cache
+  try{
+    await fresh();const S=P.S,G=P.G;P.closePanel();
+    const a=P.fishes(),b=P.bugs(),pp=P.parts();for(let i=0;i<100;i++){P.step(.016);P.render()}
+    ok(a===P.fishes()&&b===P.bugs()&&pp===P.parts(),'prune: entity arrays keep their instances');
+    const e1=P.events(),e2=P.events();ok(e1===e2,'prune: events() cached within a minute');
+    P.timeTravel(S.timeOff+3600e3);ok(P.events()!==e1,'prune: timeTravel refreshes events()');
+    const d=new Date(new Date().getFullYear(),11,31,21,0,0,0);P.timeTravel(d.getTime()-Date.now());if(G.scene!=='island')P.exitHouse();P.closePanel();
+    let sawB=0;for(let i=0;i<600;i++){if(i%40===0)P.stars().push({x:100,y:20,vx:-300,vy:150,t:0,l:.9,w:false});P.step(.05);P.render();sawB=Math.max(sawB,P.bursts().length)}
+    ok(sawB>0&&P.stars().length<5,'prune: 600 steps with fireworks and shooting stars',sawB+'/'+P.stars().length);
+  }catch(e){ok(false,'prune block threw',e.stack)}
+
+  // v1.2.0 Screen shake + Reduce motion
+  try{
+    await fresh();let S=P.S;const G=P.G;P.closePanel();if(G.scene!=='island')P.exitHouse();
+    const proto=CanvasRenderingContext2D.prototype,orig=proto.setTransform;let calls=[];proto.setTransform=function(...x){calls.push(x);return orig.apply(this,x)};
+    const world=(sh,rnd)=>{const mr=Math.random;Math.random=()=>rnd;G.shake=sh;calls=[];try{P.render()}finally{Math.random=mr;G.shake=0}return calls[1]||[]};
+    try{S.set.rm=false;const r0=world(0,.95),r1=world(.3,.95);ok(r1[4]!==r0[4]||r1[5]!==r0[5],'motion: shake offsets the world transform',r0+' | '+r1);
+      S.set.rm=true;const r2=world(.3,.95);ok(r2[4]===r0[4]&&r2[5]===r0[5],'motion: reduce motion disables shake');}finally{proto.setTransform=orig}
+    ok(P.wob({_sh:G.t-.1})===0,'motion: tree wobble off when calm');S.set.rm=false;ok(P.wob({_sh:G.t-.1})!==0,'motion: tree wobble on otherwise');S.set.rm=true;
+    const n0=P.parts().length;P.puff(0,0,14,'#fff');ok(P.parts().length-n0<=3,'motion: puff capped at 3 when calm',P.parts().length-n0);
+    const o=JSON.parse(JSON.stringify(S));o.set={music:.3,sfx:.5};P.loadFrom(JSON.stringify(o));S=P.S;
+    ok(S.set.rm===null&&S.set.music===.3&&S.set.sfx===.5,'motion: old save gets set.rm=null, keeps volumes',JSON.stringify(S.set));
+    P.openPhone('set');await wait(5);ok(click('[data-a="rm"][data-v="1"]')&&S.set.rm===true&&!document.querySelector('[data-a="rm"][data-v="1"]').classList.contains('alt'),'motion: Settings toggle On re-renders');
+    click('[data-a="rm"][data-v="0"]');ok(S.set.rm===false&&document.querySelector('[data-a="rm"][data-v="0"]').getAttribute('aria-pressed')==='true','motion: Settings toggle Off');
+    click('[data-a="rm"][data-v="auto"]');ok(S.set.rm===null,'motion: Settings toggle Auto');P.closePanel();
+  }catch(e){ok(false,'motion block threw',e.stack)}
+
+  // v1.2.0 Heart Day
+  try{
+    await fresh();const S=P.S,G=P.G;S.moveIn=null;const y=new Date().getFullYear()+1;
+    S.vill.forEach((v,i)=>{v.fr=[30,10,120,24,40][i]??30});
+    P.timeTravel(new Date(y,1,14,9,0,0,0).getTime()-Date.now());P.processDays();
+    ok(P.events().some(e=>/Heart Day/.test(e)),'heart: events line on Feb 14');
+    const cnt=()=>S.vill.map(v=>S.mail.filter(m=>m.from===P.VPOOL[v.p].n&&m.day===S.lastDay).length);
+    const c1=cnt();ok(S.vill.every((v,i)=>c1[i]===(v.fr>=25?1:0)),'heart: one letter from each friend (fr>=25), none otherwise',c1.join(','));
+    ok(S.mail.some(m=>m.gift==='choco')&&P.IT.choco&&P.IT.choco.c==='candy','heart: chocolate gift defined and sent');
+    {const bf=P.VPOOL[S.vill[2].p].n,m=S.mail.find(q=>q.from===bf&&q.day===S.lastDay);ok(m&&/^fu_/.test(m.gift),'heart: best friend sends furniture',m&&m.gift)}
+    S.lastDay-=1;P.processDays();const c2=cnt();ok(c2.join()===c1.join(),'heart: no duplicates on a second processDays',c2.join(','));
+    {const v=S.vill.find(q=>q.fr>=25&&P.VPOOL[q.p].bd.join()!=='2,14');S.met[v.p]=1;v.td=-1;const a=P.villActors().find(q=>q.v===v);a.home=false;a.x=G.px;a.y=G.py+24;P.closePanel();
+     P.talkTo(a);await wait(5);ok(P.DLG.on&&/Heart Day/.test(P.DLG.full),'heart: first talk uses Heart Day line',P.DLG.full);
+     for(let g=0;g<40&&(P.DLG.on||G.busy);g++){if(P.DLG.choices){P.dlgAdvance();P.choose(P.DLG.choices.length-1)}else P.dlgAdvance();await wait(5)}}
+    P.timeTravel(new Date(y,1,15,9,0,0,0).getTime()-Date.now());
+    ok(!P.events().some(e=>/Heart Day/.test(e))&&!S.mail.some(m=>m.day===S.lastDay&&/Heart Day/.test(m.text)),'heart: nothing on Feb 15');
+  }catch(e){ok(false,'heart block threw',e.stack)}
+
+  // v1.2.0 Critterpedia filters
+  try{
+    await fresh();const S=P.S;const y=new Date().getFullYear()+1;P.closePanel();
+    P.timeTravel(new Date(y,8,28,11,0,0,0).getTime()-Date.now());S.pedia.fish={};S.pedia.bug={};
+    const ids=()=>[...document.querySelectorAll('#pBody [data-pi]')].map(e=>+e.dataset.pi);
+    const salmon=P.FISH.find(f=>f.n==='Salmon'),sb=P.FISH.find(f=>f.n==='Sea bass');
+    P.openPhone('pedia');await wait(5);click('[data-a="sub"][data-s="fish"]');ok(click('[data-a="pf"][data-f="leave"]'),'pedia: Leaving chip exists');
+    const L1=ids();ok(L1.includes(salmon.i)&&!L1.includes(sb.i),'pedia: Leaving has salmon, not sea bass',L1.length);
+    ok(document.querySelector('#pBody').textContent.includes('⏳ leaving')&&document.querySelector('#pBody').textContent.includes('???'),'pedia: leaving badge, names stay hidden');
+    const inH=(hs,h)=>hs==='all'||hs.split(',').some(p=>{const [a,b]=p.split('-').map(Number);return a<b?(h>=a&&h<b):(h>=a||h<b)});
+    click('[data-a="sub"][data-s="bug"]');click('[data-a="pf"][data-f="now"]');const N=ids();
+    ok(N.length>0&&N.every(i=>inH(P.BUGS[i].hs,11))&&P.BUGS.some(b=>!inH(b.hs,11)),'pedia: Now at 11 AM excludes night-only bugs',N.length);
+    click('[data-a="pf"][data-f="und"]');ok(ids().length===P.BUGS.filter(b=>!S.don.bug[b.i]).length,'pedia: Undonated filter');
+    click('[data-a="sub"][data-s="fish"]');click('[data-a="pf"][data-f="leave"]');S.hemi='S';click('[data-a="pf"][data-f="leave"]');const L2=ids();S.hemi='N';
+    ok(L2.join()!==L1.join(),'pedia: Southern hemisphere changes Leaving set',L2.length);P.closePanel();
+    let nt=0;const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(/leave after this month/.test(n.textContent||''))nt++});mo.observe(document.getElementById('toasts'),{childList:true});
+    S.flags.leaveNote=0;S.flags.leaveN=0;P.timeTravel(new Date(y,8,29,11,0,0,0).getTime()-Date.now());P.notes();await wait(5);
+    ok(nt===1,'pedia: one leave toast on Sept 29',nt);S.lastDay-=1;P.processDays();P.notes();await wait(5);ok(nt===1,'pedia: no second leave toast same month',nt);mo.disconnect();
+  }catch(e){ok(false,'pedia block threw',e.stack)}
+
+  // v1.2.0 review fixes: bloom thresholds, cheapest wildcard flowers, mail hard cap, derby sizes, a11y
+  try{
+    await fresh();const S=P.S,B=P.BLOOM_STARS;
+    ok(S.bloom.stars===0&&S.bloom.best===0&&P.bloomScore().score<B[1],'bloomfix: new island starts at 0 stars',P.bloomScore().score+'/'+B[1]);
+    const plots=P.ISLE.B.filter(b=>b.t==='vh').length,cap=120*20+160*10+40*30+plots*300+(P.FISH.length+P.BUGS.length+P.FOSSILS.length)*15+1500;
+    ok(B[5]<=cap-500,'bloomfix: 5-star threshold is reachable',B[5]+' <= '+cap);
+    S.inv.fill(null);P.addItem('fw_rose_blue',2);P.addItem('fw_tulip_red',2);P.addItem('fw_rose_white',1);P.addItem('wood',4);S.recipes.push('r_flowerarch');P.craft('r_flowerarch');
+    ok(S.inv.some(s=>s&&s.id==='fu_flowerarch')&&S.inv.filter(s=>s&&s.id==='fw_rose_blue').reduce((n,s)=>n+s.q,0)===2,'bloomfix: flower arch keeps rare hybrids',JSON.stringify(S.inv.filter(Boolean)));
+    S.inv.fill(null);for(let i=0;i<S.inv.length;i++)S.inv[i]={id:'stone',q:30};S.stor=[];S.storSize=0;S.mail=[];
+    const G=P.G,sc=G.scene;G.scene='house';for(let i=0;i<70;i++)P.mail('T','x'+i,'fu_chair');
+    ok(S.mail.filter(m=>m.gift==='fu_chair').length===70,'bloomfix: full pockets+storage keep every gift letter',S.mail.length);G.scene=sc;S.storSize=200;S.inv.fill(null);S.mail=[];
+    const fz=sz=>{const f=P.FISH.find(q=>q.sz===sz);return f};
+    ok(fz(8)&&fz(7),'bloomfix: eel and shark sizes exist');
+    {if(P.G.scene!=='island')P.exitHouse();P.startDerby('fish');const mr=Math.random;Math.random=()=>.5;try{P.landFish({f:fz(8),st:'bite'})}finally{Math.random=mr}
+     ok(P.tr&&P.tr.score===2,'bloomfix: narrow eel scores 2, below big shadows',P.tr&&P.tr.score);
+     const s0=P.tr.score;Math.random=()=>.5;try{P.landFish({f:fz(7),st:'bite'})}finally{Math.random=mr}ok(P.tr.score-s0===4,'bloomfix: fin shark scores 4',P.tr.score-s0);P.enterHouse();P.exitHouse();}
+    const tn=document.getElementById('tName');ok(tn&&!/display:\s*none/.test(document.querySelector('style').textContent.match(/#tName\{[^}]*\}/)[0]),'bloomfix: tool name stays in accessibility tree');
+    S.island='Z';P.openHall();await adv(12);click('[data-a="tab"][data-t="bloom"]');await wait(5);const st=document.querySelector('#pBody [aria-label$="of 5 stars"]');
+    ok(st&&st.getAttribute('role')==='img','bloomfix: stars have role=img');P.closePanel();
+    ok(P.APP_VERSION==='1.2.0','bloomfix: version bumped to 1.2.0',P.APP_VERSION);
+  }catch(e){ok(false,'bloomfix block threw',e.stack)}
+
   // ---- feature tests: append new blocks above this line (END marker) ----
 }catch(e){errs.push('EXC '+e.stack)}
 const pre=document.createElement('pre');pre.id='RESULT';pre.textContent=out.join('\n')+'\n--ERRORS--\n'+errs.slice(0,25).join('\n');document.body.appendChild(pre);

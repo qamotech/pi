@@ -2,6 +2,21 @@
 
 All notable changes to Puddlewick Isle. New releases are added at the top.
 
+## v1.2.0 (2026-10-17 13:36)
+**New features**
+- **Saturday Derby**: every Saturday from 9 AM to 6 PM, Marlowe the otter runs a 3-minute Fishing Derby or Bug-Off in the plaza. The two alternate weekly. Points pay Tide Points and win bronze, silver and gold trophies.
+- **Isle Bloom Rating**: Hazel rates your island from 0 to 5 stars on a new Town Hall tab, offers advice, and mails a one-time reward for each new star. The score counts flowers, trees, residents, furniture, museum donations and your home, and weeds and litter lower it.
+
+**Improvements**
+- Gift letters are no longer deleted when the mailbox overflows. The gift moves to storage or your pockets.
+- When your pockets are full, items drop at your feet, go to storage or arrive as a Lost & Found letter.
+- Hazards and timers freeze while menus or dialogs are open.
+- The update loop allocates fewer arrays per frame, which keeps frame times smoother.
+- Screen shake is now real, and a new Reduce motion setting (Auto, On or Off) follows the system preference.
+- The layout works better on phones in landscape and on small screens, and screen readers still announce the tool name.
+- Heart Day on February 14: friends mail Heart chocolates and best friends send furniture.
+- The Critterpedia has Now, Leaving and Undonated filters, plus a reminder near month end when critters are about to leave.
+
 ## v1.1.0 (2026-10-17)
 **PWA & deployment release**: installable progressive web app with offline support, full metadata for search and social sharing, and a headless-Chrome test suite.
 

@@ -28,7 +28,7 @@ try{
   P.addItem('branch',10);P.addItem('stone',2);P.craft('r_axe0');ok(P.S.inv.some(s=>s&&s.id==='t_axe0'),'crafting works');
   // fishing
   const S=P.S,G=P.G,W=P.W;let found=null;
-  for(let y=0;y<W.H&&!found;y++)for(let x=0;x<W.W&&!found;x++){if(W.ter[y*W.W+x]===1){const wy=y-2;if(wy>=0&&W.ter[wy*W.W+x]===2&&!W.obj[wy*W.W+x])found={bx:x,by:y,wx:x,wy:wy}}}
+  for(let y=0;y<W.H&&!found;y++)for(let x=0;x<W.W&&!found;x++){if(W.ter[y*W.W+x]===1){const wy=y-2;if(wy>=0&&W.ter[(y-1)*W.W+x]===1&&W.ter[wy*W.W+x]===2&&!W.obj[wy*W.W+x])found={bx:x,by:y,wx:x,wy:wy}}}
   ok(!!found,'found a beach fishing spot');
   if(found){G.px=(found.bx+.5)*32;G.py=(found.by+.5)*32;G.fx=0;G.fy=-1;S.eq=S.inv.findIndex(s=>s&&s.id==='t_rod0');P.act();ok(!!G.cast,'rod casts into water');
     for(let k=0;k<30;k++)P.step(1/60);P.spawnFishAt(found.wx,found.wy,'S');

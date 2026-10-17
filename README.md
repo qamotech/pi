@@ -31,6 +31,8 @@ No install, no account, no ads. Works on desktop and phones, and plays offline o
 | 🌸 **Gardening** | Plant and water flowers. Watered neighbors of the same species can breed hybrid colors. Plant fruit trees and saplings. |
 | 🌊 **Tide Points** | 22 achievements plus 5 daily tasks. Spend points on bigger pockets, better tools and mystery-island tickets. |
 | 📱 **ShellPhone** | Map, Critterpedia, DIY recipes, sunroot chart, neighbors, calendar, camera mode, settings (including time travel) and a guide. |
+| 🏆 **Saturday Derby** | Every Saturday from 9 AM to 6 PM, Marlowe the otter runs 3-minute Fishing Derby and Bug-Off rounds in the plaza, alternating weekly. Win Tide Points and bronze, silver and gold trophies. |
+| 🏵️ **Isle Bloom rating** | Hazel at Town Hall rates your island from 0 to 5 stars and suggests improvements. Each new star mails a one-time reward. |
 | ✨ **Island life** | Shake trees, break rocks, pop balloons with a slingshot, wish on shooting stars, watch Sunday fireworks in August, trick-or-treat on Halloween. |
 
 <p align="center">

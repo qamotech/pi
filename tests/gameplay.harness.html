@@ -38,7 +38,7 @@ try{
   click('[data-a="tab"][data-t="sell"]');const c1=S.coins;click('[data-a="sell1"]');log('sold for',S.coins-c1);click('[data-a="tab"][data-t="sun"]');log('sun tab',!!document.querySelector('#pBody .chart'));P.closePanel();
   const a=P.villActors()[0];a.home=false;a.x=G.px;a.y=G.py+24;
   P.talkTo(a);await wait(5);let guard=0;
-  while(guard++<60){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();await wait(2);const gi=P.DLG.choices.indexOf('Give a gift');P.choose(gi>=0?gi:P.DLG.choices.length-1);await wait(5)}
+  while(guard++<60){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();await wait(2);const gi=Math.max(P.DLG.choices.indexOf('Give a gift'),P.DLG.choices.indexOf('Yes, give it'));P.choose(gi>=0?gi:P.DLG.choices.length-1);await wait(5)}
     else if(P.PAN.open&&P.PAN.kind==='pick'){click('[data-a="pickg"]')}else if(P.DLG.on)P.dlgAdvance();else break}
   log('talked',S.stats.talks||0,'gifts',S.stats.gifts||0,'fr',S.vill[0].fr,'busy',G.busy);
   P.addItem('fu_tv',1);P.addItem('wl_wmint',1);P.enterHouse();for(let k=0;k<5;k++)P.step(1/60);

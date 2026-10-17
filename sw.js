@@ -1,6 +1,6 @@
 /* Puddlewick Isle service worker: network-first so new releases show up immediately,
    with a cached copy for offline play. Scope is limited to /pi/. */
-const VERSION = 'pi-v1.1.0';
+const VERSION = 'pi-v1.2.0';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon.svg'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
