@@ -1,0 +1,24 @@
+<script>
+/* Feature regression tests.
+   Every automated upgrade run appends one block per new feature/improvement ABOVE the END marker.
+   Use ok(condition, 'label') for each check. Keep blocks independent (wrap each in its own try/catch). */
+(async()=>{
+const out=[],errs=[];const ok=(c,label,extra='')=>out.push(`${c?'ok  ':'FAIL'} ${label}${extra!==''?' :: '+extra:''}`);
+window.addEventListener('error',e=>errs.push('ERR '+e.message+' @'+e.lineno));
+window.addEventListener('unhandledrejection',e=>errs.push('REJ '+(e.reason&&e.reason.stack||e.reason)));
+const ce=console.error;console.error=(...a)=>{errs.push('CE '+a.map(x=>x&&x.stack||x).join(' '));ce.apply(console,a)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const click=sel=>{const b=document.querySelector(sel);if(b){b.click();return true}return false};
+const P=window.PW;
+const adv=async(n=10)=>{for(let k=0;k<n;k++){P.dlgAdvance();await wait(5)}};
+const fresh=async()=>{P.closePanel();P.newGame({name:'Tess',island:'Testa',hemi:'N',look:{skin:'#fbe0c8',hair:'#3b2a1e',shirt:'#3f9fd2'}});const d=new Date();d.setHours(11,0,0,0);P.S.timeOff=d.getTime()-Date.now();P.startGame(true);await adv(12)};
+try{
+  await fresh();
+  const S=P.S,G=P.G;
+  ok(typeof P.APP_VERSION==='string'&&/^\d+\.\d+\.\d+$/.test(P.APP_VERSION),'APP_VERSION is exposed',P.APP_VERSION);
+
+  // ---- feature tests: append new blocks above this line (END marker) ----
+}catch(e){errs.push('EXC '+e.stack)}
+const pre=document.createElement('pre');pre.id='RESULT';pre.textContent=out.join('\n')+'\n--ERRORS--\n'+errs.slice(0,25).join('\n');document.body.appendChild(pre);
+})();
+</script>

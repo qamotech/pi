@@ -3,9 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src data: blob:; connect-src 'none'">
-<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src data: blob:; manifest-src 'self'; worker-src 'self'; connect-src 'none'">
+<meta name="robots" content="index, follow">
 <meta name="theme-color" content="#2a6f97">
+<meta name="description" content="A cozy island life sim in your browser — fish, catch bugs, dig fossils, befriend neighbors, play the sunroot market and grow a tent into a manor. No install, no ads, works offline.">
+<meta property="og:title" content="Puddlewick Isle">
+<meta property="og:description" content="A cozy island life sim in your browser. Fish, catch bugs, befriend neighbors, decorate your home and play the sunroot market.">
+<meta property="og:image" content="https://qamotech.github.io/pi/docs/og-image.png">
+<meta property="og:url" content="https://qamotech.github.io/pi/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://qamotech.github.io/pi/">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Puddlewick Isle</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%233f9fd2'/%3E%3Cellipse cx='32' cy='40' rx='24' ry='14' fill='%23f1dfa6'/%3E%3Cellipse cx='32' cy='37' rx='18' ry='10' fill='%236dbb5a'/%3E%3Ccircle cx='38' cy='26' r='9' fill='%233f8a3b'/%3E%3Crect x='36' y='28' width='4' height='10' fill='%238a5a33'/%3E%3C/svg%3E">
 <style>
@@ -233,6 +245,7 @@ body.touch #hint{bottom:calc(170px + env(safe-area-inset-bottom))}
 <script>
 'use strict';
 (()=>{
+const APP_VERSION='1.1.0';
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -1957,7 +1970,8 @@ function boot(){
 }
 function alertBox(msg){if($('title').hidden)toast(msg);else{const p=document.querySelector('#title .foot');p.textContent=msg;p.style.color='#c45656'}}
 window.PW={get S(){return S},get W(){return W},get ISLE(){return ISLE},G,act,IT,FISH,BUGS,RECIPES,stat,processDays,save,addItem,newGame,startGame,loadFrom,openPhone,openInv,openShop,openMuseum,openHall,
-  fishes:()=>fishes,bugs:()=>bugs,spawnFishAt,spawnBug,craft,learn,timeTravel,frontCands,computeHint,enterHouse,exitHouse,startTour,returnHome,sellSlot,PAN,DLG,dlgAdvance,choose,closePanel,talkTo,villActors,render,step};
+  fishes:()=>fishes,bugs:()=>bugs,spawnFishAt,spawnBug,craft,learn,timeTravel,frontCands,computeHint,enterHouse,exitHouse,startTour,returnHome,sellSlot,PAN,DLG,dlgAdvance,choose,closePanel,talkTo,villActors,render,step,APP_VERSION};
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 boot();
 })();
 </script>
