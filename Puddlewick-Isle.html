@@ -1397,11 +1397,12 @@ function waterFx(x0,x1,y0,y1){ctx.strokeStyle='rgba(255,255,255,.38)';ctx.lineWi
     ctx.strokeStyle=`rgba(255,255,235,${.22+tw*.5})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X-r,Y);ctx.lineTo(X+r,Y);ctx.moveTo(X,Y-r);ctx.lineTo(X,Y+r);ctx.stroke()}}
   if(!calm()&&(hr>=19||hr<6)){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(!isWaterT(W.ter[y*W.W+x]))continue;const h=(x*73856093^y*19349663^0x9e37)>>>0;if(h%7)continue;
     const tw=(Math.sin(G.t*2.4+h)+1)/2;if(tw<.3)continue;const X=x*TS+6+(h>>5)%20,Y=y*TS+6+(h>>11)%20,r=1+tw*2.2;
-    ctx.strokeStyle=`rgba(185,212,255,${.2+tw*.45})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X-r,Y);ctx.lineTo(X+r,Y);ctx.moveTo(X,Y-r);ctx.lineTo(X,Y+r);ctx.stroke()}}}
+    ctx.strokeStyle=`rgba(185,212,255,${.2+tw*.45})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X-r,Y);ctx.lineTo(X+r,Y);ctx.moveTo(X,Y-r);ctx.lineTo(X,Y+r);ctx.stroke()}}
   // rain/snow splash ripples on water tiles (respects reduced-motion)
   if(!calm()&&isRaining()){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(!isWaterT(W.ter[y*W.W+x]))continue;const h=(x*73856093^y*19349663^0x3ca7)>>>0;if(h%5)continue;
     const ph=(G.t*.9+(h%100)/100)%1,X=x*TS+(h>>4)%26+3,Y=y*TS+(h>>9)%26+3,r=3+ph*9;
     ctx.strokeStyle=`rgba(230,240,255,${.5*(1-ph)})`;ctx.lineWidth=1.3;ctx.beginPath();ctx.ellipse(X,Y,r,r*.42,0,0,6.283);ctx.stroke()}}
+}
 const FRUIT_COL={apple:'#e2474b',cherry:'#b8223a',pear:'#c9d65a',peach:'#f4a38a',orange:'#f39039',coconut:'#8a5a33'};
 function canopyCol(o,i){const m=P.m,h=(i*2654435761)>>>0;
   if(m>=3&&m<=5)return m===4&&!o.ft?['#f4b6cc','#fbd9e5']:['#62b955','#82cc68'];
