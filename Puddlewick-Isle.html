@@ -383,7 +383,9 @@ const CRAFT_FURN=[['logstool','Log stool','🪵'],['stonestool','Stone stool','�
 ['phono','Record player','🎶'],['blossomlamp','Blossom lamp','💮'],['mapleumb','Maple umbrella','☂️'],['leafpile','Leaf pile','🍂'],['frostlamp','Frost lamp','💠'],['icechair','Ice chair','🧊'],
 ['flakewreath','Flake wreath','❄️'],['sunfountain','Sunshell fountain','⛲'],['sunbench','Sunshell bench','🏖️'],['sandcastle','Sandcastle','🏰'],
 ['windchime','Sea-glass wind chime','🎐'],
-['well','Wishing well','💧']];
+['well','Wishing well','💧'],
+['birdhouse','Birdhouse','🪹'],
+['scarecrow','Scarecrow','🌾']];
 const WALLS=[['wcream','Cream wall','#fbefd5','#f3e2bf','plain',1200],['wmint','Mint stripe wall','#d8f1e0','#bfe6cc','stripe',1800],['wrose','Rose dot wall','#fbe0e6','#f3bfcc','dots',1800],
 ['wsky','Sky wall','#d6ecfa','#b7dcf3','stripe',1600],['wlog','Log cabin wall','#c48a55','#a86f3f','wood',2400],['wnight','Starry wall','#2b2f62','#ffe9a8','dots',3200],['wbrick','Brick wall','#c86a4f','#a6503a','brick',2200],
 ['wblossom','Blossom wall','#fde6ee','#f5a9c4','dots',2000,1],['wmaple','Maple wall','#f3d7b0','#d9773a','stripe',2000,1]];
@@ -402,6 +404,7 @@ def('fossilU',{n:'Fossil',e:'🦴',p:100,c:'fossilU',s:1,desc:'Unidentified. Tak
  .forEach(([id,n,e,p,col])=>def(id,{n,e,p,c:'mat',s:30,col}));
 def('clam',{n:'Manila clam',e:'🦪',p:100,c:'mat',s:10});
 def('star',{n:'Star fragment',e:'⭐',p:500,c:'mat',s:10});
+def('firefly',{n:'Firefly',e:'✨',p:200,c:'mat',s:10,desc:'Glows softly. Catch them with your net on clear nights.'});
 def('bait',{n:'Fish bait',e:'🪱',p:200,c:'bait',s:10,desc:'Toss it into water to lure a fish.'});
 def('med',{n:'Medicine',e:'💊',p:100,c:'med',s:10,desc:'Soothes stings.'});
 def('grill',{n:'Grilled fish',e:'🍢',p:0,c:'misc',desc:'Fresh off the campfire. Sells for more than raw fish.'});
@@ -499,14 +502,16 @@ const RECIPES={
  r_frostlamp:{out:'fu_frostlamp',m:{flake:5,iron:1},ss:'flake'},r_icechair:{out:'fu_icechair',m:{flake:6,wood:2},ss:'flake'},r_flakewreath:{out:'fu_flakewreath',m:{flake:6,branch:2},ss:'flake'},
  r_sunfountain:{out:'fu_sunfountain',m:{sunshell:5,stone:4},ss:'sunshell'},r_sunbench:{out:'fu_sunbench',m:{sunshell:4,wood:4},ss:'sunshell'},r_sandcastle:{out:'fu_sandcastle',m:{sunshell:3,clay:3},ss:'sunshell'},
  r_windchime:{out:'fu_windchime',m:{sunshell:3,iron:1}},
- r_well:{out:'fu_well',m:{stone:8,wood:4,iron:1}}};
+ r_well:{out:'fu_well',m:{stone:8,wood:4,iron:1}},
+ r_birdhouse:{out:'fu_birdhouse',m:{wood:3,branch:2,softwood:1}},
+ r_scarecrow:{out:'fu_scarecrow',m:{weeds:8,wood:2,branch:2}}};
 for(const k in RECIPES){RECIPES[k].id=k}
-const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike','r_phono','r_windchime','r_well'];
+const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike','r_phono','r_windchime','r_well','r_birdhouse','r_scarecrow'];
 // Seasonal forage: [material, months (effMonth), badge, events line]. Petals/leaves/flakes drift by and are caught with the net; sunshells wash up on the beach
 const FORAGE=[['petal','3-4','🌸','🌸 Blossom petals are drifting! Catch them with your net.'],['maple','10-11','🍂','🍁 Maple leaves are falling! Catch them with your net.'],
  ['flake','12-2','❄️','❄️ Snowflakes drift by on snowy and cloudy days. Catch them with your net!'],['sunshell','6-8','☀️','🐚 Sunshells are washing up on the beach!']].map(([id,ms,b,ev])=>({id,mo:parseRanges(ms),ms,b,ev}));
 const SS_RECIPES=Object.keys(RECIPES).filter(k=>RECIPES[k].ss);
-const BOTTLE_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_starlamp','r_mushlamp','r_wreath','r_frame','r_flag','r_med','r_chair','r_bike_frame','r_bike_wheel','r_bike','r_bike_stunt','r_phono','r_windchime','r_well'];
+const BOTTLE_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_starlamp','r_mushlamp','r_wreath','r_frame','r_flag','r_med','r_chair','r_bike_frame','r_bike_wheel','r_bike','r_bike_stunt','r_phono','r_windchime','r_well','r_birdhouse','r_scarecrow'];
 
 // Neighbors (original characters)
 const VPOOL=[
@@ -555,7 +560,7 @@ const ACH=[
  ['days','Island Regular','Play on different days',[2,7,30,100]],['wishes','Wishful Thinking','Wish on shooting stars',[1,10,40]],
  ['gifts','Generous Neighbor','Give gifts',[1,10,40]],['sunProfit','Root of All Profit','Profit from sunroots',[1000,20000,200000]],
  ['tours','Island Hopper','Take mystery tours',[1,5,20]],['furnPlaced','Interior Designer','Place furniture at home',[1,10,30]],
- ['requests','Helping Paw','Finish neighbor requests',[1,5,20,50]],['visits','Come On In','Visit neighbors at home',[1,10,40]],['forage','Seasonal Forager','Collect seasonal materials',[5,30,100,300]],['bloom','Island Star','Raise the island rating',[1,2,3,4,5]],['derby','Contest Regular','Finish derby rounds',[1,5,20]],['catalog','Cataloguer','Catalog new items',[10,40,80,120]],['gigs','Front Row Regular','Hear Saturday concerts',[1,5,20,50]],['stung','Ouch!','Get stung by wasps',[1]],['trophies','Tall Tales','Catch trophy-size critters',[1,5,20,50]]];
+ ['requests','Helping Paw','Finish neighbor requests',[1,5,20,50]],['visits','Come On In','Visit neighbors at home',[1,10,40]],['forage','Seasonal Forager','Collect seasonal materials',[5,30,100,300]],['bloom','Island Star','Raise the island rating',[1,2,3,4,5]],['derby','Contest Regular','Finish derby rounds',[1,5,20]],['catalog','Cataloguer','Catalog new items',[10,40,80,120]],['gigs','Front Row Regular','Hear Saturday concerts',[1,5,20,50]],['fireflies','Nightlight','Catch fireflies',[1,10,50,150]],['stung','Ouch!','Get stung by wasps',[1]],['trophies','Tall Tales','Catch trophy-size critters',[1,5,20,50]]];
 const ACH_PTS=[300,500,1000,2000,3000];
 const DAILY_POOL=[['fish',3,'Catch 3 fish',200],['bugs',2,'Catch 2 bugs',200],['weeds',5,'Pull 5 weeds',150],['sold',3,'Sell 3 items',150],['shakes',3,'Shake 3 trees',150],
  ['watered',5,'Water 5 flowers',150],['rocks',4,'Hit rocks 4 times',150],['talks',4,'Talk to 4 neighbors',200],['crafts',1,'Craft something',150],['donated',1,'Donate to the museum',200],
@@ -640,6 +645,7 @@ function events(){
   if(c.dow===6)out.push(c.h>=20?'🎵 Piper the heron is playing guitar in the plaza until midnight. Request a song!':'🎵 Tonight from 8 PM, Piper the heron plays guitar in the plaza.');
   {const f=forageNow();if(f)out.push(f.ev)}
   if(meteorNight())out.push(`🌠 Meteor shower! Look up and make a wish (${ctl('wish')}).`);
+  if(fireflyNight()&&!meteorNight())out.push('✨ Fireflies are out tonight! Swing your net to catch them.');
   return out;
 }
 
@@ -905,6 +911,8 @@ function taskSwap(i){const t=S.tasks[i];if(!t||t.done||!S.dly||S.dly.rr)return f
   S.tasks[i]=mkTask(pick(Math.random,L));S.dly.rr=1;return true}
 function dailyRefresh(today){
   const w=ISLE,r=rngFor(S.seed,'day',today),m=effMonth(),c=clk();
+  // birdhouse visitors: each placed birdhouse gets a feathered visitor each morning (seeded, 60% per house)
+  w.obj.forEach(o=>{if(o&&o.k==='furn'&&o.id==='fu_birdhouse')o.bird=r()<.6?today:0});
   for(let i=0;i<w.obj.length;i++){const o=w.obj[i];if(o&&(o.k==='dig'||(o.k==='it'&&o.b)))w.obj[i]=null}
   const put=(pred,o)=>{const t=randTile(w,r,pred);if(t)w.obj[t[1]*w.W+t[0]]=o;return t};
   const gF=(x,y,t,o)=>t===T_GRASS&&!o,sF=(x,y,t,o)=>t===T_SAND&&!o;
@@ -1162,6 +1170,23 @@ function manageDrifts(){
   const [px,py]=playerTile();for(let k=0;k<4;k++){const x=px+rint(Math.random,-7,7),y=py+rint(Math.random,-5,4);if(terAt(x,y)!==T_GRASS)continue;
     d.on=true;d.id=id;d.x=(x+.5)*TS;d.y=(y-1)*TS;d.vx=(Math.random()-.5)*16;d.ph=Math.random()*6.28;d.t=0;return}}
 function updateDrifts(dt){const cm=calm();for(const d of drifts){if(!d.on)continue;d.t+=dt;if(d.t>8){d.on=false;continue}d.ph+=dt*2.2;d.x+=(d.vx+(cm?0:Math.cos(d.ph)*16))*dt;d.y+=9*dt}}
+// fireflies: a fixed pool of 6 reused records, out on clear nights (catch with the net)
+const flies=Array.from({length:6},()=>({on:false,x:0,y:0,ph:0,t:0}));
+function fireflyNight(){const h=clk().h;return G.scene==='island'&&(h>=20||h<5)&&weather()==='sunny'}
+function manageFlies(){
+  const ok=fireflyNight();
+  for(const f of flies)if(f.on&&(!ok||Math.abs(f.x-G.px)>18*TS||Math.abs(f.y-G.py)>14*TS))f.on=false;
+  if(!ok||Math.random()>=(calm()?.15:.3))return;const f=flies.find(q=>!q.on);if(!f)return;
+  const [px,py]=playerTile();for(let k=0;k<4;k++){const x=px+rint(Math.random,-6,6),y=py+rint(Math.random,-4,3);if(terAt(x,y)!==T_GRASS)continue;
+    f.on=true;f.x=(x+.5)*TS;f.y=(y+.3)*TS;f.ph=Math.random()*6.28;f.t=0;return}}
+function updateFlies(dt){const cm=calm();for(const f of flies){if(!f.on)continue;f.t+=dt;if(f.t>10){f.on=false;continue}f.ph+=dt*1.8;
+  if(!cm){f.x+=Math.cos(f.ph)*22*dt;f.y+=Math.sin(f.ph*1.3)*12*dt}}}
+function drawFlies(){for(const f of flies){if(!f.on)continue;const a=.55+Math.sin(G.t*5+f.ph)*.35;
+  ctx.fillStyle=`rgba(255,240,140,${a*.28})`;circ(f.x,f.y,9);ctx.fillStyle=`rgba(255,246,170,${a})`;circ(f.x,f.y,2.6);LIGHTS.push([f.x,f.y,20])}}
+function catchFly(){const [tx,ty]=netTip();for(const f of flies){if(!f.on||Math.hypot(f.x-tx,f.y-ty)>22)continue;
+  f.on=false;if(!addItem('firefly',1))giveOrDrop('firefly',1);stat('fireflies');sfx('pick');puff(f.x,f.y,6,'#ffe87a');floatIcon('✨');
+  if(!S.flags.tipFly){S.flags.tipFly=1;toast('✨ You caught a firefly! They drift over the grass on clear nights — swing your net to catch them.')}return true}return false}
+function nearScarecrow(x,y,r){r=r||4;for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const o=objAt(x+dx,y+dy);if(o&&o.k==='furn'&&o.id==='fu_scarecrow')return true}return false}
 const netTip=()=>{const n=Math.hypot(G.fx,G.fy)||1;return [G.px+G.fx/n*24,G.py-14+G.fy/n*20]};
 function catchDrift(){const [tx,ty]=netTip();for(const d of drifts){if(!d.on||Math.hypot(d.x-tx,d.y-ty)>22)continue;
   d.on=false;const id=d.id,it=IT[id];if(!addItem(id,1))giveOrDrop(id,1);puff(d.x,d.y,6,id==='maple'?'#e8894a':id==='flake'?'#e8f4ff':'#f7b2c8');stat('forage');sfx('pick');floatIcon(it.e);
@@ -1334,6 +1359,10 @@ function waterFx(x0,x1,y0,y1){ctx.strokeStyle='rgba(255,255,255,.38)';ctx.lineWi
   if(!calm()&&(hr>=19||hr<6)){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(!isWaterT(W.ter[y*W.W+x]))continue;const h=(x*73856093^y*19349663^0x9e37)>>>0;if(h%7)continue;
     const tw=(Math.sin(G.t*2.4+h)+1)/2;if(tw<.3)continue;const X=x*TS+6+(h>>5)%20,Y=y*TS+6+(h>>11)%20,r=1+tw*2.2;
     ctx.strokeStyle=`rgba(185,212,255,${.2+tw*.45})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(X-r,Y);ctx.lineTo(X+r,Y);ctx.moveTo(X,Y-r);ctx.lineTo(X,Y+r);ctx.stroke()}}}
+  // rain/snow splash ripples on water tiles (respects reduced-motion)
+  if(!calm()&&isRaining()){for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){if(!isWaterT(W.ter[y*W.W+x]))continue;const h=(x*73856093^y*19349663^0x3ca7)>>>0;if(h%5)continue;
+    const ph=(G.t*.9+(h%100)/100)%1,X=x*TS+(h>>4)%26+3,Y=y*TS+(h>>9)%26+3,r=3+ph*9;
+    ctx.strokeStyle=`rgba(230,240,255,${.5*(1-ph)})`;ctx.lineWidth=1.3;ctx.beginPath();ctx.ellipse(X,Y,r,r*.42,0,0,6.283);ctx.stroke()}}
 const FRUIT_COL={apple:'#e2474b',cherry:'#b8223a',pear:'#c9d65a',peach:'#f4a38a',orange:'#f39039',coconut:'#8a5a33'};
 function canopyCol(o,i){const m=P.m,h=(i*2654435761)>>>0;
   if(m>=3&&m<=5)return m===4&&!o.ft?['#f4b6cc','#fbd9e5']:['#62b955','#82cc68'];
@@ -1376,8 +1405,8 @@ function drawBloom(g,sp,col,x,y,cn){g.fillStyle=col;const C=(a,b,r)=>{g.beginPat
   const n={cosmos:8,pansy:5,lily:6,mum:11}[sp]||6,pr={cosmos:2.8,pansy:4.2,lily:3.2,mum:2.4}[sp]||3,d={cosmos:5,pansy:3.6,lily:5,mum:5.2}[sp]||4;
   for(let k=0;k<n;k++){const a=k/n*6.283;C(x+Math.cos(a)*d,y+Math.sin(a)*d,pr)}
   g.fillStyle=cn==='black'?'#7a2030':cn==='yellow'?'#e08a20':'#f5cf3b';C(x,y,2.3)}
-function drawWeed(x,y){const cx=(x+.5)*TS,cy=(y+.72)*TS;ctx.strokeStyle=P.snow?'#7f9a6a':'#4e8f3a';ctx.lineWidth=2;ctx.beginPath();
-  for(const [a,b] of [[-6,-8],[-2,-12],[3,-10],[7,-6]]){ctx.moveTo(cx+a*.4,cy);ctx.quadraticCurveTo(cx+a*.6,cy+b*.5,cx+a,cy+b)}ctx.stroke()}
+function drawWeed(x,y){const cx=(x+.5)*TS,cy=(y+.72)*TS,sw=calm()?0:Math.sin(G.t*1.3+x*1.7+y*.9)*1.4;ctx.strokeStyle=P.snow?'#7f9a6a':'#4e8f3a';ctx.lineWidth=2;ctx.beginPath();
+  for(const [a,b] of [[-6,-8],[-2,-12],[3,-10],[7,-6]]){ctx.moveTo(cx+a*.4,cy);ctx.quadraticCurveTo(cx+a*.6,cy+b*.5,cx+a+sw,cy+b)}ctx.stroke()}
 function drawDig(x,y,o){const cx=(x+.5)*TS,cy=(y+.55)*TS;
   if(o.t==='clam'){const ph=(G.t*1.2+x*.37+y*.21)%1;ctx.fillStyle='rgba(120,90,50,.3)';ell(cx,cy+3,4,2);if(ph<.4){ctx.fillStyle='rgba(255,255,255,.9)';circ(cx-1,cy-ph*22,1.8);circ(cx+2,cy-ph*14-2,1.3)}return}
   const gl=o.t==='glow';if(gl){const a=.35+Math.sin(G.t*4)*.15;ctx.fillStyle=`rgba(255,220,90,${a})`;circ(cx,cy,10);LIGHTS.push([cx,cy,26])}
@@ -1683,6 +1712,7 @@ function drawOutdoorFurn(x,y,o){
   drawEmo(it.e,cx,cy-8,22);
   if(LIGHT_IDS.has(o.id))LIGHTS.push([cx,cy-6,55]);
   if(o.id==='fu_campfire'&&!calm()){for(let k=0;k<3;k++){const ph=(G.t*.22+k/3)%1;ctx.fillStyle=`rgba(160,160,160,${.26*(1-ph)})`;ctx.beginPath();ctx.arc(cx+Math.sin(G.t*2+k*2.1)*4*ph,cy-20-ph*30,2.5+ph*5.5,0,6.3);ctx.fill()}}
+  if(o.id==='fu_birdhouse'&&o.bird===today()){const fl=calm()?0:Math.sin(G.t*6)*1.5;drawEmo('🐦',cx+9,cy-26+fl,16);ctx.fillStyle='rgba(30,20,10,.2)';ell(cx+9,cy-22,4,1.6)}
 }
 function renderWorld(){
   const w=W;if(w._gk!==groundSig()||!w._g){w._g=buildGround(w);w._gk=groundSig()}
@@ -1703,6 +1733,7 @@ function renderWorld(){
   for(const t of tall){if(t.p)drawPlayer();else if(t.a)drawNpc(t.a);else if(t.bug)drawBug(t.bug);else if(t.b)drawBld(t.b);
     else{const o=t.o;if(o.k==='tree')drawTree(t.x,t.ty,o,t.i);else if(o.k==='palm')drawPalm(t.x,t.ty,o);else if(o.k==='rock')drawRock(t.x,t.ty,o);else if(o.k==='mail')drawMail(t.x,t.ty);else if(o.k==='furn')drawOutdoorFurn(t.x,t.ty,o);else drawBoard(t.x,t.ty)}}
   for(const d of drifts)if(d.on)drawEmo(IT[d.id].e,d.x,d.y,14,clamp(Math.min(d.t*2,8-d.t),0,1));
+  drawFlies();
   for(const s of shots){ctx.fillStyle='#7a5230';circ(s.x,s.y,2.5)}
   for(const b of balloons){ctx.fillStyle='rgba(40,40,20,.15)';ell(b.x,b.y,7,3);const by=b.y-b.z;ctx.strokeStyle='rgba(80,60,40,.6)';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(b.x,by+8);ctx.lineTo(b.x,by+18);ctx.stroke();
     drawEmo('🎁',b.x,by+22,12);ctx.fillStyle=b.gold?'#f5cf3b':'#ef7b7b';ell(b.x,by,7.5,9);ctx.fillStyle='rgba(255,255,255,.5)';ell(b.x-2.5,by-3,2,3)}
@@ -1808,7 +1839,7 @@ function act(){
   const [ptx,pty]=playerTile(),C=frontCands();
   for(const [x,y] of [[ptx,pty],...C]){const o=objAt(x,y);if(o&&o.k==='it'){pickupGround(x,y,o);return}}
   for(const [x,y] of C){const o=objAt(x,y);if(!o)continue;
-    if(o.k==='furn'){if(o.id==='fu_well'){useWell(x,y);return}if(o.id==='fu_campfire'){cookAtCampfire(x,y);return}if(!canAdd(o.id)){toast('Your pockets are full!');return}addItem(o.id);setObj(x,y,null);sfx('pick');dust((x+.5)*TS,(y+.5)*TS);toast(`Picked up the ${IT[o.id].n.toLowerCase()}.`);return}
+    if(o.k==='furn'){if(o.id==='fu_well'){useWell(x,y);return}if(o.id==='fu_campfire'){cookAtCampfire(x,y);return}if(o.id==='fu_birdhouse'){watchBird(x,y);return}if(!canAdd(o.id)){toast('Your pockets are full!');return}addItem(o.id);setObj(x,y,null);sfx('pick');dust((x+.5)*TS,(y+.5)*TS);toast(`Picked up the ${IT[o.id].n.toLowerCase()}.`);return}
     if(o.k==='bld'){enterBuilding(W.B[o.b]);return}if(o.k==='mail'){openMail();return}if(o.k==='board'){openBoard();return}}
   const tool=eqTool(),t=tool?IT[tool.id].tool:null;
   const first=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o)||{x:C[0][0],y:C[0][1],o:null};
@@ -1848,7 +1879,7 @@ function shakeTree(x,y,o){
   if(W===ISLE&&S.dly){
     if(S.dly.bag===i){drops.push({id:'bag',v:100});S.dly.bag=-1}
     else if(S.dly.furn.includes(i)){drops.push({id:'fu_'+pick(Math.random,FURN_RAW.filter(f=>f[3]<8000))[0]});S.dly.furn=S.dly.furn.filter(v=>v!==i)}
-    else if(S.dly.wasp.includes(i)){S.dly.wasp=S.dly.wasp.filter(v=>v!==i);spawnWasp(x,y)}
+    else if(S.dly.wasp.includes(i)){S.dly.wasp=S.dly.wasp.filter(v=>v!==i);if(nearScarecrow(x,y,4)){drops.push({id:'branch'});toast('🌾 Your scarecrow scared the wasps away!')}else spawnWasp(x,y)}
   }else if(W!==ISLE){const r=Math.random();if(r<.06)spawnWasp(x,y);else if(r<.16)drops.push({id:'bag',v:100})}
   if(!drops.length&&!bugs.some(b=>b.sp==='wasp')){const r=Math.random();
     if(seasonOf(effMonth())==='fall'&&o.k==='tree'&&!o.ft&&r<.35)drops.push({id:'acorn'});
@@ -1866,7 +1897,7 @@ function wakeUp(){S.flags.stung=0;G.stung=0;prune(bugs,b=>b.sp!=='wasp'&&!b.b.ch
   if(isTour()){const d=W.dock;G.px=(d.door.x+.5)*TS;G.py=(d.door.y+.6)*TS}else{const h=ISLE.B.find(b=>b.t==='home');G.px=(h.door.x+.5)*TS;G.py=(h.door.y+.75)*TS}
   G.fx=0;G.fy=1;G.snapCam=true;toast('...You woke up feeling much better.')}
 function swingNet(){
-  G.swing=.32;sfx('swish');if(catchDrift())return;const reach=1.75*TS,fa=Math.atan2(G.fy,G.fx);let got=null,gd=1e9;
+  G.swing=.32;sfx('swish');if(catchDrift()||catchFly())return;const reach=1.75*TS,fa=Math.atan2(G.fy,G.fx);let got=null,gd=1e9;
   for(const o of bugs){if(o.st==='flee')continue;const dx=o.x-G.px,dy=(o.y-o.z*.3)-(G.py-10),d=Math.hypot(dx,dy);if(d>reach)continue;if(d>16&&Math.abs(angDiff(fa,Math.atan2(dy,dx)))>1.15)continue;if(d<gd){gd=d;got=o}}
   if(got){got.st='gone';prune(bugs,b=>b!==got);catchBug(got.b);wearTool()}
   else for(const o of bugs)if(o.sp!=='wasp'&&!o.b.chase&&Math.hypot(o.x-G.px,o.y-G.py)<2.6*TS)scare(o);
@@ -1918,6 +1949,12 @@ async function cookAtCampfire(x,y){
   const[i,s]=shown[c],it=IT[s.id],gp=Math.round(it.p*1.75*(s.tr?1.5:1));
   takeSlot(i,1);addItem('grill',1,{gp});sfx('fanfare');floatIcon('🍢');
   toast(`🍢 Grilled ${it.n.toLowerCase()}! Sells for ${fmt(gp)} chimes.`);uiDirty()}
+// Birdhouse visitors (fu_birdhouse): a daily feathered visitor that sings for 25 chimes, then flies off
+function watchBird(x,y){
+  const o=objAt(x,y);
+  if(o&&o.bird===today()){delete o.bird;earn(25);sfx('twinkle');floatIcon('🐦',G.px,G.py-56);hearts(G.px,G.py-56);
+    toast('🐦 A sparrow sang for you! +25 chimes');return}
+  pickFurn(x,y,'fu_birdhouse')}
 function castRod(){
   const n=Math.hypot(G.fx,G.fy)||1;
   for(const dist of [2.5,1.9,1.35]){const bx=G.px+G.fx/n*dist*TS,by=G.py-4+G.fy/n*dist*TS;if(isWaterT(terAt(Math.floor(bx/TS),Math.floor(by/TS)))){
@@ -2409,7 +2446,7 @@ const PA={
   imp:()=>$('fileIn').click(),
   reset:()=>{if(PAN.confirm!=='reset'){PAN.confirm='reset';return}try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(BAK_KEY)}catch(e){}location.reload();return false},
 };
-function timeTravel(off){S.timeOff=Math.round(off);const before=S.lastDay;processDays();if(dayIdx()!==before)toast('⏳ Time travel! The island has changed.');G.vact=null;G.pT=-9;G.evK=-1;fishes.length=bugs.length=balloons.length=0;for(const d of drifts)d.on=false;uiDirty()}
+function timeTravel(off){S.timeOff=Math.round(off);const before=S.lastDay;processDays();if(dayIdx()!==before)toast('⏳ Time travel! The island has changed.');G.vact=null;G.pT=-9;G.evK=-1;fishes.length=bugs.length=balloons.length=0;for(const d of drifts)d.on=false;for(const f of flies)f.on=false;uiDirty()}
 function exportSave(){save();try{const blob=new Blob([serialize()],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${S.island.replace(/[^\w-]+/g,'_')}-save.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('💾 Save file exported.')}catch(e){toast('Export failed in this browser.')}}
 
 /* ---------- panel renderers ---------- */
@@ -2567,9 +2604,17 @@ function renderMail(){if(!S.mail.length)return '<p class="mute">No letters right
     ${PAN.sel===i?`<p style="width:100%;margin:8px 4px 2px;font-weight:600;user-select:text">${esc(m.text)}</p>`:''}</div>`});
   return h+'</div>'}
 function openMail(){openPanel('📬','Mailbox',renderMail,{kind:'mail'})}
+// Board forecast: tomorrow's midday weather + next meteor night within 7 days (deterministic per island seed)
+const WXE={sunny:'☀️',cloudy:'☁️',rain:'🌧️',snow:'🌨️'},WXN={sunny:'Sunny',cloudy:'Cloudy',rain:'Rain',snow:'Snow'};
+function nextMeteor(){const d0=dayIdx();for(let k=1;k<=7;k++){const d=d0+k;if(rngFor(S.seed,'meteor',d)()<.16&&weather(d,21)==='sunny')return k}return 0}
+function forecastLis(){const t=weather(dayIdx()+1,12),k=nextMeteor(),lis=[li(WXE[t]||'🌤️',`Tomorrow: ${WXN[t]||t}`,'','')];
+  if(k){const wd=new Date(nowMs()+k*864e5);lis.push(li('🔭','Next meteor night',DOWS[wd.getDay()],'Make wishes after 7 PM'))}
+  else lis.push(li('🔭','Next meteor night','None expected this week',''));
+  return lis.join('')}
 function openBoard(){openPanel('📌','Bulletin board',()=>{const c=clk(),ev=events(),bd=S.vill.map(v=>VPOOL[v.p]).filter(P=>P.bd[0]===c.mo).sort((a,b)=>a.bd[1]-b.bd[1]);
   return `<p><b>${DOWS[c.dow]}, ${MONTHS[c.mo-1]} ${c.dd}</b> · ${esc(S.island)} · ${seasonOf(effMonth())}</p>
     <h3>Today</h3><div class="list">${(ev.length?ev:['A peaceful day on the island.']).map(e=>li('📣',esc(e),'','')).join('')}${li('🌸',`Island rating: ${S.bloom.stars}★`,'Ask Hazel at Town Hall how to raise it','')}</div>
+    <h3>Forecast</h3><div class="list">${forecastLis()}</div>
     <h3>Birthdays this month</h3><div class="list">${bd.length?bd.map(P=>li(P.e,esc(P.n),`${MONTHS[c.mo-1]} ${P.bd[1]}`,'')).join(''):'<p class="mute">No birthdays this month.</p>'}</div>
     <h3>Notice</h3><p>${esc(pick(rngFor(S.seed,'tip',today()),TIPS))}</p>`},{kind:'board'})}
 
@@ -2635,7 +2680,9 @@ function renderPhone(){
       <h3>Save data</h3><p class="mute" id="saveSt">${G.saveOk===false?"⚠️ Couldn't save in this browser. Use Export save to keep your island safe.":G.savedAt?`Saves automatically in this browser. Last saved ${hmTxt(G.savedAt)}.`:'Saves automatically in this browser.'} · v${APP_VERSION}</p><div class="row"><button class="btn" data-a="savenow">Save now</button><button class="btn alt" data-a="exp">Export save</button><button class="btn alt" data-a="imp">Import save</button><button class="btn warn" data-a="reset">${PAN.confirm==='reset'?'Tap again to erase everything':'Start over'}</button></div>`}
     case 'help':return back+`<div class="list">${[isTouch?['🕹️','Move','Drag the stick at the bottom left. Tap 🏃 to toggle running, or push the stick gently to tiptoe.']:['🕹️','Move','WASD or arrow keys. Hold Shift to run, Ctrl to tiptoe. On touch screens, use the stick.'],isTouch?['🅰️','Action','A button: talk, pick up, shake trees, use your tool.']:['🅰️','Action','Space or E: talk, pick up, shake trees, use your tool.'],isTouch?['🔧','Tools','🔧 button (or tap the tool chip) cycles tools; cycle to ✋ Hands to put them away. Tap 📱 for your ShellPhone and 🎒 for pockets.']:['🔧','Tools','Q / R to switch, 1-6 for net, rod, shovel, axe, can, slingshot. F puts tools away.'],
         ['🎣','Fishing','Cast in front of a shadow. Wait through the nibbles. When the bobber sinks with a splash, press Action fast!'],['🦋','Bugs','Walk or tiptoe close, face the bug and swing your net. Running scares them off.'],['📏','Record Book','Every fish and bug has a size. The Critterpedia keeps your personal best for each species. About 3% of catches are Trophy-size (🏆): they sell for 1.5x and score a bonus derby point. Measure 10, 25, 50 and all species for Tide Points.'],['🦴','Fossils','Dig up star-shaped cracks with a shovel. The museum assesses them.'],['📖','Critterpedia','The Critterpedia on your ShellPhone tracks every fish, bug and fossil you have logged. Dr. Quillfeather mails you Tide Points at 25%, 50%, 75% and 100% of each category.'],
-        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['👗','Clothes','Wren\'s Rack at Bramble\'s sells 4 new clothes every morning. Tap clothing in your Pockets and choose Dress. Your wardrobe and dressing mirror are in home storage. Neighbors notice your style!'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['📒','Catalog','Every furniture, wallpaper and flooring item you get is cataloged on your ShellPhone. Order cataloged items at Bramble\'s (5 a day, delivered by mail tomorrow). Completing a furniture series pays 1,000 Tide Points.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies.'],['🎵','Saturday night music','Saturdays 8 PM-midnight, Piper the heron plays guitar in the plaza. Request a song and stay to the end for a record (one a night). Craft a record player and place it with a record at home to play it. Track songs in the Songbook app.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['💧','Wishing well','Craft a wishing well, place it outside and face it to toss in 100 chimes. You get one random blessing for the day: Lucky Catch (trophy-size catches come easier), Midas Day (sell for 25% more), or Bounty Day (more fish and bugs around). Watch for the badge by your clock.'],['🍢','Campfire cooking','Face your placed campfire and cook a fish from your pockets into grilled fish, worth 1.75x the raw price.'],['🌠','Wishes',(isTouch?'On meteor nights, tap the 🌠 button when a star streaks by.':'On meteor nights, press Y (or the 🌠 button) when a star streaks by.')+' Make 3 wishes in one night for a bonus star fragment!']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
+        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['👗','Clothes','Wren\'s Rack at Bramble\'s sells 4 new clothes every morning. Tap clothing in your Pockets and choose Dress. Your wardrobe and dressing mirror are in home storage. Neighbors notice your style!'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['📒','Catalog','Every furniture, wallpaper and flooring item you get is cataloged on your ShellPhone. Order cataloged items at Bramble\'s (5 a day, delivered by mail tomorrow). Completing a furniture series pays 1,000 Tide Points.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies.'],['🎵','Saturday night music','Saturdays 8 PM-midnight, Piper the heron plays guitar in the plaza. Request a song and stay to the end for a record (one a night). Craft a record player and place it with a record at home to play it. Track songs in the Songbook app.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['💧','Wishing well','Craft a wishing well, place it outside and face it to toss in 100 chimes. You get one random blessing for the day: Lucky Catch (trophy-size catches come easier), Midas Day (sell for 25% more), or Bounty Day (more fish and bugs around). Watch for the badge by your clock.'],['🍢','Campfire cooking','Face your placed campfire and cook a fish from your pockets into grilled fish, worth 1.75x the raw price.'],['🪹','Birdhouse','Craft a birdhouse, place it outside, and most mornings a feathered visitor will perch on it. Face it and press Action to listen: the bird sings, drops 25 chimes and flies off.'],['✨','Fireflies','On clear nights from 8 PM to 5 AM, fireflies drift over the grass. Swing your net to catch them — they sell for 200 chimes and count toward the Nightlight achievement.'],
+        ['🌾','Scarecrow','Craft a scarecrow and place it outside. Trees within 4 tiles of it never drop wasp nests when shaken — the scarecrow stands guard.'],
+        ['🌤️','Board forecast','The bulletin board now shows tomorrow\'s weather forecast plus the next expected meteor night, so you can plan watering, fishing and wishing.'],['🌠','Wishes',(isTouch?'On meteor nights, tap the 🌠 button when a star streaks by.':'On meteor nights, press Y (or the 🌠 button) when a star streaks by.')+' Make 3 wishes in one night for a bonus star fragment!']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
     default:return `<p class="mute">${esc(S.name)} · ${esc(S.island)} · Day ${fmt(S.stats.days||1)}</p><div class="apps">${APPS.map(([k,e,n,c])=>`<button class="app" data-a="app" data-t="${k}"><span class="e" style="--c:${c}">${e}</span>${n}</button>`).join('')}</div>`;
   }
 }
@@ -2679,7 +2726,7 @@ function computeHint(){
   const npc=npcInFront();if(npc)return {t:`Talk to ${npc.P.n}`};
   const [ptx,pty]=playerTile();for(const [x,y] of [[ptx,pty],...C]){const o=objAt(x,y);if(o&&o.k==='it'&&IT[o.id])return {t:`Pick up ${o.id==='bag'?'chimes':IT[o.id].n.toLowerCase()}`,tile:[x,y]}}
   for(const [x,y] of C){const o=objAt(x,y);if(!o)continue;
-    if(o.k==='furn')return {t:o.id==='fu_well'?'Make a wish (100 chimes)':o.id==='fu_campfire'?'Cook fish over the fire':`Pick up ${IT[o.id].n.toLowerCase()}`,tile:[x,y]};
+    if(o.k==='furn')return {t:o.id==='fu_well'?'Make a wish (100 chimes)':o.id==='fu_campfire'?'Cook fish over the fire':o.id==='fu_birdhouse'?(o.bird===today()?'Watch the bird 🐦':'Pick up birdhouse'):`Pick up ${IT[o.id].n.toLowerCase()}`,tile:[x,y]};
     if(o.k==='bld'){const b=W.B[o.b],vv=b.t==='vh'&&W===ISLE&&S.vill.find(q=>q.h===o.b);return {t:vv&&indoorNow(vv)?`Visit ${VPOOL[vv.p].n} (home now)`:b.t==='vh'?'Knock on the door':b.t==='home'?'Go inside':`Enter ${BLD[b.t].n}`}}
     if(o.k==='mail'){const n=unreadMail();return {t:n?`Check mail (${n} new)`:'Check mail',tile:[x,y]}}if(o.k==='board')return {t:'Read the bulletin board',tile:[x,y]}}
   const s=eqTool(),t=s?IT[s.id].tool:null,first=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o),o=first&&first.o,tl=first?[first.x,first.y]:null;
@@ -2839,12 +2886,12 @@ function step(dt){
   const frozen=PAN.open||DLG.on||G.busy;updateDlg(dt);
   if(frozen)G.moving=false;else{updatePlayer(dt);
     const c=G.cast;if(c){c.t+=dt;c.dip=Math.max(0,c.dip-dt);if(c.st==='fly'&&c.t>=.35){c.st='float';splash(c.x,c.y,5);sfx('plop');for(const o of fishes)if(Math.hypot(o.x-c.x,o.y-c.y)<13)fleeFish(o)}}
-    updateFish(dt);updateBugs(dt);updateDrifts(dt);manageBalloons(dt);updateShots(dt)}
+    updateFish(dt);updateBugs(dt);updateDrifts(dt);updateFlies(dt);manageBalloons(dt);updateShots(dt)}
   updateVill(dt);updateParts(dt);updateSky(dt);
   if(G.shake>0)G.shake-=dt;
   if(G.tr&&!frozen&&!(G.fade>0)&&G.faint<=0&&(G.tr.t-=dt)<=0)endDerby();
   if(G.gig&&!frozen){const g=G.gig;if(!calm()&&(g.nt-=dt)<=0){g.nt=1;g.np++;const b=G.scene==='island'&&buskerHere();floatIcon(g.np%2?'🎵':'🎶',b?BUSKER.x:G.px,(b?BUSKER.y:G.py)-44)}if((g.t-=dt)<=0)endGig()}
-  acc1+=dt;if(acc1>1){acc1=0;if(!frozen){manageFish();manageBugs();manageDrifts()}}
+  acc1+=dt;if(acc1>1){acc1=0;if(!frozen){manageFish();manageBugs();manageDrifts();manageFlies()}}
   acc5+=dt;if(acc5>5){acc5=0;if(processDays()){toast(`☀️ A new day has begun on ${S.island}!`,'big');G.vact=null;notes()}}
   hudT-=dt;if(hudT<=0||uiD){hudT=.2;uiD=false;updateHUD()}
   updateCam(dt);
