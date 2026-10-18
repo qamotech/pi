@@ -2,6 +2,10 @@
 
 All notable changes to Puddlewick Isle. New releases are added at the top.
 
+## v1.6.1 (2026-10-18 00:21)
+**Repair release**
+- **Test clock fix**: the feature tests now start each fresh island at 11:00 on the current island day (days roll over at 5 AM). Before this, runs between midnight and 5 AM skipped ahead a day, which broke three save and bloom checks. No gameplay changes.
+
 ## v1.6.0 (2026-10-17 23:59)
 **New features**
 - **Threadbare Tailors**: Wren the hedgehog runs a daily rack of 4 clothes in Bramble's store, so you can wear a hat, top, bottoms, shoes and an accessory (30 original pieces, some seasonal), mix outfits at a home wardrobe and mirror, and earn neighbor compliments.

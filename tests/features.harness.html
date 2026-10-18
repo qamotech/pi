@@ -11,7 +11,8 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const click=sel=>{const b=document.querySelector(sel);if(b){b.click();return true}return false};
 const P=window.PW;
 const adv=async(n=10)=>{for(let k=0;k<n;k++){P.dlgAdvance();await wait(5)}};
-const fresh=async()=>{P.closePanel();P.newGame({name:'Tess',island:'Testa',hemi:'N',look:{skin:'#fbe0c8',hair:'#3b2a1e',shirt:'#3f9fd2'}});const d=new Date();d.setHours(11,0,0,0);P.S.timeOff=d.getTime()-Date.now();P.startGame(true);await adv(12)};
+// fresh(): 11:00 on the CURRENT island day (days roll over at 5 AM), so runs between midnight and 5 AM don't skip a day
+const fresh=async()=>{P.closePanel();P.newGame({name:'Tess',island:'Testa',hemi:'N',look:{skin:'#fbe0c8',hair:'#3b2a1e',shirt:'#3f9fd2'}});const d=new Date(Date.now()-5*36e5);d.setHours(11,0,0,0);P.S.timeOff=d.getTime()-Date.now();P.startGame(true);await adv(12)};
 try{
   await fresh();
   const S=P.S,G=P.G;
@@ -604,7 +605,7 @@ try{
      t.hidden=wh;ok(!bad.length,'kbd: touch buttons have labels and 44px targets',bad.join(';'))}
     key('KeyI');ok(P.PAN.open&&P.PAN.kind==='inv','kbd: I opens pockets');key('KeyI');ok(!P.PAN.open,'kbd: I closes pockets');
     // 6. version and save health
-    ok(P.APP_VERSION==='1.6.0','save: APP_VERSION is 1.6.0');
+    ok(P.APP_VERSION==='1.6.1','save: APP_VERSION is 1.6.1');
     const tb=document.getElementById('toasts'),nWarn=()=>[...tb.children].filter(d=>/Couldn't save/.test(d.textContent)).length;tb.innerHTML='';
     const oSI=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new Error('QuotaExceededError')};let thrown=false;
     try{P.save();P.save();P.save()}catch(e){thrown=true}finally{Storage.prototype.setItem=oSI}
