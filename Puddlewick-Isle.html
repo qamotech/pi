@@ -2749,7 +2749,7 @@ function auInit(){
   const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
   try{AU.c=new C();AU.s=AU.c.createGain();AU.m=AU.c.createGain();const comp=AU.c.createDynamicsCompressor();AU.s.connect(comp);AU.m.connect(comp);comp.connect(AU.c.destination);
     const len=AU.c.sampleRate*.5,b=AU.c.createBuffer(1,len,AU.c.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;AU.nb=b;applyVol();
-    AU.timer=setInterval(musicTick,90)}catch(e){AU.c=null}
+    AU.timer=setInterval(musicTick,90);AU.ambi=setInterval(ambiTick,1400)}catch(e){AU.c=null}
 }
 function applyCalm(){document.body.classList.toggle('calm',!!calm());document.documentElement.style.setProperty('--fs',String(S&&S.set.fs||1))}   // also applies the text size setting
 function applyVol(){if(!AU.c)return;AU.s.gain.value=S?S.set.sfx:.7;AU.m.gain.value=(S?S.set.music:.45)*.55}
@@ -2758,20 +2758,21 @@ function tone(f,d,type='sine',v=.2,t0=0,dest,f2){const c=AU.c;if(!c)return;const
 function noise(d,v=.2,t0=0,freq=1200,type='lowpass',dest){const c=AU.c;if(!c||!AU.nb)return;const t=c.currentTime+t0,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=AU.nb;f.type=type;f.frequency.value=freq;
   g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0005,t+d);s.connect(f);f.connect(g);g.connect(dest||AU.s);s.start(t);s.stop(t+d+.05)}
 const mtof=m=>440*Math.pow(2,(m-69)/12);
+const FR_=()=>.9+Math.random()*.2, VL_=()=>.85+Math.random()*.3;   // pitch/volume jitter so repeated SFX never sound mechanical
 function sfx(n){if(!AU.c||!S||S.set.sfx<=0)return;switch(n){
-  case 'pick':tone(880,.08,'triangle',.16);tone(1320,.1,'triangle',.12,.05);break;
-  case 'coins':[1568,2093,2637].forEach((f,i)=>tone(f,.12,'triangle',.1,i*.05));break;
+  case 'pick':{const f=FR_();tone(880*f,.08,'triangle',.16*VL_());tone(1320*f,.1,'triangle',.12,.05);break;}
+  case 'coins':{const f=FR_();[1568,2093,2637].forEach((q,i)=>tone(q*f,.12,'triangle',.1*VL_(),i*.05));break;}
   case 'points':[784,988,1175,1568].forEach((f,i)=>tone(f,.14,'sine',.12,i*.06));break;
   case 'fanfare':[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.13,i*.08));break;
   case 'learn':[659,880,1175].forEach((f,i)=>tone(f,.2,'sine',.12,i*.07));break;
-  case 'swish':noise(.18,.18,0,2400,'bandpass');break;case 'rustle':noise(.35,.2,0,3000,'highpass');noise(.25,.12,.12,2200,'highpass');break;
-  case 'chop':tone(180,.12,'square',.14,0,null,90);noise(.08,.2,0,900);break;case 'rock':tone(320,.08,'square',.12,0,null,160);noise(.06,.25,0,3000,'highpass');break;
-  case 'dig':noise(.2,.25,0,700);break;case 'water':noise(.4,.12,0,1800,'bandpass');break;case 'pluck':tone(500,.08,'triangle',.12,0,null,800);break;
-  case 'cast':noise(.25,.12,0,2000,'bandpass');tone(900,.25,'sine',.05,0,null,300);break;case 'plop':tone(500,.12,'sine',.14,0,null,160);break;
-  case 'nibble':tone(700,.06,'sine',.1,0,null,400);break;case 'bite':noise(.3,.35,0,1400);tone(300,.25,'sine',.16,0,null,90);break;case 'reel':tone(1200,.12,'triangle',.06,0,null,600);break;
+  case 'swish':noise(.18,.18*VL_(),0,2400*FR_(),'bandpass');break;case 'rustle':noise(.35,.2,0,3000,'highpass');noise(.25,.12,.12,2200,'highpass');break;
+  case 'chop':{const f=FR_();tone(180*f,.12,'square',.14*VL_(),0,null,90*f);noise(.08,.2*VL_(),0,900*f);break;}case 'rock':{const f=FR_();tone(320*f,.08,'square',.12*VL_(),0,null,160*f);noise(.06,.25*VL_(),0,3000*f,'highpass');break;}
+  case 'dig':noise(.2,.25*VL_(),0,700*FR_());break;case 'water':noise(.4,.12,0,1800,'bandpass');break;case 'pluck':{const f=FR_();tone(500*f,.08,'triangle',.12*VL_(),0,null,800*f);break;}
+  case 'cast':{const f=FR_();noise(.25,.12*VL_(),0,2000*f,'bandpass');tone(900*f,.25,'sine',.05,0,null,300*f);break;}case 'plop':{const f=FR_();tone(500*f,.12,'sine',.14*VL_(),0,null,160*f);break;}
+  case 'nibble':{const f=FR_();tone(700*f,.06,'sine',.1*VL_(),0,null,400*f);break;}case 'bite':noise(.3,.35,0,1400);tone(300,.25,'sine',.16,0,null,90);break;case 'reel':{const f=FR_();tone(1200*f,.12,'triangle',.06*VL_(),0,null,600*f);break;}
   case 'err':tone(220,.15,'square',.07);tone(180,.18,'square',.06,.08);break;case 'meh':tone(392,.2,'triangle',.1);tone(330,.3,'triangle',.1,.15);break;
   case 'tool':tone(660,.05,'triangle',.08);break;case 'open':tone(523,.06,'triangle',.08);tone(784,.08,'triangle',.07,.04);break;case 'close':tone(784,.06,'triangle',.07);tone(523,.08,'triangle',.06,.04);break;
-  case 'bell':tone(1760,.08,'sine',.15);tone(2349,.12,'sine',.12,.06);break;case 'hop':tone(340,.12,'triangle',.14,0,null,620);break;case 'land':noise(.08,.16,0,600);tone(130,.08,'sine',.12);break;
+  case 'bell':tone(1760,.08,'sine',.15);tone(2349,.12,'sine',.12,.06);break;case 'hop':tone(340,.12,'triangle',.14,0,null,620);break;case 'land':{const f=FR_();noise(.08,.16*VL_(),0,600*f);tone(130*f,.08,'sine',.12*VL_());break;}
   case 'blip2':tone(1046,.04,'triangle',.05);break;case 'place':tone(300,.08,'triangle',.14,0,null,220);break;case 'craft':[0,.12,.24].forEach(t=>{tone(260,.06,'square',.08,t);noise(.05,.15,t,2500)});tone(1046,.25,'sine',.1,.36);break;
   case 'pop':noise(.12,.4,0,4000,'highpass');tone(900,.1,'sine',.12,0,null,200);break;case 'sling':tone(400,.12,'triangle',.1,0,null,1200);break;
   case 'buzz':tone(160,.6,'sawtooth',.05,0,null,190);break;case 'ouch':tone(600,.2,'square',.1,0,null,200);break;case 'faint':[440,392,330,262].forEach((f,i)=>tone(f,.25,'triangle',.12,i*.14));break;
@@ -2802,6 +2803,17 @@ function playStep(st,h,t0,spb){
   const r=rngFor('mel',h,st%32,Math.floor(st/64)%2)();
   if(r<.5){const n=deg(prog+Math.floor(rngFor('mn',h,st%32)()*7));tone(mtof(n),spb*1.6,'triangle',.05*soft*rain,t0,AU.m);tone(mtof(n+12),spb*.8,'sine',.012,t0,AU.m)}
   if(st%4===2&&h>=8&&h<20)noise(.03,.02,t0,6000,'highpass',AU.m);
+}
+
+/* =============================== AMBIENCE =============================== */
+function ambiTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidden||S.set.music<=0||!$('title').hidden||G.scene!=='island')return;
+  if(!AU.a){AU.a=c.createGain();AU.a.connect(AU.m)}
+  AU.a.gain.value=calm()?.12:.32;   // reduced-motion users get a quieter ambience bed (audio equivalent of quiet mode)
+  const h=clk().h,w=weather(),R=Math.random;
+  if(w==='rain'||w==='snow'){noise(.3,w==='rain'?.05:.025,R()*.4,5200,'highpass',AU.a);if(R()<.3){const f=1800+R()*2400;tone(f,.12,'sine',.02,R()*.6,AU.a,f*.7)}return}
+  if(h>=19||h<5){if(w==='sunny'&&R()<.75){const n=2+Math.floor(R()*3),f=4200+R()*900;for(let i=0;i<n;i++)tone(f+R()*200,.045,'sine',.016,i*.085,AU.a)}return}
+  if(w==='sunny'&&h>=6&&h<18&&R()<.3){const f=2300+R()*700;tone(f,.09,'sine',.03,0,AU.a,f*1.3);tone(f*1.1,.08,'sine',.02,.1,AU.a,f*.85);return}
+  if(w==='cloudy'&&R()<.5)noise(1.1,.035,R()*.5,380,'lowpass',AU.a);
 }
 
 /* =============================== INPUT =============================== */
@@ -2851,6 +2863,7 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',()=>{keys.clear();G.joy=null;if(S)save()});
+addEventListener('visibilitychange',()=>{if(!document.hidden&&AU.c&&AU.c.state==='suspended')AU.c.resume()});   // resume audio when tab returns to the front
 addEventListener('resize',queueResize);
 addEventListener('pointerdown',e=>{auInit();if(G.photo&&!e.target.closest('#panel'))endPhoto()});
 $('toolchip').onclick=()=>cycleTool(1);$('bWish').onclick=wish;
