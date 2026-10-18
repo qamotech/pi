@@ -2,6 +2,21 @@
 
 All notable changes to Puddlewick Isle. New releases are added at the top.
 
+## v1.6.0 (2026-10-17 23:59)
+**New features**
+- **Threadbare Tailors**: Wren the hedgehog runs a daily rack of 4 clothes in Bramble's store, so you can wear a hat, top, bottoms, shoes and an accessory (30 original pieces, some seasonal), mix outfits at a home wardrobe and mirror, and earn neighbor compliments.
+- **Record Book**: every fish and bug now has a size, the Critterpedia tracks your personal bests with "New record!" toasts, and rare Trophy-size catches sell for 1.5x, add derby points and unlock record milestones and the Tall Tales achievement.
+
+**Improvements**
+- A damaged save is no longer silently overwritten: the title warns you, still asks twice, and offers Restore backup from an automatic backup slot.
+- New Text speed (Slow to Instant) and Text size (Normal, Large, Larger) settings scale dialogue, toasts, menus and the HUD clock.
+- Daily Tide tasks only ask for things you can actually do, and you can swap one unfinished task each day.
+- The Neighbors app shows progress to the next heart, talked/gifted-today marks, the next friendship gift and pending requests.
+- The HUD redraws only what changed, and phone address-bar resizes no longer rebuild every sprite, for smoother mobile play.
+- Touch players now see touch controls in the title footer, Hazel's welcome, tips and the Guide.
+- Sound pauses while the game is in the background, and volume sliders show a percentage, save on release and preview Effects.
+- Rainbows arc over the island when a daytime rain shower clears, with an event banner and neighbor remarks.
+
 ## v1.5.0 (2026-10-17 18:50)
 **New features**
 - **Bramble's Catalog**: your ShellPhone Catalog remembers every furniture, wallpaper and flooring item you've owned. Re-order cataloged items from Bramble's new Catalog tab (up to 5 a day, mailed the next morning), and earn 1,000 Tide Points for each of 8 themed furniture series you complete.

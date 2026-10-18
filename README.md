@@ -35,6 +35,8 @@ No install, no account, no ads. Works on desktop and phones, and plays offline o
 | 🏵️ **Isle Bloom rating** | Hazel at Town Hall rates your island from 0 to 5 stars and suggests improvements. Each new star mails a one-time reward. |
 | 📒 **Catalog** | The ShellPhone Catalog remembers every furniture, wallpaper and flooring item you've owned. Re-order up to 5 a day from Bramble's (delivered by mail the next morning) and complete 8 themed furniture series for Tide Points. |
 | 🎵 **Tidewater Tunes** | Saturdays from 8 PM to midnight, Piper the heron busks in the plaza. Request one of 12 original songs, take home its record, and play it at home on a crafted record player. |
+| 👕 **Threadbare Tailors** | Wren the hedgehog sells 4 new clothes a day inside Bramble's. Dress five slots (hat, top, bottoms, shoes, accessory) from your pockets or the home wardrobe, and neighbors may compliment your style. |
+| 📏 **Record Book** | Every catch has a size. The Critterpedia keeps your personal best per species, and rare 🏆 Trophy-size catches sell for 1.5x and pay out record milestones. |
 | ✨ **Island life** | Shake trees, break rocks, pop balloons with a slingshot, wish on shooting stars, watch Sunday fireworks in August, trick-or-treat on Halloween. |
 
 <p align="center">

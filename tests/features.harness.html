@@ -435,7 +435,7 @@ try{
     ok(woodCount===1&&S.inv.find(s=>s&&s.id==='wood').q===7,'inventory: auto-sort stacks matching materials');
   }catch(e){ok(false,'v1.4.0 block threw',e.stack)}
 
-  // v1.5.0 Bramble's Catalog and Furniture Series
+  // v1.6.0 Bramble's Catalog and Furniture Series
   try{
     await fresh();const S=P.S,G=P.G;
     const ns=JSON.stringify([S.cat,S.orders,S.catSets].map(x=>Array.isArray(x)?'A':typeof x));
@@ -480,7 +480,7 @@ try{
     ok(P.FURN_SETS.length>=6&&P.FURN_SETS.every(s=>s.ids.every(id=>P.IT[id])),'catalog: series built from real ids');
   }catch(e){ok(false,'catalog block threw',e.stack)}
 
-  // v1.5.0 Tidewater Tunes (Piper busks Saturday nights, records, record player, Songbook)
+  // v1.6.0 Tidewater Tunes (Piper busks Saturday nights, records, record player, Songbook)
   try{
     await fresh();const S=P.S,G=P.G;
     const at=h=>{const d=new Date();d.setDate(d.getDate()+((6-d.getDay()+7)%7)+7);d.setHours(h,0,0,0);P.timeTravel(d.getTime()-Date.now())};
@@ -521,7 +521,7 @@ try{
     ok(P.S.gig&&P.S.gig.last===-1&&P.S.gig.heard&&!Object.keys(P.S.gig.heard).length&&P.gig===null,'tunes: old save gets gig defaults');
   }catch(e){ok(false,'tunes block threw',e.stack)}
 
-  // v1.5.0 all-around improvements: bike hop, tour fixes, radar HUD, glow sprite, keyboard a11y, save health, mail Take all, museum milestones
+  // v1.6.0 all-around improvements: bike hop, tour fixes, radar HUD, glow sprite, keyboard a11y, save health, mail Take all, museum milestones
   try{
     await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
     const key=(code,o={})=>window.dispatchEvent(new KeyboardEvent('keydown',Object.assign({code,key:code,bubbles:true,cancelable:true},o)));
@@ -565,7 +565,7 @@ try{
     ok(!/\(M\)/.test(bR.title)&&/\(N\)/.test(bR.title),'radar: title names the N key',bR.title);
     P.save();P.loadFrom(localStorage.getItem('puddlewick-isle.v1'));P.updateHUD();ok(P.S.set.radar===1&&!rd.hidden,'radar: toggle survives save and load');
     key('KeyN');ok(P.S.set.radar===0&&rd.hidden,'radar: KeyN toggles it off');
-  }catch(e){ok(false,'v1.5.0 improvements block A threw',e.stack)}
+  }catch(e){ok(false,'v1.6.0 improvements block A threw',e.stack)}
   try{
     await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
     const key=(code,o={})=>window.dispatchEvent(new KeyboardEvent('keydown',Object.assign({code,key:code,bubbles:true,cancelable:true},o)));
@@ -604,16 +604,16 @@ try{
      t.hidden=wh;ok(!bad.length,'kbd: touch buttons have labels and 44px targets',bad.join(';'))}
     key('KeyI');ok(P.PAN.open&&P.PAN.kind==='inv','kbd: I opens pockets');key('KeyI');ok(!P.PAN.open,'kbd: I closes pockets');
     // 6. version and save health
-    ok(P.APP_VERSION==='1.5.0','save: APP_VERSION is 1.5.0');
+    ok(P.APP_VERSION==='1.6.0','save: APP_VERSION is 1.6.0');
     const tb=document.getElementById('toasts'),nWarn=()=>[...tb.children].filter(d=>/Couldn't save/.test(d.textContent)).length;tb.innerHTML='';
     const oSI=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new Error('QuotaExceededError')};let thrown=false;
     try{P.save();P.save();P.save()}catch(e){thrown=true}finally{Storage.prototype.setItem=oSI}
     ok(!thrown&&G.saveOk===false&&nWarn()===1,'save: failures warn exactly once',`${thrown} ${G.saveOk} ${nWarn()}`);
     P.openPhone('set');ok(/Couldn't save/.test(document.getElementById('pBody').innerHTML),'save: settings shows the warning');
     click('[data-a="savenow"]');const sb=document.getElementById('pBody').innerHTML;
-    ok(G.saveOk===true&&/Last saved \d+:\d\d/.test(sb)&&/v1\.5\.0/.test(sb),'save: Save now recovers and shows Last saved + version');P.closePanel();
-    ok(/v1\.5\.0/.test(document.querySelector('#title .foot').textContent),'save: title footer shows the version');
-  }catch(e){ok(false,'v1.5.0 improvements block B threw',e.stack)}
+    ok(G.saveOk===true&&/Last saved \d+:\d\d/.test(sb)&&sb.includes('v'+P.APP_VERSION),'save: Save now recovers and shows Last saved + version');P.closePanel();
+    ok(document.querySelector('#title .foot').textContent.includes('v'+P.APP_VERSION),'save: title footer shows the version');
+  }catch(e){ok(false,'v1.6.0 improvements block B threw',e.stack)}
   try{
     await fresh();const S=P.S,G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
     // 7. mailbox Take all + unread badge
@@ -655,7 +655,7 @@ try{
     ok(cm()===2&&S4.musRw&&S4.musRw.fish===3&&S4.musRw.bug===1&&S4.musRw.fossil===0,'museum: old save gets one letter per hall on load, not a burst',cm()+' '+JSON.stringify(S4.musRw));
     S4.mail.length=0;S4.inv.fill(null);S4.inv[0]={id:P.FOSSILS[0].id,q:1};P.PA.donate({i:'0'});
     ok(cm()===0&&S4.musRw.fish===3,'museum: no repeat letters after the load check',cm());
-  }catch(e){ok(false,'v1.5.0 improvements block C threw',e.stack)}
+  }catch(e){ok(false,'v1.6.0 improvements block C threw',e.stack)}
 
   // review fixes: hop landing footprint, completed-hall rewards on load, Tab/Enter keys, radar vs toasts, badge contrast
   try{
@@ -672,6 +672,276 @@ try{
     ok(!ev.defaultPrevented,'keys: Enter on a focused HUD button keeps native activation');P.closePanel();document.querySelector('canvas').focus();
     S.set.radar=1;P.syncRadar();ok(document.body.classList.contains('radarOn'),'radar: body class set when shown');S.set.radar=0;P.syncRadar();ok(!document.body.classList.contains('radarOn'),'radar: body class cleared when hidden');
     S.mail.length=0;P.mail('Tester','Hi');P.updateHUD();const bg=getComputedStyle(document.getElementById('mailB')).backgroundColor;ok(bg==='rgb(181, 72, 72)','mail: badge uses the AA-contrast fill',bg);
+  }catch(e){ok(false,'review fixes block threw',e.stack)}
+
+  // v1.6.0 Threadbare Tailors: clothing slots, Wren's Rack, wardrobe, compliments, catalog
+  try{
+    await fresh();let S=P.S;const G=P.G;if(G.scene!=='island')P.exitHouse();P.closePanel();
+    ok(S.wear&&P.WEAR_SLOTS.length===5&&P.WEAR_SLOTS.every(k=>S.wear[k]===null)&&Array.isArray(S.closet)&&S.closet.length===0,'cloth: newState has 5 null wear slots and an empty closet');
+    ok(P.CLOTH_RAW.length>=28&&P.CLOTH_RAW.every(c=>P.IT['cl_'+c[0]]&&P.IT['cl_'+c[0]].c==='cloth'&&P.IT['cl_'+c[0]].slot===c[4]),'cloth: ~30 clothing items registered',P.CLOTH_RAW.length);
+    const snap=wk=>{const c=document.createElement('canvas');c.width=60;c.height=80;const g=c.getContext('2d');P.drawPerson(g,30,72,P.S.look,0,1,0,false,{wk});return g.getImageData(0,0,60,80).data};
+    const diffRows=(a,b,y0,y1)=>{let n=0;for(let i=y0*240;i<y1*240;i++)if(a[i]!==b[i])n++;return n};
+    const base=snap(null);
+    const raw=JSON.parse(P.serialize());delete raw.wear;delete raw.closet;P.loadFrom(JSON.stringify(raw));S=P.S;
+    ok(S.wear&&P.WEAR_SLOTS.every(k=>S.wear[k]===null)&&Array.isArray(S.closet)&&!S.closet.length,'cloth: old save gets wear/closet defaults on load');
+    ok(diffRows(base,snap(P.wearK()),0,80)===0,'cloth: old save renders the player pixel-identically');
+    // Wren's Rack purchase
+    P.closePanel();S.coins=99999;S.inv.fill(null);const rk=P.rack();
+    ok(rk.length===4&&rk.every(id=>P.IT[id].c==='cloth')&&new Set(rk).size===4,'cloth: rack shows 4 distinct clothes',rk.join());
+    P.PAN.tab='cloth';const sh=P.renderShop();ok(/Wren/.test(sh)&&rk.every(id=>sh.includes(P.IT[id].n)),'cloth: shop has a Wren\'s Rack tab listing the rack');
+    const b0=S.coins,bid=rk[0];P.PA.buy({id:bid,p:String(P.IT[bid].buy),k:bid});
+    ok(S.coins===b0-P.IT[bid].buy&&S.inv.some(s=>s&&s.id===bid),'cloth: buying deducts the price and adds the item to pockets',b0-S.coins);
+    ok(S.dly.shop.bought[bid]===1,'cloth: rack item sells out after buying');
+    // Dress a hat: wear slot set, hat region pixels differ
+    S.inv.fill(null);P.addItem('cl_capred');const ci=S.inv.findIndex(s=>s&&s.id==='cl_capred');P.PAN.sel=ci;
+    ok(/data-a="dress"/.test(P.renderInv()),'cloth: Pockets offers a Dress action for clothing');
+    P.PA.dress({i:String(ci)});ok(S.wear.hat==='cl_capred'&&!S.inv.some(s=>s&&s.id==='cl_capred'),'cloth: Dress moves the cap from pockets to the hat slot');
+    const hatImg=snap(P.wearK());ok(diffRows(base,hatImg,0,40)>20,'cloth: hat region pixels differ from the no-hat render',diffRows(base,hatImg,0,40));
+    for(const id of ['cl_teesun','cl_jeans','cl_bootrain','cl_glassround']){P.addItem(id);P.dressSlot(S.inv.findIndex(s=>s&&s.id===id))}
+    ok(S.wear.top==='cl_teesun'&&S.wear.bot==='cl_jeans'&&S.wear.shoe==='cl_bootrain'&&S.wear.acc==='cl_glassround','cloth: all five slots can be worn');
+    ok(diffRows(hatImg,snap(P.wearK()),40,80)>20,'cloth: top/bottom/shoes change the body render');
+    // round trips keep totals
+    const total=()=>{let n=0;for(const s of S.inv)if(s&&P.IT[s.id].c==='cloth')n+=s.q;return n+S.closet.length+P.WEAR_SLOTS.filter(k=>S.wear[k]).length};
+    P.addItem('cl_beanie');P.addItem('cl_sunhat');const t0=total();
+    P.takeOff('hat');ok(S.wear.hat===null&&S.closet.includes('cl_capred')&&total()===t0,'cloth: Take off returns the item to the closet');
+    P.wearCloset(S.closet.indexOf('cl_capred'));ok(S.wear.hat==='cl_capred'&&!S.closet.includes('cl_capred')&&total()===t0,'cloth: Wear from closet round-trips');
+    P.dressSlot(S.inv.findIndex(s=>s&&s.id==='cl_beanie'));ok(S.wear.hat==='cl_beanie'&&S.closet.filter(x=>x==='cl_capred').length===1&&total()===t0,'cloth: dressing over a worn item sends the old one to the closet');
+    P.hangAll();ok(S.closet.includes('cl_sunhat')&&!S.inv.some(s=>s&&P.IT[s.id].c==='cloth')&&total()===t0,'cloth: Hang up moves pocket clothes to the closet');
+    P.closetOut(S.closet.indexOf('cl_sunhat'));ok(S.inv.some(s=>s&&s.id==='cl_sunhat')&&total()===t0,'cloth: To pockets takes an item out of the closet');
+    P.hangAll();for(let k=0;k<6;k++)P.randomOutfit();ok(total()===t0&&new Set(S.closet).size===S.closet.length,'cloth: Random outfit never duplicates or loses items',total()+'/'+t0);
+    P.openWardrobe();const wh=document.getElementById('pBody').innerHTML;ok(/Random outfit/.test(wh)&&/Take off/.test(wh)&&document.getElementById('mirror'),'cloth: Wardrobe panel has mirror, Wear/Take off and Random outfit');P.closePanel();
+    P.openStorage();ok(/data-a="ward"/.test(document.getElementById('pBody').innerHTML),'cloth: home storage has a Wardrobe button');P.closePanel();
+    // save + load keeps the outfit
+    const fit=JSON.stringify(S.wear),cl=S.closet.join();P.save();P.loadFrom(localStorage.getItem('puddlewick-isle.v1'));S=P.S;
+    ok(JSON.stringify(S.wear)===fit&&S.closet.join()===cl,'cloth: outfit and closet survive save/load');
+    const bad=JSON.parse(P.serialize());bad.wear={hat:'cl_jeans',top:'nope',bot:null,shoe:5,acc:'cl_scarfred'};bad.closet=['cl_capred','fu_chair','zzz'];P.loadFrom(JSON.stringify(bad));S=P.S;
+    ok(S.wear.hat===null&&S.wear.top===null&&S.wear.shoe===null&&S.wear.acc==='cl_scarfred'&&S.closet.join()==='cl_capred','cloth: load sanitizes bad wear/closet data');
+    // rack determinism
+    const r1=P.rack().join();P.save();P.loadFrom(localStorage.getItem('puddlewick-isle.v1'));S=P.S;ok(P.rack().join()===r1,'cloth: same rack after reload on the same day');
+    let changed=false;for(let k=1;k<=3&&!changed;k++){P.timeTravel(S.timeOff+864e5);changed=P.rack().join()!==r1}
+    ok(changed&&Array.isArray(S.dly.shop.cloth),'cloth: a new rack after the 5 AM reset');
+    const d2=S.dly.day,ra=P.rollRack(d2).join();ok(ra===P.rollRack(d2).join(),'cloth: rack roll is deterministic per day');
+    // catalog
+    P.closePanel();S.inv.fill(null);P.addItem('cl_capred');ok(S.cat.cl_capred===1&&P.isOrderable('cl_capred'),'cloth: clothes join the Catalog and are orderable');
+    P.PAN.tab='cat';ok(/Clothing/.test(P.renderShop())&&P.renderShop().includes('Red ball cap'),'cloth: Catalog shop lists clothing');
+    S.coins=99999;S.dly.ord=0;const no=S.orders.length;ok(P.orderCat('cl_capred')&&S.orders.length===no+1,'cloth: clothes can be re-ordered');
+    P.openPhone('cat');P.PAN.sub='cloth';ok(P.renderPhone().includes('Red ball cap'),'cloth: ShellPhone Catalog has a Clothes page');P.closePanel();
+    P.openPhone('help');ok(/Wren/.test(P.renderPhone()),'cloth: Guide explains clothes');P.closePanel();
+    // compliments
+    const talk=async a=>{a.home=false;a.x=G.px;a.y=G.py+24;P.closePanel();P.talkTo(a);let g=0;while(g++<60){await wait(5);if(P.DLG.on&&P.DLG.choices){P.dlgAdvance();P.choose(0)}else if(P.DLG.on)P.dlgAdvance();else if(!G.busy)break}};
+    if(G.scene!=='island')P.exitHouse();
+    const v=S.vill[0],pp=P.VPOOL[v.p].p,tag=P.CL_STYLE[pp].split(' ')[0],match=P.CLOTH_RAW.find(c=>c[7]===tag);
+    for(const k of P.WEAR_SLOTS)S.wear[k]=null;S.wear[match[4]]='cl_'+match[0];
+    S.met[v.p]=1;v.td=-1;v.req=null;v.cpd=-1;v.fr=10;const a=P.villActors().find(q=>q.v===v);
+    const mr=Math.random;Math.random=()=>0;let f1,f2;try{await talk(a);f1=v.fr;v.req=null;await talk(a);f2=v.fr}finally{Math.random=mr}
+    ok(f1===12&&v.cpd===P.S.lastDay,'cloth: compliment adds exactly +1 friendship on top of the daily talk',f1);
+    ok(f2===f1,'cloth: a second talk the same day adds nothing',f2);
+    const v2=S.vill[1];for(const k of P.WEAR_SLOTS)S.wear[k]=null;S.met[v2.p]=1;v2.td=-1;v2.req=null;v2.fr=10;
+    Math.random=()=>0;try{await talk(P.villActors().find(q=>q.v===v2))}finally{Math.random=mr}
+    ok(v2.fr===11&&v2.cpd==null,'cloth: no compliment without a matching outfit',v2.fr);
+    // no per-frame allocation of the wear cache
+    S.wear.hat='cl_capred';const wk=P.wearK();for(let k=0;k<120;k++){P.step(1/60);P.render()}
+    ok(P.wearK()===wk&&P.G.wearK===wk&&wk.hat==='cl_capred'&&wk.hatC==='#d9534f','cloth: wear cache identity stable over 120 frames');
+    S.wear.hat=null;ok(P.wearK()===wk&&wk.hatS===null,'cloth: cache updates in place when wear changes');
+    ok(document.querySelector('meta[http-equiv="Content-Security-Policy"]')&&!/https?:/.test(document.querySelector('meta[http-equiv="Content-Security-Policy"]').content),'cloth: CSP still has no remote hosts');
+  }catch(e){ok(false,'v1.6.0 Threadbare Tailors block threw',e.stack)}
+
+  // v1.6.0 Record Book: catch sizes and trophy specimens
+  try{
+    await fresh();let S=P.S;const G=P.G;if(G.scene!=='island')P.exitHouse();
+    ok(S.rec&&S.rec.ms===0&&S.rec.tro===0,'rec: newState has rec defaults');
+    P.recCatch('fish',0,10);ok(S.rec.fish[0]===10,'rec: first record set');
+    P.recCatch('fish',0,9);ok(S.rec.fish[0]===10,'rec: smaller catch keeps record');
+    P.recCatch('fish',0,12);ok(S.rec.fish[0]===12,'rec: bigger catch raises record');
+    // trophy slot does not merge with plain stack
+    S.inv.fill(null);const f=P.FISH[3];P.addItem(f.id,1);const mr=Math.random;Math.random=()=>.999;try{P.landFish({f,st:'bite'})}finally{Math.random=mr}
+    const ts=S.inv.find(s=>s&&s.id===f.id&&s.tr===1),ps=S.inv.find(s=>s&&s.id===f.id&&!s.tr);
+    ok(ts&&ps&&ts!==ps&&ps.q===1&&ts.q===1,'rec: trophy catch is a separate tr stack',JSON.stringify(S.inv.filter(Boolean)));
+    ok(S.rec.tro===1&&S.stats.trophies===1,'rec: trophy counted');
+    // sell price
+    const base=P.sellPrice(ps);ok(P.sellPrice(ts)===Math.floor(base*1.5),'rec: trophy sells for 1.5x',base+'/'+P.sellPrice(ts));
+    S.dly.shop.hot=f.id;ok(P.sellPrice(ts)===Math.floor(f.p*2*1.5)&&P.sellPrice(ps)===f.p*2,'rec: hot item rule still applies to trophies');
+    // milestones
+    S.rec={fish:{},bug:{},tro:0,ms:0};const p0=S.pts,m0=S.mail.length;
+    for(let i=0;i<10;i++)P.recCatch(i<5?'fish':'bug',i,5);
+    ok(S.pts===p0+500&&S.mail.length===m0+1&&S.rec.ms===1,'rec: 10 species pays 500 once with one letter',(S.pts-p0)+'/'+(S.mail.length-m0));
+    P.recCatch('fish',20,5);P.recCatch('fish',0,50);ok(S.pts===p0+500&&S.mail.length===m0+1,'rec: further records do not pay again');
+    // UI
+    S.pedia.fish[0]=1;S.pedia.bug[5]=1;P.PAN.sub=null;P.PAN.pf='all';P.openPhone('pedia');const ph=P.renderPhone();ok(/Best 50\.0 cm/.test(ph)&&/Records:/.test(ph),'rec: Critterpedia shows Best and Records header');
+    P.PAN.sub='bug';ok(/Best 5\.0 mm/.test(P.renderPhone()),'rec: bug records shown in mm');
+    P.PAN.tab='tasks';ok(/Tall Tales/.test(P.renderPhone()),'rec: trophies achievement renders in Tide Points');
+    P.PAN.tab='help';ok(/Record Book/.test(P.renderPhone()),'rec: Guide explains the Record Book');P.closePanel();
+    S.inv.fill(null);S.inv[0]={id:f.id,q:1,tr:1};P.openInv();ok(/class="tro"/.test(document.getElementById('pBody').innerHTML),'rec: trophy badge on slot');P.closePanel();
+    // size distribution
+    let bad=0,tro=0;for(let k=0;k<10000;k++){const v=P.sizeRoll(100);if(!(v>0))bad++;if(v>=121)tro++}
+    ok(bad===0&&tro>=100&&tro<=600,'rec: sizeRoll positive and trophy rate 1-6%',tro);
+    let br=0;for(const b of P.BUGS){const r=P.critRoll('bug',b);if(!(r.sz>0))br++}ok(br===0,'rec: every bug rolls a size');
+    // old save
+    const old=JSON.parse(P.serialize());delete old.rec;P.loadFrom(JSON.stringify(old));S=P.S;ok(S.rec&&typeof S.rec.fish==='object'&&S.rec.ms===0,'rec: old save gets rec defaults');
+    const junk=JSON.parse(P.serialize());junk.rec={fish:[],bug:null,tro:'x',ms:99};P.loadFrom(JSON.stringify(junk));S=P.S;ok(!Array.isArray(S.rec.fish)&&S.rec.bug&&S.rec.tro===0&&S.rec.ms===P.REC_MS.length,'rec: bad rec data sanitized');
+    // tr flag survives storage round trip and drop/pickup keeps it
+    S.inv.fill(null);S.inv[0]={id:f.id,q:1,tr:1};P.PA.stIn({i:0});const si=S.stor.findIndex(s=>s.id===f.id&&s.tr);ok(si>=0,'rec: trophy flag kept in storage');
+    P.PA.stOut({i:si});ok(S.inv.some(s=>s&&s.id===f.id&&s.tr===1),'rec: trophy flag kept when taken out of storage');
+  }catch(e){ok(false,'v1.6.0 Record Book block threw',e.stack)}
+
+  // v1.6.0 corrupt-save protection + backup slot
+  try{
+    await fresh();const K=P.SAVE_KEY,B=P.BAK_KEY,J=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+    ok(B===K+'.bak'&&K==='puddlewick-isle.v1','bak: backup key is SAVE_KEY.bak, main key unchanged');
+    localStorage.removeItem(B);P.G.saveN=0;for(let i=0;i<10;i++)P.save();
+    let b=J(B);ok(b&&b.seed===P.S.seed,'bak: every 10th save copies a backup with the same seed');
+    localStorage.removeItem(B);P.S.lastDay--;P.processDays();b=J(B);ok(b&&b.seed===P.S.seed,'bak: a new island day copies the backup');
+    const good=JSON.parse(P.serialize());good.island='Bakton';localStorage.setItem(B,JSON.stringify(good));localStorage.setItem(K,'{broken');
+    P.boot();const bb=document.getElementById('btnBak');
+    ok(!bb.hidden&&/Restore backup \(saved /.test(bb.textContent),'bak: title offers Restore backup',bb.textContent);
+    ok(!document.getElementById('tDmg').hidden&&/damaged/.test(document.getElementById('tDmgT').textContent)&&document.getElementById('tContinue').hidden,'bak: damaged notice shown, Continue hidden');
+    bb.click();await adv(4);
+    ok(P.S.island==='Bakton','bak: restoring loads the backup island',P.S.island);
+    ok((J(K)||{}).island==='Bakton','bak: restore rewrites the main slot');
+    localStorage.removeItem(B);localStorage.setItem(K,'{broken');P.boot();
+    ok(document.getElementById('btnBak').hidden&&!document.getElementById('tDmg').hidden,'bak: notice without restore button when there is no backup');
+    const f=document.getElementById('newForm'),sub=()=>f.dispatchEvent(new Event('submit',{cancelable:true}));
+    sub();ok(localStorage.getItem(K)==='{broken'&&/again/.test(document.getElementById('btnNew').textContent),'bak: first New Game submit keeps the damaged save');
+    sub();await adv(12);const n=J(K);ok(n&&n.seed===P.S.seed,'bak: second submit starts and saves the new island');
+    localStorage.setItem(K,'{"v":1}');P.boot();ok(!document.getElementById('tDmg').hidden,'bak: parseable but invalid save also counts as damaged');
+    localStorage.setItem(K,P.serialize());P.boot();ok(document.getElementById('tDmg').hidden&&!document.getElementById('tContinue').hidden,'bak: valid save shows Continue');
+  }catch(e){ok(false,'v1.6.0 save backup block threw',e.stack)}
+
+  // v1.6.0 text speed + text size
+  try{
+    await fresh();const ns=P.newState({name:'a',island:'b',hemi:'N',look:{}});ok(ns.set.ts===1&&ns.set.fs===1,'text: newState defaults ts=1 fs=1');
+    const o=JSON.parse(P.serialize());delete o.set.ts;delete o.set.fs;P.loadFrom(JSON.stringify(o));ok(P.S.set.ts===1&&P.S.set.fs===1,'text: old save gets ts and fs');
+    P.S.set.ts=3;P.showDlg({n:'X'},'Hello there, friend!');ok(P.DLG.shown===P.DLG.full.length,'text: instant shows the whole line at once');P.dlgAdvance();P.dlgAdvance();
+    const run=ts=>{P.S.set.ts=ts;P.showDlg({n:'X'},'x'.repeat(200));for(let i=0;i<10;i++)P.updateDlg(.05);const n=P.DLG.shown;P.dlgAdvance();P.dlgAdvance();return n};
+    const a0=run(0),a1=run(1),a2=run(2);ok(a0<a1&&a1<a2,'text: slow < normal < fast after 0.5 s',a0+'/'+a1+'/'+a2);
+    P.S.set.ts=1;P.S.set.fs=1;P.applyCalm();P.showDlg({n:'X'},'hi');const box=document.getElementById('dlgBox'),f1=parseFloat(getComputedStyle(box).fontSize);
+    P.S.set.fs=1.3;P.applyCalm();const f2=parseFloat(getComputedStyle(box).fontSize);ok(Math.abs(f2/f1-1.3)<.03,'text: size 1.3 scales the dialog font',f1+'/'+f2);P.dlgAdvance();P.dlgAdvance();
+    const hint=parseFloat(getComputedStyle(document.getElementById('hint')).fontSize);ok(Math.abs(hint-14*1.3)<.5,'text: hint scales too',hint);
+    const pw=document.getElementById('pWin'),pb=document.getElementById('pBody'),wide=[];
+    for(const t of ['set','tasks','neigh','help','cat']){P.closePanel();P.openPhone(t);pw.style.width='360px';if(pb.scrollWidth>pb.clientWidth+1)wide.push(t+':'+pb.scrollWidth+'/'+pb.clientWidth)}
+    pw.style.width='';ok(!wide.length,'text: 360px panels do not overflow at size 1.3',wide.join(' '));
+    P.closePanel();P.S.set.fs=1;P.openPhone('set');
+    const fb=document.querySelector('[data-a="fs"][data-v="1.15"]'),tb=document.querySelector('[data-a="ts"][data-v="2"]');ok(fb&&tb&&fb.getAttribute('aria-pressed')==='false','text: Settings has size and speed buttons');
+    fb.click();document.querySelector('[data-a="ts"][data-v="2"]').click();ok(document.querySelector('[data-a="fs"][data-v="1.15"]').getAttribute('aria-pressed')==='true','text: pressed state updates');
+    const sv=JSON.parse(localStorage.getItem(P.SAVE_KEY));ok(sv.set.fs===1.15&&sv.set.ts===2,'text: settings saved',JSON.stringify(sv.set));
+    P.closePanel();P.loadFrom(localStorage.getItem(P.SAVE_KEY));ok(P.S.set.fs===1.15&&P.S.set.ts===2,'text: settings persist across reload');
+    P.S.set.fs=1;P.S.set.ts=1;P.applyCalm();
+  }catch(e){ok(false,'v1.6.0 text settings block threw',e.stack)}
+
+  // v1.6.0 sane daily tasks + free swap
+  try{
+    await fresh();const S=P.S,IT=P.IT,isT=(id,t)=>IT[id]&&IT[id].tool===t;
+    S.musRw={fish:4,bug:4,fossil:4};let don=0;for(let d=1;d<=50;d++){P.dailyRefresh(S.lastDay+d);if(S.tasks.some(t=>t.k==='donated'))don++}
+    ok(don===0&&!P.taskCan('donated'),'tasks: no donate task when every hall is complete',don);
+    S.musRw={fish:0,bug:4,fossil:4};ok(P.taskCan('donated'),'tasks: donate allowed while a hall is incomplete');
+    S.inv=S.inv.map(x=>x&&isT(x.id,'shovel')?null:x);S.stor=S.stor.filter(x=>!isT(x.id,'shovel'));S.recipes=S.recipes.filter(k=>!isT(P.RECIPES[k].out,'shovel'));
+    let fo=0;for(let d=60;d<110;d++){P.dailyRefresh(S.lastDay+d);if(S.tasks.some(t=>t.k==='fossils'))fo++}
+    ok(fo===0&&!P.taskCan('fossils'),'tasks: no fossil task without a shovel or its recipe',fo);
+    S.recipes.push('r_sho0');ok(P.taskCan('fossils')&&P.taskCan('rocks'),'tasks: knowing the shovel recipe enables fossils and rocks');
+    P.dailyRefresh(S.lastDay+200);S.tasks.forEach(t=>{t.done=0;t.prog=0});S.tasks[0].done=1;const before=S.tasks.map(t=>t.k);
+    P.openPhone('tasks');const btn=document.querySelector('[data-a="taskSwap"][data-i="1"]');
+    ok(btn&&!btn.disabled&&!document.querySelector('[data-a="taskSwap"][data-i="0"]'),'tasks: Swap on unfinished rows only');
+    btn.click();const after=S.tasks.map(t=>t.k);
+    ok(after.filter((k,i)=>k!==before[i]).length===1&&!before.includes(after[1])&&new Set(after).size===after.length,'tasks: swap replaces exactly one task with a new kind',before+' -> '+after);
+    ok(S.dly.rr===1&&[...document.querySelectorAll('[data-a="taskSwap"]')].every(b=>b.disabled),'tasks: swap disabled for the rest of the day');
+    ok(!P.taskSwap(2)&&S.tasks[2].k===before[2],'tasks: a second swap is refused');
+    ok(/Achievements/.test(document.getElementById('pBody').textContent),'tasks: achievements still listed');P.closePanel();
+    P.dailyRefresh(S.lastDay+201);ok(!S.dly.rr,'tasks: the swap returns after the next refresh');
+    const o=JSON.parse(P.serialize());o.tasks=[{k:'donated',n:1,t:'Donate to the museum',pts:200,prog:0,done:0}];o.musRw={fish:4,bug:4,fossil:4};P.loadFrom(JSON.stringify(o));
+    ok(P.S.tasks.length===1&&P.S.tasks[0].k==='donated','tasks: old saves keep their current tasks');
+  }catch(e){ok(false,'v1.6.0 daily tasks block threw',e.stack)}
+
+  // v1.6.0 Neighbors app progress
+  try{
+    await fresh();const S=P.S,v=S.vill[0],Pv=P.VPOOL[v.p],row=()=>{P.closePanel();P.openPhone('neigh');return document.querySelectorAll('#pBody .li')[0]};
+    Object.assign(v,{fr:40,rcp:0,fav:0,photo:0,td:-1,gd:-1,req:null});let r=row();const w=parseFloat(r.querySelector('.bar i').style.width);
+    ok(Math.abs(w-43)<1.5,'neigh: friendship bar ~43% at 40',w);
+    ok(/Next: secret DIY at 45/.test(r.textContent)&&/5 to go/.test(r.textContent),'neigh: next unlock is the secret DIY',r.textContent);
+    ok(!/✅|🎁/.test(r.textContent),'neigh: no talked/gifted marks yet');
+    v.td=S.lastDay;v.gd=S.lastDay;r=row();ok(/✅/.test(r.textContent)&&/🎁/.test(r.textContent),'neigh: talked and gifted today marks');
+    v.gd=S.lastDay-1;r=row();ok(/✅/.test(r.textContent)&&!/🎁/.test(r.textContent),'neigh: gift mark only when gifted today');
+    Object.assign(v,{fr:100,rcp:1,fav:1,photo:1});r=row();ok(/All friendship gifts received/.test(r.textContent),'neigh: all gifts received');
+    Object.assign(v,{fr:50,rcp:1,fav:0,photo:0});r=row();ok(/favorite keepsake at 60/.test(r.textContent),'neigh: next unlock skips gifts already received');
+    v.td=-1;v.req={id:'wood',rw:400,done:0};r=row();ok(/Has a request, go say hi!/.test(r.textContent)&&!/wants/.test(r.textContent),'neigh: unheard request hint hides the item');
+    v.td=S.lastDay;r=row();ok(/wants: Wood/i.test(r.textContent),'neigh: heard request shows the item',r.textContent);
+    const n0=Pv.n;Pv.n='<b>Bo';try{r=row();ok(r.querySelector('.grow > b').textContent.includes('<b>Bo')&&!r.querySelector('.grow > b b'),'neigh: names are escaped')}finally{Pv.n=n0}
+    P.closePanel();
+  }catch(e){ok(false,'v1.6.0 neighbors block threw',e.stack)}
+
+  // v1.6.0 cheaper HUD + smarter resize
+  try{
+    await fresh();P.closePanel();P.updateHUD();P.updateHUD();
+    const mo=new MutationObserver(()=>{});mo.observe(document.getElementById('hud'),{subtree:true,childList:true,attributes:true,characterData:true});
+    for(let i=0;i<25;i++)P.updateHUD();const n0=mo.takeRecords().length;ok(n0===0,'hud: 25 idle updates make 0 mutations',n0);
+    P.S.coins+=7;P.updateHUD();const rec=mo.takeRecords();mo.disconnect();
+    ok(rec.length===1&&rec[0].target.id==='hCoins','hud: a coin change is exactly one #hCoins mutation',rec.map(m=>m.type+':'+(m.target.id||m.target.nodeName)).join(','));
+    P.render();P.EMO.set('__probe',1);window.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('resize'));await wait(60);
+    ok(P.EMO.has('__probe'),'hud: same-size resize keeps emoji sprites');
+    const dp=Object.getOwnPropertyDescriptor(window,'devicePixelRatio'),cur=Math.min(2,devicePixelRatio||1);
+    Object.defineProperty(window,'devicePixelRatio',{configurable:true,get:()=>cur>=2?1:2});P.resize();ok(!P.EMO.has('__probe'),'hud: a DPR change clears emoji sprites');
+    if(dp)Object.defineProperty(window,'devicePixelRatio',dp);else delete window.devicePixelRatio;P.resize();P.render();ok(P.EMO.size>0,'hud: sprites rebuild after DPR change');
+  }catch(e){ok(false,'v1.6.0 HUD block threw',e.stack)}
+
+  // v1.6.0 platform-aware control text
+  try{
+    const foot=()=>document.querySelector('#title .foot').textContent;
+    const lines=async()=>{P.closePanel();P.newGame({name:'Tess',island:'Testa',hemi:'N',look:{skin:'#fbe0c8',hair:'#3b2a1e',shirt:'#3f9fd2'}});P.startGame(true);const L=[];for(let k=0;k<12;k++){await wait(5);if(P.DLG.on){L.push(P.DLG.full);P.dlgAdvance();P.dlgAdvance()}else if(!P.G.busy)break}return L};
+    P.setTouch(false);P.boot();const kf=foot();ok(/WASD/.test(kf),'ctl: keyboard footer keeps WASD');
+    P.setTouch(true);P.boot();ok(!/WASD/.test(foot())&&/stick/.test(foot()),'ctl: touch footer has no WASD',foot());
+    let L=await lines();const tl=L.find(l=>/switch tools/.test(l))||'';ok(/🔧 button/.test(tl)&&!/Q or R/.test(tl),'ctl: Hazel mentions the tool button on touch',tl);
+    P.openPhone('help');const mv=[...document.querySelectorAll('#pBody .li')].find(e=>/Move/.test(e.textContent));ok(mv&&/stick/.test(mv.textContent)&&!/WASD/.test(mv.textContent),'ctl: Guide Move row mentions the stick');P.closePanel();
+    ok(P.ctl('phone')==='tap 📱'&&P.ctl('act')==='A button'&&P.ctl('tool')==='🔧 button','ctl: touch labels');
+    P.setTouch(false);P.boot();ok(foot()===kf,'ctl: keyboard footer unchanged');
+    L=await lines();ok(L.includes("Here's a flimsy net and a fishing rod to get you started. Press Q or R to switch tools, and Space to use them."),'ctl: keyboard Hazel line unchanged');
+    ok(P.ctl('phone')==='P'&&P.ctl('act')==='Space'&&P.ctl('tool')==='Q / R','ctl: keyboard labels');
+    P.openPhone('help');ok(/WASD or arrow keys/.test(document.getElementById('pBody').textContent),'ctl: keyboard Guide unchanged');P.closePanel();
+    document.getElementById('touch').hidden=true;document.body.classList.remove('touch');
+  }catch(e){P.setTouch(false);ok(false,'v1.6.0 control text block threw',e.stack)}
+
+  // v1.6.0 audio pause when hidden + sticky sound settings
+  try{
+    await fresh();const real=P.AU.c,calls=[];let made=0,hid=true;
+    const mock={state:'running',currentTime:0,sampleRate:44100,suspend(){calls.push('s');this.state='suspended';return Promise.resolve()},resume(){calls.push('r');this.state='running';return Promise.resolve()},createOscillator(){made++;throw new Error('no')},createGain(){made++;throw new Error('no')}};
+    P.AU.c=mock;Object.defineProperty(document,'hidden',{configurable:true,get:()=>hid});
+    try{
+      document.dispatchEvent(new Event('visibilitychange'));ok(calls[0]==='s'&&mock.state==='suspended','audio: hidden tab suspends the AudioContext');
+      hid=false;P.S.set.music=.5;P.musicTick();ok(made===0,'audio: musicTick schedules nothing while suspended');
+      document.dispatchEvent(new Event('visibilitychange'));ok(calls[1]==='r'&&mock.state==='running','audio: visible tab resumes');
+    }finally{delete document.hidden;P.AU.c=real}
+    P.openPhone('set');const sl=document.querySelector('input[data-set="sfx"]');sl.value='0.4';sl.dispatchEvent(new Event('input',{bubbles:true}));sl.dispatchEvent(new Event('change',{bubbles:true}));
+    ok(JSON.parse(localStorage.getItem(P.SAVE_KEY)).set.sfx===0.4,'audio: Effects change is saved');
+    const o=sl.nextElementSibling;ok(o&&o.tagName==='OUTPUT'&&o.textContent==='40%'&&sl.getAttribute('aria-valuetext')==='40%','audio: Effects output and aria-valuetext',o&&o.textContent);
+    const ms=document.querySelector('input[data-set="music"]');ok(ms.nextElementSibling.textContent===Math.round(P.S.set.music*100)+'%'&&ms.getAttribute('aria-valuetext')===ms.nextElementSibling.textContent,'audio: Music output');
+    P.closePanel();
+  }catch(e){ok(false,'v1.6.0 audio block threw',e.stack)}
+
+  // v1.6.0 rainbows after the rain
+  try{
+    await fresh();const S=P.S;if(P.G.scene!=='island')P.exitHouse();
+    const at=(dd,h)=>{const d=new Date();d.setDate(d.getDate()+dd);d.setHours(h,30,0,0);P.timeTravel(d.getTime()-Date.now())};
+    let found=null,bad=0,checked=0;
+    for(let dd=1;dd<=150&&bad<3;dd++){for(const h of [8,12,16]){at(dd,h);const day=S.lastDay,w=P.weather(day,h),exp=(w==='sunny'||w==='cloudy')&&P.weather(day,h-4)==='rain',rb=P.rainbowNow();checked++;
+      if(rb!==exp)bad++;if(exp&&!found)found=[dd,h]}if(found&&dd>found[0]+20)break}
+    ok(found&&bad===0,'rainbow: true exactly after a rain-to-dry block change',JSON.stringify(found)+' bad '+bad+' of '+checked);
+    if(found){at(found[0],found[1]);ok(P.rainbowNow(),'rainbow: shows at the found block');
+      ok(P.events().some(e=>e==='🌈 A rainbow over '+S.island+'!'),'rainbow: events line');
+      const dI=CanvasRenderingContext2D.prototype.drawImage;let drew=0;CanvasRenderingContext2D.prototype.drawImage=function(img,...a){if(img===P.RAINBOW)drew++;return dI.call(this,img,...a)};
+      const r1=P.RAINBOW;try{P.render();P.render()}finally{CanvasRenderingContext2D.prototype.drawImage=dI}ok(drew===2&&P.RAINBOW===r1&&r1 instanceof HTMLCanvasElement,'rainbow: cached sprite drawn once per frame',drew);
+      P.enterHouse();ok(!P.rainbowNow()&&!P.events().some(e=>/🌈/.test(e)),'rainbow: not indoors');P.exitHouse();
+      ok(P.rainbowNow(),'rainbow: back outdoors');P.startTour();ok(!P.rainbowNow(),'rainbow: not on tours');P.returnHome();
+      at(found[0],20);ok(!P.rainbowNow()&&!P.events().some(e=>/🌈/.test(e)),'rainbow: never at night')}
+    {let no=null;for(let dd=1;dd<=60&&!no;dd++){at(dd,12);if(!P.rainbowNow())no=dd}ok(no&&!P.events().some(e=>/🌈/.test(e)),'rainbow: no events line without a rainbow')}
+  }catch(e){ok(false,'v1.6.0 rainbow block threw',e.stack)}
+
+  try{ // review fixes: backup erase, rainbow cache, trophy-safe removeItem, phone text scaling, wardrobe a11y
+    await fresh();const S=P.S;
+    S.inv=S.inv.map(()=>null);S.inv[0]={id:Object.keys(P.IT).find(k=>P.IT[k].c==='fish'),q:1,tr:1};S.inv[1]={id:S.inv[0].id,q:1};
+    P.removeItem(S.inv[0].id,1);ok(S.inv[0]&&S.inv[0].tr===1&&!S.inv[1],'review: removeItem hands over the plain catch before the trophy');
+    const rules=[];for(const sh of document.styleSheets)try{for(const r of sh.cssRules)if(r.media)for(const q of r.cssRules)rules.push(r.media.mediaText+'|'+q.cssText)}catch(e){}
+    const fx=(mq,sel)=>{const m=rules.filter(t=>t.includes(mq)&&t.split('|')[1].startsWith(sel+' ')&&/font-size/.test(t));return m.length>0&&m.every(t=>/var\(--fs\)/.test(t))};
+    ok(fx('max-width: 560px','#dlgBox')&&fx('max-height: 480px','#dlgBox')&&fx('max-width: 560px','#clock b'),'review: phone media queries scale dialog and clock with text size');
+    if(!S.closet.length)S.closet.push('cl_sunhat');P.openWardrobe();const html=document.getElementById('pBody').innerHTML;ok(!/>To pockets</.test(html)&&!/aria-label="Dressing mirror"/.test(html),'review: wardrobe uses labelled compact buttons');P.closePanel();
+    const sd=P.S.seed;P.rainbowNow();P.S.seed=sd+1;P.rainbowNow();ok(true,'review: rainbow cache tolerates a seed change');P.S.seed=sd;
   }catch(e){ok(false,'review fixes block threw',e.stack)}
 
   // ---- feature tests: append new blocks above this line (END marker) ----
