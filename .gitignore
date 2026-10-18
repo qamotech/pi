@@ -1,3 +1,6 @@
 .upgrade/
 node_modules/
 *.log
+
+# Game save exports (personal data, not source)
+*-save*.json
