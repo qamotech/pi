@@ -1936,7 +1936,7 @@ async function useWell(x,y){
   if(c===0){if(S.coins<100){toast('You need 100 chimes for a wish.');sfx('err');return}
     S.coins-=100;uiDirty();sfx('coins');splash(G.px,G.py-30,10);
     const k=pick(Math.random,Object.keys(BLESS));S.flags.bless={k,day:today()};
-    const[e,nm,d]=BLESS[k];hearts(G.px,G.py-50);sfx('fanfare');
+    const[e,nm,d]=BLESS[k];hearts(G.px,G.py-50);sfx('wellwish');sfx('fanfare');
     toast(`${e} ${nm}! ${d}`,'big');uiDirty()}
   else if(c===1)pickFurn(x,y,'fu_well')}
 async function cookAtCampfire(x,y){
@@ -1947,7 +1947,7 @@ async function cookAtCampfire(x,y){
   if(c==null||c>=shown.length+2)return;
   if(opts[c]==='📦 Pick up the campfire'){pickFurn(x,y,'fu_campfire');return}
   const[i,s]=shown[c],it=IT[s.id],gp=Math.round(it.p*1.75*(s.tr?1.5:1));
-  takeSlot(i,1);addItem('grill',1,{gp});sfx('fanfare');floatIcon('🍢');
+  takeSlot(i,1);addItem('grill',1,{gp});sfx('sizzle');sfx('fanfare');floatIcon('🍢');
   toast(`🍢 Grilled ${it.n.toLowerCase()}! Sells for ${fmt(gp)} chimes.`);uiDirty()}
 // Birdhouse visitors (fu_birdhouse): a daily feathered visitor that sings for 25 chimes, then flies off
 function watchBird(x,y){
@@ -2762,23 +2762,25 @@ const FR_=()=>.9+Math.random()*.2, VL_=()=>.85+Math.random()*.3;   // pitch/volu
 function sfx(n){if(!AU.c||!S||S.set.sfx<=0)return;switch(n){
   case 'pick':{const f=FR_();tone(880*f,.08,'triangle',.16*VL_());tone(1320*f,.1,'triangle',.12,.05);break;}
   case 'coins':{const f=FR_();[1568,2093,2637].forEach((q,i)=>tone(q*f,.12,'triangle',.1*VL_(),i*.05));break;}
-  case 'points':[784,988,1175,1568].forEach((f,i)=>tone(f,.14,'sine',.12,i*.06));break;
-  case 'fanfare':[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.13,i*.08));break;
-  case 'learn':[659,880,1175].forEach((f,i)=>tone(f,.2,'sine',.12,i*.07));break;
-  case 'swish':noise(.18,.18*VL_(),0,2400*FR_(),'bandpass');break;case 'rustle':noise(.35,.2,0,3000,'highpass');noise(.25,.12,.12,2200,'highpass');break;
+  case 'points':{const fr=FR_();[784,988,1175,1568].forEach((f,i)=>tone(f*fr,.14,'sine',.12*VL_(),i*.06));break;}
+  case 'fanfare':{const fr=FR_();[523,659,784,1047,784,1047].forEach((f,i)=>tone(f*fr,.18,'triangle',.13*VL_(),i*.08));break;}
+  case 'learn':{const fr=FR_();[659,880,1175].forEach((f,i)=>tone(f*fr,.2,'sine',.12*VL_(),i*.07));break;}
+  case 'swish':noise(.18,.18*VL_(),0,2400*FR_(),'bandpass');break;case 'rustle':noise(.35,.2*VL_(),0,3000,'highpass');noise(.25,.12*VL_(),.12,2200,'highpass');break;
   case 'chop':{const f=FR_();tone(180*f,.12,'square',.14*VL_(),0,null,90*f);noise(.08,.2*VL_(),0,900*f);break;}case 'rock':{const f=FR_();tone(320*f,.08,'square',.12*VL_(),0,null,160*f);noise(.06,.25*VL_(),0,3000*f,'highpass');break;}
-  case 'dig':noise(.2,.25*VL_(),0,700*FR_());break;case 'water':noise(.4,.12,0,1800,'bandpass');break;case 'pluck':{const f=FR_();tone(500*f,.08,'triangle',.12*VL_(),0,null,800*f);break;}
+  case 'dig':noise(.2,.25*VL_(),0,700*FR_());break;case 'water':noise(.4,.12*VL_(),0,1800,'bandpass');break;case 'pluck':{const f=FR_();tone(500*f,.08,'triangle',.12*VL_(),0,null,800*f);break;}
   case 'cast':{const f=FR_();noise(.25,.12*VL_(),0,2000*f,'bandpass');tone(900*f,.25,'sine',.05,0,null,300*f);break;}case 'plop':{const f=FR_();tone(500*f,.12,'sine',.14*VL_(),0,null,160*f);break;}
-  case 'nibble':{const f=FR_();tone(700*f,.06,'sine',.1*VL_(),0,null,400*f);break;}case 'bite':noise(.3,.35,0,1400);tone(300,.25,'sine',.16,0,null,90);break;case 'reel':{const f=FR_();tone(1200*f,.12,'triangle',.06*VL_(),0,null,600*f);break;}
-  case 'err':tone(220,.15,'square',.07);tone(180,.18,'square',.06,.08);break;case 'meh':tone(392,.2,'triangle',.1);tone(330,.3,'triangle',.1,.15);break;
-  case 'tool':tone(660,.05,'triangle',.08);break;case 'open':tone(523,.06,'triangle',.08);tone(784,.08,'triangle',.07,.04);break;case 'close':tone(784,.06,'triangle',.07);tone(523,.08,'triangle',.06,.04);break;
-  case 'bell':tone(1760,.08,'sine',.15);tone(2349,.12,'sine',.12,.06);break;case 'hop':tone(340,.12,'triangle',.14,0,null,620);break;case 'land':{const f=FR_();noise(.08,.16*VL_(),0,600*f);tone(130*f,.08,'sine',.12*VL_());break;}
-  case 'blip2':tone(1046,.04,'triangle',.05);break;case 'place':tone(300,.08,'triangle',.14,0,null,220);break;case 'craft':[0,.12,.24].forEach(t=>{tone(260,.06,'square',.08,t);noise(.05,.15,t,2500)});tone(1046,.25,'sine',.1,.36);break;
-  case 'pop':noise(.12,.4,0,4000,'highpass');tone(900,.1,'sine',.12,0,null,200);break;case 'sling':tone(400,.12,'triangle',.1,0,null,1200);break;
-  case 'buzz':tone(160,.6,'sawtooth',.05,0,null,190);break;case 'ouch':tone(600,.2,'square',.1,0,null,200);break;case 'faint':[440,392,330,262].forEach((f,i)=>tone(f,.25,'triangle',.12,i*.14));break;
-  case 'break':noise(.3,.3,0,2500);tone(400,.3,'square',.08,0,null,80);break;case 'door':tone(330,.08,'triangle',.1);tone(440,.12,'triangle',.08,.08);break;
-  case 'eat':noise(.08,.2,0,1500);noise(.08,.2,.14,1500);break;case 'plane':noise(1.4,.12,0,500);break;case 'boom':noise(.6,.25,0,400);tone(90,.5,'sine',.2,0,null,40);break;
-  case 'twinkle':tone(2093,.3,'sine',.04);tone(2637,.4,'sine',.03,.1);break;case 'wish':[1047,1319,1568,2093].forEach((f,i)=>tone(f,.4,'sine',.07,i*.09));break}}
+  case 'nibble':{const f=FR_();tone(700*f,.06,'sine',.1*VL_(),0,null,400*f);break;}case 'bite':{const f=FR_();noise(.3,.35*VL_(),0,1400*f);tone(300*f,.25,'sine',.16*VL_(),0,null,90*f);break;}case 'reel':{const f=FR_();tone(1200*f,.12,'triangle',.06*VL_(),0,null,600*f);break;}
+  case 'err':{const f=FR_();tone(220*f,.15,'square',.07*VL_());tone(180*f,.18,'square',.06*VL_(),.08);break;}case 'meh':tone(392,.2,'triangle',.1*VL_());tone(330,.3,'triangle',.1*VL_(),.15);break;
+  case 'tool':{const f=FR_();tone(660*f,.05,'triangle',.08*VL_());break;}case 'open':{const f=FR_();tone(523*f,.06,'triangle',.08*VL_());tone(784*f,.08,'triangle',.07*VL_(),.04);break;}case 'close':{const f=FR_();tone(784*f,.06,'triangle',.07*VL_());tone(523*f,.08,'triangle',.06*VL_(),.04);break;}
+  case 'bell':{const f=FR_();tone(1760*f,.08,'sine',.15*VL_());tone(2349*f,.12,'sine',.12*VL_(),.06);break;}case 'hop':{const f=FR_();tone(340*f,.12,'triangle',.14*VL_(),0,null,620*f);break;}case 'land':{const f=FR_();noise(.08,.16*VL_(),0,600*f);tone(130*f,.08,'sine',.12*VL_());break;}
+  case 'blip2':tone(1046*FR_(),.04,'triangle',.05*VL_());break;case 'place':{const f=FR_();tone(300*f,.08,'triangle',.14*VL_(),0,null,220*f);break;}case 'craft':[0,.12,.24].forEach(t=>{tone(260,.06,'square',.08*VL_(),t);noise(.05,.15*VL_(),t,2500)});tone(1046,.25,'sine',.1*VL_(),.36);break;
+  case 'pop':noise(.12,.4*VL_(),0,4000,'highpass');tone(900,.1,'sine',.12*VL_(),0,null,200);break;case 'sling':tone(400,.12,'triangle',.1*VL_(),0,null,1200);break;
+  case 'buzz':{const f=FR_();tone(160*f,.6,'sawtooth',.05*VL_(),0,null,190*f);break;}case 'ouch':tone(600,.2,'square',.1*VL_(),0,null,200);break;case 'faint':[440,392,330,262].forEach((f,i)=>tone(f,.25,'triangle',.12*VL_(),i*.14));break;
+  case 'break':noise(.3,.3*VL_(),0,2500);tone(400,.3,'square',.08*VL_(),0,null,80);break;case 'door':{const f=FR_();tone(330*f,.08,'triangle',.1*VL_());tone(440*f,.12,'triangle',.08*VL_(),.08);break;}
+  case 'eat':noise(.08,.2*VL_(),0,1500*FR_());noise(.08,.2*VL_(),.14,1500*FR_());break;case 'plane':noise(1.4,.12*VL_(),0,500);break;case 'boom':noise(.6,.25*VL_(),0,400);tone(90,.5,'sine',.2*VL_(),0,null,40);break;
+  case 'twinkle':tone(2093,.3,'sine',.04*VL_());tone(2637,.4,'sine',.03*VL_(),.1);break;case 'wish':[1047,1319,1568,2093].forEach((f,i)=>tone(f,.4,'sine',.07*VL_(),i*.09));break;
+  case 'sizzle':{const f=FR_();noise(.9,.22*VL_(),0,3800*f,'highpass');for(let i=0;i<6;i++)tone(2400*f+Math.random()*1800,.04,'sine',.05*VL_(),Math.random()*.8);break;}
+  case 'wellwish':{const f=FR_();tone(1400*f,.18,'sine',.1*VL_(),0,null,700*f);tone(1050,.4,'sine',.09*VL_(),.15);[1568,2093,2637].forEach((q,i)=>tone(q,.3,'sine',.05*VL_(),i*.07+.3));break}}}
 function blip(ch,p){if(!AU.c||!S||S.set.sfx<=0)return;const k=(ch.toLowerCase().charCodeAt(0)-97+26)%26,f=(190+((k*7)%12)*18)*p;tone(f,.055,'triangle',.07,0,null,f*1.12)}
 const SCALES=[[0,2,4,7,9],[0,3,5,7,10],[0,2,4,5,7,9,11],[0,2,3,5,7,9,10]];
 function musicTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidden||S.set.music<=0||!$('title').hidden)return;
@@ -2803,12 +2805,24 @@ function playStep(st,h,t0,spb){
   const r=rngFor('mel',h,st%32,Math.floor(st/64)%2)();
   if(r<.5){const n=deg(prog+Math.floor(rngFor('mn',h,st%32)()*7));tone(mtof(n),spb*1.6,'triangle',.05*soft*rain,t0,AU.m);tone(mtof(n+12),spb*.8,'sine',.012,t0,AU.m)}
   if(st%4===2&&h>=8&&h<20)noise(.03,.02,t0,6000,'highpass',AU.m);
+  if(meteorNight()&&(st%16===6)){const f=mtof(sdeg(sc,root,8+Math.floor(rngFor('ms',h,st%64)()*8)+12));tone(f,spb*.8,'sine',.018*soft,t0,AU.m);tone(f*2,spb*.4,'sine',.006,t0+.02,AU.m)}
+  // fishing tension: adaptive motif while the bobber is out (island only)
+  const cs=G.cast;
+  if(cs&&cs.st!=='fly'&&G.scene==='island'){const low=mtof(deg(prog)-36),hig=mtof(deg(prog+3)-36);
+    if(cs.fish&&cs.fish.st!=='bite'&&st%4===0){tone(cs.fish.st==='nibble'?hig:low,spb*.7,'sine',.03*soft,t0,AU.m);noise(.02,.015,t0,7000,'highpass',AU.m)}
+    else if(!cs.fish&&st%16===0){tone(low,spb*2,'sine',.028*soft,t0,AU.m);tone(hig,spb*1.2,'sine',.018*soft,t0+spb,AU.m)}}
 }
 
 /* =============================== AMBIENCE =============================== */
 function ambiTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidden||S.set.music<=0||!$('title').hidden||G.scene!=='island')return;
   if(!AU.a){AU.a=c.createGain();AU.a.connect(AU.m)}
   AU.a.gain.value=calm()?.12:.32;   // reduced-motion users get a quieter ambience bed (audio equivalent of quiet mode)
+  // ocean wave swells: slow-attack noise every ~7 s (quiet in calm mode; rain/snow patter already covers it there)
+  AU.wv=(AU.wv||0)+1;
+  if(AU.wv%5===0&&weather()!=='rain'&&weather()!=='snow'){const wt=c.currentTime,wv=calm()?.018:.045,ws=c.createBufferSource(),wf=c.createBiquadFilter(),wg=c.createGain();
+    ws.buffer=AU.nb;ws.loop=true;wf.type='lowpass';wf.frequency.value=420;wg.gain.setValueAtTime(.0001,wt);
+    wg.gain.linearRampToValueAtTime(wv,wt+.7);wg.gain.exponentialRampToValueAtTime(.0005,wt+2.6);
+    ws.connect(wf);wf.connect(wg);wg.connect(AU.a);ws.start(wt);ws.stop(wt+2.8)}
   const h=clk().h,w=weather(),R=Math.random;
   if(w==='rain'||w==='snow'){noise(.3,w==='rain'?.05:.025,R()*.4,5200,'highpass',AU.a);if(R()<.3){const f=1800+R()*2400;tone(f,.12,'sine',.02,R()*.6,AU.a,f*.7)}return}
   if(h>=19||h<5){if(w==='sunny'&&R()<.75){const n=2+Math.floor(R()*3),f=4200+R()*900;for(let i=0;i<n;i++)tone(f+R()*200,.045,'sine',.016,i*.085,AU.a)}return}
