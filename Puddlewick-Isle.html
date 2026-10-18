@@ -2786,6 +2786,9 @@ const SCALES=[[0,2,4,7,9],[0,3,5,7,10],[0,2,4,5,7,9,11],[0,2,3,5,7,9,10]];
 function musicTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidden||S.set.music<=0||!$('title').hidden)return;
   const h=clk().h,sid=songNow(),sg=sid&&SONG_BY[sid],bpm=sg?sg[4]:h>=22||h<5?64:h<9?80:h<17?96:76,spb=60/bpm/2;
   if(AU.next<c.currentTime)AU.next=c.currentTime+.05;
+  // track-change bridge: a soft ascending motif smooths the cut between music tracks (house ↔ outdoors, gig start/end)
+  if(AU.lastSid!==undefined&&AU.lastSid!==(sid||'')){const t0b=AU.next-c.currentTime;[523,659,784].forEach((f,i)=>tone(f*FR_(),spb*.8,'triangle',.035,t0b+i*spb*.45,AU.m))}
+  AU.lastSid=sid||'';
   while(AU.next<c.currentTime+.3){if(sg)playSong(AU.step,sg,AU.next-c.currentTime,spb);else playStep(AU.step,h,AU.next-c.currentTime,spb);AU.next+=spb;AU.step++}}
 // songs: seeded 64-step melody built once per song (Int8Array, -1 = rest); per step only tone() nodes are created
 const SONG_MEL={},SPROG=[[0,3,4,0],[0,5,3,4],[0,4,5,3],[0,2,3,4]];
@@ -2806,6 +2809,9 @@ function playStep(st,h,t0,spb){
   if(r<.5){const n=deg(prog+Math.floor(rngFor('mn',h,st%32)()*7));tone(mtof(n),spb*1.6,'triangle',.05*soft*rain,t0,AU.m);tone(mtof(n+12),spb*.8,'sine',.012,t0,AU.m)}
   if(st%4===2&&h>=8&&h<20)noise(.03,.02,t0,6000,'highpass',AU.m);
   if(meteorNight()&&(st%16===6)){const f=mtof(sdeg(sc,root,8+Math.floor(rngFor('ms',h,st%64)()*8)+12));tone(f,spb*.8,'sine',.018*soft,t0,AU.m);tone(f*2,spb*.4,'sine',.006,t0+.02,AU.m)}
+  // meteor-night celestial theme: sub-bass drone each bar + a slow ascending pentatonic sweep each 8 bars (soft in quiet/calm mode)
+  if(meteorNight()&&st%32===0)tone(mtof(deg(prog)-36),spb*12,'sine',(calm()?.014:.028)*soft,t0,AU.m);
+  if(meteorNight()&&st%64===40){const base=sdeg(sc,root,12),seq=[0,2,4,7,9];seq.forEach((s,i)=>{const f=mtof(base+s);tone(f,spb*.9,'sine',.02*soft,t0+i*spb*.5,AU.m)})}
   // fishing tension: adaptive motif while the bobber is out (island only)
   const cs=G.cast;
   if(cs&&cs.st!=='fly'&&G.scene==='island'){const low=mtof(deg(prog)-36),hig=mtof(deg(prog+3)-36);
@@ -2828,6 +2834,12 @@ function ambiTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidd
   if(h>=19||h<5){if(w==='sunny'&&R()<.75){const n=2+Math.floor(R()*3),f=4200+R()*900;for(let i=0;i<n;i++)tone(f+R()*200,.045,'sine',.016,i*.085,AU.a)}return}
   if(w==='sunny'&&h>=6&&h<18&&R()<.3){const f=2300+R()*700;tone(f,.09,'sine',.03,0,AU.a,f*1.3);tone(f*1.1,.08,'sine',.02,.1,AU.a,f*.85);return}
   if(w==='cloudy'&&R()<.5)noise(1.1,.035,R()*.5,380,'lowpass',AU.a);
+  // event crowd murmur: soft human-texture bed during fireworks nights and gigs (quieter in calm/quiet mode)
+  if((fireworksNight()||G.gig)&&R()<.85){const ct=c.currentTime,mv=calm()?.02:.05,cs=c.createBufferSource(),cf=c.createBiquadFilter(),cg=c.createGain();
+    cs.buffer=AU.nb;cs.loop=true;cf.type='bandpass';cf.frequency.value=480+R()*160;cf.Q.value=.7;
+    cg.gain.setValueAtTime(.0001,ct);cg.gain.linearRampToValueAtTime(mv,ct+.5);cg.gain.exponentialRampToValueAtTime(.0005,ct+1.6);
+    cs.connect(cf);cf.connect(cg);cg.connect(AU.a);cs.start(ct);cs.stop(ct+1.7);
+    if(R()<.12)tone(300+R()*220,.5,'sine',mv*.5,.3,AU.a,600+R()*300)}   // occasional distant cheer swell
 }
 
 /* =============================== INPUT =============================== */
