@@ -455,7 +455,9 @@ const CLOTH_RAW=[['capred','Red ball cap','🧢',580,'hat','#d9534f','all','cap'
  ['glassround','Round glasses','👓',760,'acc','#3a2f28','all','glasses'],['shades','Sunglasses','🕶️',840,'acc','#1e1e24','6-8','shades'],['scarfred','Cranberry scarf','🧣',900,'acc','#c0392b','12-2','scarf'],
  ['scarfmoss','Moss scarf','🧣',900,'acc','#6b8e3e','10-3','scarf'],['packorange','Explorer backpack','🎒',1800,'acc','#e8843a','all','backpack'],['packblue','School backpack','🎒',1800,'acc','#4a7fd0','all','backpack'],['capjack','Jack-o\'-lantern cap','🎃',780,'hat','#e8813a','10','cap'],['hoodrust','Harvest hoodie','🧥',1400,'top','#a8552a','10-11','hoodie'],['beaniesnow','Snowday beanie','🧶',720,'hat','#dfeefc','12-2','beanie'],['scarffrost','Frostbite scarf','🧣',900,'acc','#a8d8e8','12-2','scarf'],['rainpink','Blossom raincoat','🧥',1600,'top','#f2a7c3','3-5','raincoat'],['hatsun','Sunburst sunhat','👒',950,'hat','#ffd25e','6-8','sunhat'],['crownwheat','Wheatfield crown','🌾',1300,'hat','#d9a441','9-11','crown'],['bootfrost','Frost boots','🥾',1350,'shoe','#a8d8e8','12-2','boots'],['teetide','Tide-dye tee','👕',560,'top','#4fb6c9','6-8','tee'],['bootbloom','Blossom boots','🥾',1350,'shoe','#f2a7c3','3-5','boots'],['bootmaple','Maple boots','🥾',1350,'shoe','#a8552a','9-11','boots'],['teekite','Kite-dye tee','👕',560,'top','#f2a7c3','7-8','tee'],['capclover','Clover cap','🍀',650,'hat','#3f9e4d','3','cap'],['capegg','Eggshell cap','🥚',690,'hat','#f2c9a0','4-5','cap'],['skirtlove','Sweetheart skirt','💗',920,'bot','#e0668a','2','skirt'],['teepump','Pumpkin patch tee','👕',560,'top','#e07b39','10','tee'],['teelove','Sweetheart tee','💗',620,'top','#e0668a','2','tee'],
  ['tophat','Dapper top hat','🎩',2400,'hat','#2b2b33','all','tophat'],['turtle','Cable-knit turtleneck','👚',1500,'top','#8c5a8e','10-3','turtle'],
- ['denimjack','Denim jacket','🧥',1650,'top','#4a74b8','all','jacket'],['gloves','Trail gloves','🧤',700,'acc','#7a4f2e','11-2','gloves']];
+ ['denimjack','Denim jacket','🧥',1650,'top','#4a74b8','all','jacket'],['gloves','Trail gloves','🧤',700,'acc','#7a4f2e','11-2','gloves'],
+ ['capnews','Newsboy cap','🧢',860,'hat','#8a6f4d','all','flatcap'],['swstripe','Striped sweater','🧶',940,'top','#c65b3f','9-3','sweater'],
+ ['cargokhaki','Khaki cargo pants','🩳',1050,'bot','#8a7f5c','all','cargo'],['sneakhigh','High-top sneakers','👟',1180,'shoe','#3f6fb5','all','hightop']];
 CLOTH_RAW.forEach(([id,n,e,b,slot,col,ms,shape])=>def('cl_'+id,{n,e,p:Math.round(b/4),buy:b,c:'cloth',slot,col,shape,ms:parseRanges(ms)}));
 const WEAR_SLOTS=['hat','top','bot','shoe','acc'],SLOT_NAME={hat:'Hat',top:'Top',bot:'Bottoms',shoe:'Shoes',acc:'Accessory'},CLOSET_MAX=120;
 // neighbors compliment outfits that match their personality's favorite shapes
@@ -1542,13 +1544,23 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     g.fillStyle='rgba(40,30,10,.25)';E(x,y,9,3.5);
     const l=moving?Math.sin(step)*3:0;
     g.fillStyle='#5a4a3a';g.fillRect(x-5,by-8,4,8+(l>0?-1:0));g.fillRect(x+1,by-8,4,8+(l<0?-1:0));
+    g.fillStyle='rgba(0,0,0,.20)';g.fillRect(x-1.7,by-8,1.7,8+(l>0?-1:0));g.fillRect(x+1,by-8,1.7,8+(l<0?-1:0));
     const bs=wk&&wk.botS,sc=wk&&wk.shoeC,sa=sc&&wk.shoeS==='sandals';
     if(bs){g.fillStyle=wk.botC;if(bs==='shorts')g.fillRect(x-5.5,by-8.5,11,5.5);
       else if(bs==='skirt'){g.beginPath();g.moveTo(x-6,by-9);g.lineTo(x+6,by-9);g.lineTo(x+8.5,by-3);g.lineTo(x-8.5,by-3);g.closePath();g.fill();g.fillStyle=wk.botD;g.fillRect(x-8.5,by-4,17,1)}
+      else if(bs==='cargo'){g.fillRect(x-5.5,by-8.5,11,2);g.fillRect(x-5,by-8,4,7+(l>0?-1:0));g.fillRect(x+1,by-8,4,7+(l<0?-1:0));
+        g.fillStyle=wk.botD;g.fillRect(x-4.6,by-5+(l>0?-1:0),3,2.4);g.fillRect(x+1.6,by-5+(l<0?-1:0),3,2.4);
+        g.fillStyle=shade(wk.botC,-40);g.fillRect(x-5,by-1.8+(l>0?-1:0),4,1.2);g.fillRect(x+1,by-1.8+(l<0?-1:0),4,1.2)}
       else{g.fillRect(x-5.5,by-8.5,11,2);g.fillRect(x-5,by-8,4,7+(l>0?-1:0));g.fillRect(x+1,by-8,4,7+(l<0?-1:0))}}
-    if(sc&&wk.shoeS==='boots'){g.fillStyle=sc;g.fillRect(x-5.5,by-4.5+(l>0?-1:0),5,4);g.fillRect(x+.5,by-4.5+(l<0?-1:0),5,4)}
+    if(sc&&wk.shoeS==='boots'){g.fillStyle=sc;g.fillRect(x-5.5,by-4.5+(l>0?-1:0),5,4);g.fillRect(x+.5,by-4.5+(l<0?-1:0),5,4);
+      g.fillStyle=shade(sc,-62);g.fillRect(x-5.5,by-1.7+(l>0?-1:0),5,1.2);g.fillRect(x+.5,by-1.7+(l<0?-1:0),5,1.2)}
     g.fillStyle=sa?look.skin:sc||'#3a2f28';E(x-3+(side*1),by-.5+l*.3,3,1.8);E(x+3+(side*1),by-.5-l*.3,3,1.8);
     g.fillStyle=sa?sc:'#ffffff';E(x-3+(side*1),by+.4+l*.3,2.8,0.8);E(x+3+(side*1),by+.4-l*.3,2.8,0.8);
+    if(sc&&wk.shoeS==='hightop'){g.fillStyle=sc;E(x-3+(side*1),by-.8+l*.3,3,2.6);E(x+3+(side*1),by-.8-l*.3,3,2.6);
+      g.fillStyle=shade(sc,-40);g.fillRect(x-5.4+(side*1),by-4.6+l*.3,4.8,1.6);g.fillRect(x+0.6+(side*1),by-4.6-l*.3,4.8,1.6);
+      g.strokeStyle='#ffffff';g.lineWidth=.7;
+      for(let i=0;i<3;i++){g.beginPath();g.moveTo(x-4.6+side*1,by-3.2+l*.3+i*.9);g.lineTo(x-1.4+side*1,by-3.2+l*.3+i*.9);
+        g.moveTo(x+1.4+side*1,by-3.2-l*.3+i*.9);g.lineTo(x+4.6+side*1,by-3.2-l*.3+i*.9);g.stroke()}}
     if(sc&&wk.shoeS==='sneaker'){g.strokeStyle='#ffffff';g.lineWidth=.8;g.beginPath();
       g.moveTo(x-4.6,by-1.6+l*.3);g.lineTo(x-1.4,by-1.6+l*.3);g.moveTo(x+1.4,by-1.6-l*.3);g.lineTo(x+4.6,by-1.6-l*.3);g.stroke();
       g.strokeStyle=shade(sc,-50);g.lineWidth=.7;
@@ -1568,26 +1580,29 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   g.fillStyle='rgba(60,25,10,.22)';g.fillRect(x-3,ty-4,6,1.8);
   if(as==='backpack'&&side&&!up){g.fillStyle=wk.accC;rrect(x-side*7.5-3,ty+1,6,10,2,g)}
   g.fillStyle=wk&&wk.topC||look.shirt;rrect(x-7.5,ty,15,13,5,g);
+  g.fillStyle='rgba(0,0,0,.10)';g.fillRect(x-7.5,ty+2,2,9);g.fillRect(x+5.5,ty+2,2,9);
+  g.strokeStyle='rgba(255,255,255,.16)';g.lineWidth=.8;g.beginPath();g.moveTo(x-2,ty+2);g.lineTo(x-2.4,ty+11);g.moveTo(x+2,ty+2);g.lineTo(x+2.4,ty+11);g.stroke();
   if(wk&&wk.s)wearBody(g,wk,x,ty,side,up);
   g.fillStyle=look.skin;
   if(onBike){
     const dir=side||1;
     g.beginPath();g.ellipse(x+dir*4.5,by-13-bob,2.8,3.2,dir*0.4,0,6.283);g.fill();
   }else{
-    const ax=moving?Math.sin(step)*2:0;
-    E(x-8.5,by-12-bob+ax,2.6,3.2);E(x+8.5,by-12-bob-ax,2.6,3.2);
+    const ax=moving?Math.sin(step)*2:0,asw=moving?Math.sin(step+Math.PI)*1.5:0;
+    E(x-8.5-asw,by-12-bob+ax,2.6,3.2);E(x+8.5-asw,by-12-bob-ax,2.6,3.2);
     g.strokeStyle=shade(look.skin,-45);g.lineWidth=.6;g.lineCap='round';
-    g.beginPath();g.moveTo(x-8.5,by-11.4-bob+ax);g.lineTo(x-8.5,by-10.2-bob+ax);
-    g.moveTo(x+8.5,by-11.4-bob-ax);g.lineTo(x+8.5,by-10.2-bob-ax);g.stroke();
+    g.beginPath();g.moveTo(x-8.5-asw,by-11.4-bob+ax);g.lineTo(x-8.5-asw,by-10.2-bob+ax);
+    g.moveTo(x+8.5-asw,by-11.4-bob-ax);g.lineTo(x+8.5-asw,by-10.2-bob-ax);g.stroke();
     g.fillStyle=shade(look.skin,-24);
-    E(x-8.5,by-9.4-bob+ax,1.7,2.1);E(x+8.5,by-9.4-bob-ax,1.7,2.1);
+    E(x-8.5-asw,by-9.4-bob+ax,1.7,2.1);E(x+8.5-asw,by-9.4-bob-ax,1.7,2.1);
     g.fillStyle=look.skin;
-    if(as==='gloves'){g.fillStyle=wk.accC;E(x-8.5,by-12-bob+ax,3,3.6);E(x+8.5,by-12-bob-ax,3,3.6);
-      g.fillStyle=wk.accD;E(x-8.5,by-9.6-bob+ax,2.2,1.4);E(x+8.5,by-9.6-bob-ax,2.2,1.4)}
+    if(as==='gloves'){g.fillStyle=wk.accC;E(x-8.5-asw,by-12-bob+ax,3,3.6);E(x+8.5-asw,by-12-bob-ax,3,3.6);
+      g.fillStyle=wk.accD;E(x-8.5-asw,by-9.6-bob+ax,2.2,1.4);E(x+8.5-asw,by-9.6-bob-ax,2.2,1.4)}
   }
   const hy=by-(onBike?27:29)-bob-br;
   g.fillStyle=look.skin;E(x,hy,10.5,10);
   if(!side&&!up){E(x-10,hy+1,2.6,3.4);E(x+10,hy+1,2.6,3.4)}
+  g.fillStyle=shade(look.skin,-32);if(!side&&!up){E(x-10,hy+1.3,1.2,1.9);E(x+10,hy+1.3,1.2,1.9)}
   if(!up){g.fillStyle='rgba(120,60,30,.10)';if(side)E(x-side*7,hy+1,3.2,7);else E(x+7,hy+1,3,7)}
   g.fillStyle=look.hair;
   if(up){E(x,hy-1,11,10.5)}
@@ -1629,10 +1644,16 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
       E(x-3.6+ex,hy+1,1.4,2);E(x+3.6+ex,hy+1,1.4,2);
       g.fillStyle='#ffffff';
       E(x-3.0+ex,hy+0.6,0.5,0.6);E(x+4.2+ex,hy+0.6,0.5,0.6);
+      g.strokeStyle='#2b2118';g.lineWidth=.8;g.lineCap='round';
+      g.beginPath();
+      g.moveTo(x-5.2+ex,hy+0.3);g.lineTo(x-6.3+ex,hy-0.6);
+      g.moveTo(x+5.2+ex,hy+0.3);g.lineTo(x+6.3+ex,hy-0.6);
+      g.stroke();
     }
     g.fillStyle='rgba(239,123,123,.45)';
     E(x-6+ex,hy+4.5,2.2,1.3);E(x+6+ex,hy+4.5,2.2,1.3);
     if(!o.dizzy&&!o.stung){
+      g.fillStyle='rgba(150,60,60,.28)';E(x+ex,hy+5,1.6,0.8);
       g.strokeStyle='#5a3020';g.lineWidth=0.7;g.beginPath();g.arc(x+ex,hy+4.2,1.4,0.3,Math.PI-0.3);g.stroke();
     }
     if(o.stung){g.fillStyle='#ef7b7b';E(x-5+ex,hy+3,3.5,3);E(x+5+ex,hy-2,3,3)}
@@ -1654,6 +1675,9 @@ function wearBody(g,k,x,ty,side,up){
     g.fillStyle=k.topD;for(let i=0;i<4;i++)g.fillRect(x-4+i*2.4,ty+2,1.1,9)}
   else if(ts==='jacket'){g.fillStyle=k.topD;g.fillRect(x-6.5,ty+1,13,11);g.fillStyle=k.topC;g.fillRect(x-5.5,ty+2,11,9);
     g.fillStyle=k.topD;g.fillRect(x-1,ty+2,2,9);if(!up){g.fillStyle='#f2c230';E(x-3.4,ty+8.5,1,1);E(x+3.4,ty+8.5,1,1)}}
+  else if(ts==='sweater'){g.fillStyle=k.topC;g.fillRect(x-7.5,ty+1,15,11);g.fillStyle=k.topD;
+    for(let i=0;i<3;i++)g.fillRect(x-7.5,ty+3.5+i*3.2,15,1.5);
+    g.fillStyle=shade(k.topC,-30);g.fillRect(x-7.5,ty+10,15,2)}
   if(k.botS==='overalls'){g.fillStyle=k.botC;g.fillRect(x-5,ty,1.6,6);g.fillRect(x+3.4,ty,1.6,6);rrect(x-4.5,ty+5,9,8,2,g);if(!up){g.fillStyle=k.botD;E(x-3.2,ty+5.8,.8,.8);E(x+3.2,ty+5.8,.8,.8)}}
   if(k.accS==='backpack'){if(up){g.fillStyle=k.accC;rrect(x-6,ty+1,12,11,3,g);g.fillStyle=k.accD;rrect(x-6,ty+1,12,4,2,g)}
     else{g.fillStyle=k.accD;if(side)g.fillRect(x-side*2-.9,ty,1.8,9);else{g.fillRect(x-5.5,ty,1.8,9);g.fillRect(x+3.7,ty,1.8,9)}}}
@@ -1675,6 +1699,9 @@ function wearHead(g,k,x,hy,side,up){
     g.fillStyle=i&1?'#fff6d6':k.hatC;E(px,py,2.5,2.5);g.fillStyle='#ffd25e';E(px,py,.9,.9)}}
   else if(hs==='tophat'){g.fillStyle=k.hatC;E(x,hy-5,up?12:14,4);g.fillRect(x-7.5,hy-17.5,15,12.5);
     g.fillStyle=k.hatD;g.fillRect(x-7.5,hy-9,15,3.4);g.fillStyle=shade(k.hatC,42);g.fillRect(x-7.5,hy-17.5,15,1.6)}
+  else if(hs==='flatcap'){g.fillStyle=k.hatC;g.beginPath();g.ellipse(x,hy-5,10.5,6.5,0,Math.PI,0);g.fill();E(x,hy-11,1.6,1.2);
+    g.strokeStyle=k.hatD;g.lineWidth=.8;g.beginPath();g.moveTo(x-6.5,hy-8);g.lineTo(x-10.2,hy-4.2);g.moveTo(x+6.5,hy-8);g.lineTo(x+10.2,hy-4.2);g.stroke();
+    if(!up){g.fillStyle=k.hatD;if(side)E(x+side*7.5,hy-4.5,6,1.8);else E(x,hy-4,10.5,2)}}
 }
 function drawPlayer(){
   const tool=eqTool(),t=tool?IT[tool.id].tool:null,sw=G.swing>0;
@@ -2651,12 +2678,16 @@ function renderStorage(){let h=`<div class="row" style="margin-bottom:8px"><butt
   return h+(S.stor.length?'':'<p class="mute">Empty.</p>')+'</div>'}
 function openStorage(){openPanel('📦','Storage',renderStorage,{kind:'stor'})}
 // Wardrobe: closet (S.closet ids) + worn items (S.wear); every move keeps the pockets+closet+wear total unchanged
-function renderWardrobe(){PAN.after=drawMirror;const w=S.wear;let h=`<div class="row" style="align-items:flex-start;gap:12px"><canvas id="mirror" width="96" height="128" style="background:#e9f4fb;border-radius:12px;flex:none" aria-hidden="true"></canvas><div class="grow"><p class="mute">Closet: ${S.closet.length}/${CLOSET_MAX}</p><div class="row"><button class="btn" data-a="rndfit" ${S.closet.length?'':'disabled'}>🎲 Random outfit</button><button class="btn alt" data-a="hang" ${S.inv.some(x=>x&&IT[x.id].c==='cloth')?'':'disabled'}>Hang up pocket clothes</button></div></div></div><h3>Wearing</h3><div class="list">`;
+function renderWardrobe(){PAN.after=drawMirror;const w=S.wear;let h=`<div class="row" style="align-items:flex-start;gap:12px"><canvas id="mirror" width="96" height="128" aria-hidden="true" title="Tap to rotate the view"></canvas><div class="grow"><p class="mute">Closet: ${S.closet.length}/${CLOSET_MAX}</p><div class="row"><button class="btn" data-a="rndfit" ${S.closet.length?'':'disabled'}>🎲 Random outfit</button><button class="btn alt" data-a="hang" ${S.inv.some(x=>x&&IT[x.id].c==='cloth')?'':'disabled'}>Hang up pocket clothes</button></div></div></div><h3>Wearing</h3><div class="list">`;
   for(const sl of WEAR_SLOTS){const id=w[sl],it=id&&IT[id];h+=li(it?it.e:'▫️',SLOT_NAME[sl],it?esc(it.n):'Nothing',it?`<button class="btn alt" data-a="takeoff" data-s="${sl}" aria-label="Take off ${esc(it.n)}">Take off</button>`:'')}
   h+='</div>';for(const sl of WEAR_SLOTS){const L=[];S.closet.forEach((id,j)=>{if(IT[id].slot===sl)L.push(j)});if(!L.length)continue;
     h+=`<h3>${SLOT_NAME[sl]} (${L.length})</h3><div class="list">`+L.map(j=>{const it=IT[S.closet[j]];return li(it.e,esc(it.n),'',`<button class="btn" data-a="wearc" data-j="${j}" aria-label="Wear ${esc(it.n)}">Wear</button><button class="btn alt" data-a="cout" data-j="${j}" aria-label="Move ${esc(it.n)} to pockets" title="To pockets">🎒</button>`)}).join('')+'</div>'}
   return h+(S.closet.length?'':'<p class="mute">Your closet is empty. Buy clothes at Wren\'s Rack in Bramble\'s store, then hang them up here.</p>')}
-function drawMirror(){const c=$('mirror');if(!c)return;const g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);g.setTransform(2,0,0,2,0,0);drawPerson(g,24,58,S.look,0,1,0,false,{wk:wearK()})}
+function drawMirror(){const c=$('mirror');if(!c)return;const g=c.getContext('2d');
+  const DIRS=[[0,1],[1,0],[0,-1],[-1,0]],d=DIRS[G.mirrorDir=(G.mirrorDir||0)%4];
+  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,c.width,c.height);g.setTransform(2,0,0,2,0,0);
+  drawPerson(g,24,58,S.look,d[0],d[1],0,false,{wk:wearK()});
+  if(!c._rot){c._rot=1;c.style.cursor='pointer';c.onclick=()=>{G.mirrorDir=(G.mirrorDir+1)%4;drawMirror()}}}
 function openWardrobe(){openPanel('🪞','Wardrobe',renderWardrobe,{kind:'ward'})}
 const clothOwned=id=>S.closet.includes(id)||WEAR_SLOTS.some(k=>S.wear[k]===id)||S.inv.some(x=>x&&x.id===id);
 function clothTip(){if(!S.flags.clothTip){S.flags.clothTip=1;toast('👗 Tip: tap clothing in your Pockets and choose Dress. Your wardrobe is in home storage.')}}
