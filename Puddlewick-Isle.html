@@ -453,7 +453,9 @@ const CLOTH_RAW=[['capred','Red ball cap','🧢',580,'hat','#d9534f','all','cap'
  ['overalls','Denim overalls','👖',1500,'bot','#4f6fa8','all','overalls'],['jeans','Comfy jeans','👖',1100,'bot','#3b5a8a','all','pants'],['bootbrown','Trail boots','🥾',1200,'shoe','#7a4f2e','all','boots'],
  ['bootrain','Rain boots','🥾',1000,'shoe','#e2b52a','all','boots'],['sandal','Beach sandals','🩴',450,'shoe','#d9a66b','5-9','sandals'],['sneakred','Red sneakers','👟',900,'shoe','#d24b4b','all','sneaker'],
  ['glassround','Round glasses','👓',760,'acc','#3a2f28','all','glasses'],['shades','Sunglasses','🕶️',840,'acc','#1e1e24','6-8','shades'],['scarfred','Cranberry scarf','🧣',900,'acc','#c0392b','12-2','scarf'],
- ['scarfmoss','Moss scarf','🧣',900,'acc','#6b8e3e','10-3','scarf'],['packorange','Explorer backpack','🎒',1800,'acc','#e8843a','all','backpack'],['packblue','School backpack','🎒',1800,'acc','#4a7fd0','all','backpack'],['capjack','Jack-o\'-lantern cap','🎃',780,'hat','#e8813a','10','cap'],['hoodrust','Harvest hoodie','🧥',1400,'top','#a8552a','10-11','hoodie'],['beaniesnow','Snowday beanie','🧶',720,'hat','#dfeefc','12-2','beanie'],['scarffrost','Frostbite scarf','🧣',900,'acc','#a8d8e8','12-2','scarf'],['rainpink','Blossom raincoat','🧥',1600,'top','#f2a7c3','3-5','raincoat'],['hatsun','Sunburst sunhat','👒',950,'hat','#ffd25e','6-8','sunhat'],['crownwheat','Wheatfield crown','🌾',1300,'hat','#d9a441','9-11','crown'],['bootfrost','Frost boots','🥾',1350,'shoe','#a8d8e8','12-2','boots'],['teetide','Tide-dye tee','👕',560,'top','#4fb6c9','6-8','tee'],['bootbloom','Blossom boots','🥾',1350,'shoe','#f2a7c3','3-5','boots'],['bootmaple','Maple boots','🥾',1350,'shoe','#a8552a','9-11','boots'],['teekite','Kite-dye tee','👕',560,'top','#f2a7c3','7-8','tee'],['capclover','Clover cap','🍀',650,'hat','#3f9e4d','3','cap'],['capegg','Eggshell cap','🥚',690,'hat','#f2c9a0','4-5','cap'],['skirtlove','Sweetheart skirt','💗',920,'bot','#e0668a','2','skirt'],['teepump','Pumpkin patch tee','👕',560,'top','#e07b39','10','tee'],['teelove','Sweetheart tee','💗',620,'top','#e0668a','2','tee']];
+ ['scarfmoss','Moss scarf','🧣',900,'acc','#6b8e3e','10-3','scarf'],['packorange','Explorer backpack','🎒',1800,'acc','#e8843a','all','backpack'],['packblue','School backpack','🎒',1800,'acc','#4a7fd0','all','backpack'],['capjack','Jack-o\'-lantern cap','🎃',780,'hat','#e8813a','10','cap'],['hoodrust','Harvest hoodie','🧥',1400,'top','#a8552a','10-11','hoodie'],['beaniesnow','Snowday beanie','🧶',720,'hat','#dfeefc','12-2','beanie'],['scarffrost','Frostbite scarf','🧣',900,'acc','#a8d8e8','12-2','scarf'],['rainpink','Blossom raincoat','🧥',1600,'top','#f2a7c3','3-5','raincoat'],['hatsun','Sunburst sunhat','👒',950,'hat','#ffd25e','6-8','sunhat'],['crownwheat','Wheatfield crown','🌾',1300,'hat','#d9a441','9-11','crown'],['bootfrost','Frost boots','🥾',1350,'shoe','#a8d8e8','12-2','boots'],['teetide','Tide-dye tee','👕',560,'top','#4fb6c9','6-8','tee'],['bootbloom','Blossom boots','🥾',1350,'shoe','#f2a7c3','3-5','boots'],['bootmaple','Maple boots','🥾',1350,'shoe','#a8552a','9-11','boots'],['teekite','Kite-dye tee','👕',560,'top','#f2a7c3','7-8','tee'],['capclover','Clover cap','🍀',650,'hat','#3f9e4d','3','cap'],['capegg','Eggshell cap','🥚',690,'hat','#f2c9a0','4-5','cap'],['skirtlove','Sweetheart skirt','💗',920,'bot','#e0668a','2','skirt'],['teepump','Pumpkin patch tee','👕',560,'top','#e07b39','10','tee'],['teelove','Sweetheart tee','💗',620,'top','#e0668a','2','tee'],
+ ['tophat','Dapper top hat','🎩',2400,'hat','#2b2b33','all','tophat'],['turtle','Cable-knit turtleneck','👚',1500,'top','#8c5a8e','10-3','turtle'],
+ ['denimjack','Denim jacket','🧥',1650,'top','#4a74b8','all','jacket'],['gloves','Trail gloves','🧤',700,'acc','#7a4f2e','11-2','gloves']];
 CLOTH_RAW.forEach(([id,n,e,b,slot,col,ms,shape])=>def('cl_'+id,{n,e,p:Math.round(b/4),buy:b,c:'cloth',slot,col,shape,ms:parseRanges(ms)}));
 const WEAR_SLOTS=['hat','top','bot','shoe','acc'],SLOT_NAME={hat:'Hat',top:'Top',bot:'Bottoms',shoe:'Shoes',acc:'Accessory'},CLOSET_MAX=120;
 // neighbors compliment outfits that match their personality's favorite shapes
@@ -1547,6 +1549,11 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     if(sc&&wk.shoeS==='boots'){g.fillStyle=sc;g.fillRect(x-5.5,by-4.5+(l>0?-1:0),5,4);g.fillRect(x+.5,by-4.5+(l<0?-1:0),5,4)}
     g.fillStyle=sa?look.skin:sc||'#3a2f28';E(x-3+(side*1),by-.5+l*.3,3,1.8);E(x+3+(side*1),by-.5-l*.3,3,1.8);
     g.fillStyle=sa?sc:'#ffffff';E(x-3+(side*1),by+.4+l*.3,2.8,0.8);E(x+3+(side*1),by+.4-l*.3,2.8,0.8);
+    if(sc&&wk.shoeS==='sneaker'){g.strokeStyle='#ffffff';g.lineWidth=.8;g.beginPath();
+      g.moveTo(x-4.6,by-1.6+l*.3);g.lineTo(x-1.4,by-1.6+l*.3);g.moveTo(x+1.4,by-1.6-l*.3);g.lineTo(x+4.6,by-1.6-l*.3);g.stroke();
+      g.strokeStyle=shade(sc,-50);g.lineWidth=.7;
+      for(let i=0;i<3;i++){g.beginPath();g.moveTo(x-4+side*1,by-2.6+l*.3+i*.9);g.lineTo(x-2+side*1,by-2.6+l*.3+i*.9);
+        g.moveTo(x+2+side*1,by-2.6-l*.3+i*.9);g.lineTo(x+4+side*1,by-2.6-l*.3+i*.9);g.stroke()}}
   }else{
     const dir=side||1,l=Math.sin(step*2.2)*3;
     g.fillStyle='#5a4a3a';g.fillRect(x-4*dir,by-11,3.5,8+l);g.fillRect(x+2*dir,by-11,3.5,8-l);
@@ -1558,6 +1565,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   }
   const ty=by-(onBike?17:19)-bob-br,as=wk&&wk.accS;
   g.fillStyle=shade(look.skin,-16);g.fillRect(x-3,ty-4,6,5);
+  g.fillStyle='rgba(60,25,10,.22)';g.fillRect(x-3,ty-4,6,1.8);
   if(as==='backpack'&&side&&!up){g.fillStyle=wk.accC;rrect(x-side*7.5-3,ty+1,6,10,2,g)}
   g.fillStyle=wk&&wk.topC||look.shirt;rrect(x-7.5,ty,15,13,5,g);
   if(wk&&wk.s)wearBody(g,wk,x,ty,side,up);
@@ -1568,20 +1576,31 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   }else{
     const ax=moving?Math.sin(step)*2:0;
     E(x-8.5,by-12-bob+ax,2.6,3.2);E(x+8.5,by-12-bob-ax,2.6,3.2);
+    g.strokeStyle=shade(look.skin,-45);g.lineWidth=.6;g.lineCap='round';
+    g.beginPath();g.moveTo(x-8.5,by-11.4-bob+ax);g.lineTo(x-8.5,by-10.2-bob+ax);
+    g.moveTo(x+8.5,by-11.4-bob-ax);g.lineTo(x+8.5,by-10.2-bob-ax);g.stroke();
     g.fillStyle=shade(look.skin,-24);
     E(x-8.5,by-9.4-bob+ax,1.7,2.1);E(x+8.5,by-9.4-bob-ax,1.7,2.1);
     g.fillStyle=look.skin;
+    if(as==='gloves'){g.fillStyle=wk.accC;E(x-8.5,by-12-bob+ax,3,3.6);E(x+8.5,by-12-bob-ax,3,3.6);
+      g.fillStyle=wk.accD;E(x-8.5,by-9.6-bob+ax,2.2,1.4);E(x+8.5,by-9.6-bob-ax,2.2,1.4)}
   }
   const hy=by-(onBike?27:29)-bob-br;
   g.fillStyle=look.skin;E(x,hy,10.5,10);
   if(!side&&!up){E(x-10,hy+1,2.6,3.4);E(x+10,hy+1,2.6,3.4)}
+  if(!up){g.fillStyle='rgba(120,60,30,.10)';if(side)E(x-side*7,hy+1,3.2,7);else E(x+7,hy+1,3,7)}
   g.fillStyle=look.hair;
   if(up){E(x,hy-1,11,10.5)}
   else{
     g.beginPath();g.ellipse(x,hy-3,11.2,8.5,0,Math.PI,0);g.fill();
     E(x-side*4,hy-6,8,4);
-    if(!side){E(x-6,hy-2,3,4);E(x+6,hy-2,3,4)}
-    else E(x-side*8,hy-1,3.5,6);
+    const swayI=(!moving&&!onBike)?Math.sin(G.t*1.7+x*.03)*1.2:0;
+    if(!side){E(x-6+swayI,hy-2,3,4);E(x+6+swayI,hy-2,3,4)}
+    else E(x-side*8+swayI,hy-1,3.5,6);
+    g.strokeStyle=shade(look.hair,36);g.lineWidth=1.6;g.lineCap='round';
+    g.beginPath();g.ellipse(x-side*1.5,hy-5.5,6.5,2.6,-0.18,Math.PI*1.08,Math.PI*1.92);g.stroke();
+    g.fillStyle=shade(look.hair,-26);
+    E(x-9.5,hy+2,1.5,3.2);E(x+9.5,hy+2,1.5,3.2);
   }
   if(!up){
     const ex=side*3.5;
@@ -1631,22 +1650,31 @@ function wearBody(g,k,x,ty,side,up){
   if(ts==='hoodie'){g.fillStyle=k.topD;if(up)E(x,ty+3,6,3.5);else{g.fillRect(x-5,ty,10,2);rrect(x-4.5,ty+7,9,4,1.5,g)}}
   else if(ts==='raincoat'){g.fillStyle=k.topC;g.fillRect(x-7.5,ty+9,15,4.5);g.fillStyle=k.topD;g.fillRect(x-7.5,ty+12.5,15,1);if(!up&&!side){g.fillStyle='#fff4c2';E(x,ty+5,.9,.9);E(x,ty+9,.9,.9)}}
   else if(ts==='tee'&&!up){g.fillStyle=k.topD;g.fillRect(x-3,ty,6,1.4)}
+  else if(ts==='turtle'){g.fillStyle=k.topD;rrect(x-5.5,ty-4.5,11,5.5,2,g);g.fillStyle=k.topC;rrect(x-4.5,ty-3.8,9,4,1.5,g);
+    g.fillStyle=k.topD;for(let i=0;i<4;i++)g.fillRect(x-4+i*2.4,ty+2,1.1,9)}
+  else if(ts==='jacket'){g.fillStyle=k.topD;g.fillRect(x-6.5,ty+1,13,11);g.fillStyle=k.topC;g.fillRect(x-5.5,ty+2,11,9);
+    g.fillStyle=k.topD;g.fillRect(x-1,ty+2,2,9);if(!up){g.fillStyle='#f2c230';E(x-3.4,ty+8.5,1,1);E(x+3.4,ty+8.5,1,1)}}
   if(k.botS==='overalls'){g.fillStyle=k.botC;g.fillRect(x-5,ty,1.6,6);g.fillRect(x+3.4,ty,1.6,6);rrect(x-4.5,ty+5,9,8,2,g);if(!up){g.fillStyle=k.botD;E(x-3.2,ty+5.8,.8,.8);E(x+3.2,ty+5.8,.8,.8)}}
   if(k.accS==='backpack'){if(up){g.fillStyle=k.accC;rrect(x-6,ty+1,12,11,3,g);g.fillStyle=k.accD;rrect(x-6,ty+1,12,4,2,g)}
     else{g.fillStyle=k.accD;if(side)g.fillRect(x-side*2-.9,ty,1.8,9);else{g.fillRect(x-5.5,ty,1.8,9);g.fillRect(x+3.7,ty,1.8,9)}}}
 }
 function wearHead(g,k,x,hy,side,up){
   const E=(a,b,rx,ry)=>{g.beginPath();g.ellipse(a,b,rx,ry,0,0,6.2832);g.fill()},hs=k.hatS,as=k.accS,ex=up?0:side*3.5;
-  if(as==='scarf'){g.fillStyle=k.accC;rrect(x-8,hy+7.5,16,4.5,2,g);if(!up){g.fillStyle=k.accD;g.fillRect(side?x-side*4-1.75:x+2,hy+10,3.5,7)}}
+  if(as==='scarf'){g.fillStyle=k.accC;rrect(x-8,hy+7.5,16,4.5,2,g);g.fillStyle=k.accD;
+    for(let i=0;i<6;i++)g.fillRect(x-7+i*2.8,hy+7.8,1.2,3.9);
+    if(!up){g.fillRect(side?x-side*4-1.75:x+2,hy+10,3.5,7)}}
   if((as==='glasses'||as==='shades')&&!up){g.strokeStyle=k.accC;g.lineWidth=.9;if(as==='shades')g.fillStyle='rgba(20,20,30,.85)';
     for(let i=-1;i<=1;i+=2){g.beginPath();g.arc(x+i*3.6+ex,hy+1,2.6,0,6.2832);if(as==='shades')g.fill();g.stroke()}
-    g.beginPath();g.moveTo(x-1+ex,hy+.6);g.lineTo(x+1+ex,hy+.6);g.stroke()}
+    g.beginPath();g.moveTo(x-1+ex,hy+.6);g.lineTo(x+1+ex,hy+.6);g.stroke();
+    g.fillStyle='rgba(255,255,255,.55)';E(x-4.4+ex,hy+0.2,.8,.8);E(x+2.8+ex,hy+0.2,.8,.8)}
   if(hs==='cap'){g.fillStyle=k.hatC;g.beginPath();g.ellipse(x,hy-5,11,7.5,0,Math.PI,0);g.fill();E(x,hy-12.3,1.4,1);
     if(!up){g.fillStyle=k.hatD;if(side)E(x+side*8,hy-5,7,2);else E(x,hy-4.5,11.5,2.4)}}
   else if(hs==='beanie'){g.fillStyle=k.hatC;g.beginPath();g.ellipse(x,hy-4,11.6,9.5,0,Math.PI,0);g.fill();g.fillStyle=k.hatD;g.fillRect(x-11.6,hy-6,23.2,3);g.fillStyle='#f7f3ea';E(x,hy-14,3,3)}
   else if(hs==='sunhat'){g.fillStyle=k.hatC;E(x,hy-6,up?15:17,4.5);g.beginPath();g.ellipse(x,hy-7,9,7,0,Math.PI,0);g.fill();g.fillStyle=k.hatD;g.fillRect(x-9,hy-9,18,2)}
   else if(hs==='crown'){for(let i=0;i<7;i++){const a=Math.PI+i*Math.PI/6,px=x+Math.cos(a)*10,py=hy-4+Math.sin(a)*6;
     g.fillStyle=i&1?'#fff6d6':k.hatC;E(px,py,2.5,2.5);g.fillStyle='#ffd25e';E(px,py,.9,.9)}}
+  else if(hs==='tophat'){g.fillStyle=k.hatC;E(x,hy-5,up?12:14,4);g.fillRect(x-7.5,hy-17.5,15,12.5);
+    g.fillStyle=k.hatD;g.fillRect(x-7.5,hy-9,15,3.4);g.fillStyle=shade(k.hatC,42);g.fillRect(x-7.5,hy-17.5,15,1.6)}
 }
 function drawPlayer(){
   const tool=eqTool(),t=tool?IT[tool.id].tool:null,sw=G.swing>0;
