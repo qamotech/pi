@@ -258,3 +258,42 @@
   11. Exertion mouth — while moving, the mouth opens slightly (dark oval + tongue hint) instead of the idle smile arc (dizzy/stung-guarded).
   12. Hat face shadow — when a hat is worn, a soft shadow arc falls across the forehead, drawn before wearHead so hat brims stay on top (up-view guarded).
 - Validation: `node --check` passed on the single `<script>` block (all 13 anchors applied clean, first pass). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name, in shop pool (bucket hat in June pool, corduroy in Jan pool); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike (corduroy waistband) for the new gear + regression combos; stretch timing path rendered clean; mirror screenshots confirm the bucket hat, cardigan, corduroy pants, and moccasins visually (front + side).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 351,587 bytes). GitHub push BLOCKED — `github push-files` stalled awaiting user approval (no interactive user on this scheduled run); killed the pending call rather than bypass the safeguard. Working copy + Drive now carry runs #4 and #5; repo HEAD is still 7673decd (run #3). Next run (or the user) must push from /tmp/pi_staging (paths file /tmp/pi_paths.txt) and verify HEAD movement via git ls-remote.
+
+### 2026-10-19 16:10 EDT (scheduled run — appearance-scope #6, main character only)
+- **Appearance upgrades (4)**:
+  1. Inner-ear shading — small curved inner-ear arcs on both ears (front view).
+  2. Smile dimples — tiny curved crease strokes at the smile corners, idle only (front + side; exertion mouth keeps its own look).
+  3. Sneaker tread ticks — 4 lug ticks under each sneaker midsole, walking offsets tracked.
+  4. Tee hem stitch — dashed stitch line along the default tee hem (tee shape in wearBody).
+- **New clothing items (4, all registered in CLOTH_RAW with IDs, auto-flowing into Wren's Rack shop pool via clothPool, wardrobe slots, and the mirror preview)**:
+  5. 🤠 Trail cowboy hat (`cl_cowboy`, hat slot, new `cowboy` shape in wearHead: wide brim + pinched dome + dark band + crown crease; all season).
+  6. 🧥 Varsity letter jacket (`cl_varsity`, top slot, new `varsity` shape in wearBody: contrasting sleeves + dark front strip + 3 cream snaps; Sep–Mar).
+  7. 🩳 Denim cutoffs (`cl_denimcut`, bot slot, new `denimcut` shape in drawPerson: shorts + frayed hem strokes + waistband highlight; ground + bike views; May–Sep).
+  8. 🥾 Alpine hikers (`cl_hikers`, shoe slot, new `hiker` shape in drawPerson: tall boot + 3 lace crosshatch rows + lug-sole ticks; all season).
+- **Of my choosing (4, all main-character)**:
+  9. Idle hand-wave emote — after ~10s standing still (not dizzy/stung/on-bike/moving), the right hand raises and waves on a 20s cycle (~1.8s window), with motion arcs and a 👋 glyph; breath/stretch timers safe.
+  10. Wristwatch second hand — the signature wristwatch gained a thin red second hand driven by the live clock (c2.d.getSeconds()).
+  11. Start-walk dust puffs — two small dust puffs burst at the feet on the idle→moving transition (world level, G._wmv edge latch).
+  12. Backpack shoulder straps — when a backpack is equipped, shoulder straps now show over the torso (front: two straps; side: one strap; up-view guarded).
+- Validation: `node --check` passed on the single `<script>` block (all 13 anchors applied clean, first pass). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; all in the shop pool (cowboy/varsity/hikers in Jan pool, cutoffs in May pool); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike for the new gear + regression combos (incl. backpack straps + gloves); forced wave and stretch timing paths rendered clean; mirror screenshots confirm the cowboy hat, varsity jacket, denim cutoffs, and hikers visually (front + side).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 355,814 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays 7673decd (run #3); working.html now carries runs #4, #5, and #6. Staging refreshed at /tmp/pi_staging (paths file /tmp/pi_paths.txt) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
+
+### 2026-10-19 16:35 EDT (scheduled run — appearance-scope #7, main character only)
+- **Appearance upgrades (4)**:
+  1. Eyebrow definition — brows thickened (0.9→1.3) with an under-stroke shadow line and a light highlight above (front + side).
+  2. Hair gloss swirl — second offset highlight arc on the hair crown for a layered sheen (front/side hair block).
+  3. Side-view ear — ears were front-view only; the visible-side ear now renders in side view with inner-ear shading and arc.
+  4. Knuckle shading — soft dark arcs across the top of each hand (front ground view; stretch-aware arm vars).
+- **New clothing items (4, all registered in CLOTH_RAW with IDs, auto-flowing into Wren's Rack shop pool via clothPool, wardrobe slots, and the mirror preview)**:
+  5. 🎨 Cherry beret (`cl_beret`, hat slot, new `beret` shape in wearHead: tilted dome + under-shadow band + crease stroke + stem nub; front/side/back; all season).
+  6. 🎽 Riverside track jacket (`cl_trackjack`, top slot, new `trackjack` shape in wearBody: zip body + center zip strip + white side stripes + stand collar + hem; all season).
+  7. 👖 Harbor trousers (`cl_trousers`, bot slot, new `trousers` shape in drawPerson: wide legs + pressed crease lines + waistband/brass buckle; leg offsets tracked; waistband on the bike view).
+  8. 🩰 Blush ballet flats (`cl_flats`, shoe slot, new `flats` shape in drawPerson: low flat + toe seam + dark sole line; walk offsets tracked; gets the ankle-sock band).
+- **Of my choosing (4, all main-character)**:
+  9. Idle finger-snap emote — after ~13s standing still (not dizzy/stung/on-bike/moving), right hand does a snap pose with a ✨ sparkle on a 24s cycle (~1.5s window); wave/stretch timers safe.
+  10. Watch date window — the signature wristwatch gained a tiny date aperture showing the live day of month.
+  11. Hair-tie knot — back-of-head (up) view now has a hair-tie knot with two ribbon tails at the nape.
+  12. Stung squint — when stung, eyes squeeze shut (curved squint arcs) instead of the open-eye look; dizzy x-x eyes untouched.
+- Validation: `node --check` passed on the single `<script>` block (all 18 anchors applied clean; 2 anchors fixed after a dropped `)` — caught before playtest, working copy untouched). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; all in the shop pool (beret/trackjack/trousers/flats in Jan pool); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike for the new gear + regression combos; forced snap/wave/stretch timing paths rendered clean; mirror screenshots confirm the beret, track jacket, trousers, ballet flats, and the back-view hair-tie knot visually (front + side + back).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 360,377 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays 7673decd (run #3); working.html now carries runs #4, #5, #6, and #7. Staging refreshed at /tmp/pi_staging (paths file /tmp/pi_paths.txt) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
