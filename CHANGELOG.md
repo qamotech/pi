@@ -90,3 +90,4 @@ _Manual release (entry backfilled by the v1.5.0 run; APP_VERSION was not bumped 
 - **ShellPhone**: Tide Points, Critterpedia, DIY, Map, Sunroots, Neighbors, Calendar, Camera, Settings (volume, hemisphere, time travel, export/import) and Guide.
 - **Extras**: balloon presents and the slingshot, meteor showers and wishes, August Sunday fireworks, New Year and festive events, and generative hourly music.
 - **Platform**: keyboard and touch controls, autosave, and a headless-Chrome test suite.
+- **Player art polish**: added soft cel-shading, shoulder highlights, fine shirt seams, and warm face and hair accents to sharpen the main character at game scale.
