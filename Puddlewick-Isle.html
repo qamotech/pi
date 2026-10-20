@@ -3435,13 +3435,12 @@ function sfx(n){if(!AU.c||!S||S.set.sfx<=0)return;switch(n){
 function blip(ch,p){if(!AU.c||!S||S.set.sfx<=0)return;const k=(ch.toLowerCase().charCodeAt(0)-97+26)%26,f=(190+((k*7)%12)*18)*p;tone(f,.055,'triangle',.07,0,null,f*1.12)}
 const SCALES=[[0,2,4,7,9],[0,3,5,7,10],[0,2,4,5,7,9,11],[0,2,3,5,7,9,10]];
 function musicTick(){const c=AU.c;if(!c||c.state==='suspended'||!S||document.hidden||S.set.music<=0||!$('title').hidden)return;
-  const h=clk().h,sid=songNow(),sg=sid&&SONG_BY[sid],tourK=isTour()?W.kind:'',bpm=sg?sg[4]:tourK==='tour_atoll'?116:tourK==='tour_caldera'?92:tourK?104:h>=22||h<5?64:h<9?80:h<17?96:76,spb=60/bpm/2;
+  const h=clk().h,sid=songNow(),sg=sid&&SONG_BY[sid],bpm=sg?sg[4]:h>=22||h<5?64:h<9?80:h<17?96:76,spb=60/bpm/2;
   if(AU.next<c.currentTime)AU.next=c.currentTime+.05;
   // track-change bridge: a soft ascending motif smooths the cut between music tracks (house ↔ outdoors, gig start/end)
-  const mkey=(sid||'')+'|'+(tourK||(W&&W.kind)||'');
-  if(AU.lastSid!==undefined&&AU.lastSid!==mkey){const t0b=AU.next-c.currentTime;[523,659,784].forEach((f,i)=>tone(f*FR_(),spb*.8,'triangle',.035,t0b+i*spb*.45,AU.m))}
-  AU.lastSid=mkey;
-  while(AU.next<c.currentTime+.3){if(sg)playSong(AU.step,sg,AU.next-c.currentTime,spb);else if(tourK)playTourStep(AU.step,tourK,AU.next-c.currentTime,spb);else playStep(AU.step,h,AU.next-c.currentTime,spb);AU.next+=spb;AU.step++}}
+  if(AU.lastSid!==undefined&&AU.lastSid!==(sid||'')){const t0b=AU.next-c.currentTime;[523,659,784].forEach((f,i)=>tone(f*FR_(),spb*.8,'triangle',.035,t0b+i*spb*.45,AU.m))}
+  AU.lastSid=sid||'';
+  while(AU.next<c.currentTime+.3){if(sg)playSong(AU.step,sg,AU.next-c.currentTime,spb);else playStep(AU.step,h,AU.next-c.currentTime,spb);AU.next+=spb;AU.step++}}
 // songs: seeded 64-step melody built once per song (Int8Array, -1 = rest); per step only tone() nodes are created
 const SONG_MEL={},SPROG=[[0,3,4,0],[0,5,3,4],[0,4,5,3],[0,2,3,4]];
 function songMel(g){let m=SONG_MEL[g[0]];if(!m){m=SONG_MEL[g[0]]=new Int8Array(64);for(let i=0;i<64;i++){const r=rngFor('song',g[5],i%64)();m[i]=r<.3&&i%4?-1:Math.floor(r*997)%8}}return m}
@@ -3469,28 +3468,6 @@ function playStep(st,h,t0,spb){
   if(cs&&cs.st!=='fly'&&G.scene==='island'){const low=mtof(deg(prog)-36),hig=mtof(deg(prog+3)-36);
     if(cs.fish&&cs.fish.st!=='bite'&&st%4===0){tone(cs.fish.st==='nibble'?hig:low,spb*.7,'sine',.03*soft,t0,AU.m);noise(.02,.015,t0,7000,'highpass',AU.m)}
     else if(!cs.fish&&st%16===0){tone(low,spb*2,'sine',.028*soft,t0,AU.m);tone(hig,spb*1.2,'sine',.018*soft,t0+spb,AU.m)}}
-}
-
-/* ---------- per-island default music: each tour island gets its own fun generative theme (home keeps its hour-based tunes) ---------- */
-const TOUR_MUSIC={
-  tour:{sc:0,root:60,bass:.085,melP:.62,prog:[0,4,5,3],wave:'triangle'},
-  tour_atoll:{sc:2,root:62,bass:.07,melP:.55,prog:[0,5,4,3],wave:'sine'},
-  tour_caldera:{sc:1,root:48,bass:.1,melP:.42,prog:[0,3,5,4],wave:'triangle'}
-};
-function playTourStep(st,kind,t0,spb){
-  const M=TOUR_MUSIC[kind]||TOUR_MUSIC.tour,sc=SCALES[M.sc],bar=Math.floor(st/8)%4,pr=M.prog[bar%M.prog.length],deg=i=>M.root+sc[((i%sc.length)+sc.length)%sc.length]+12*Math.floor(i/sc.length);
-  if(st%8===0){tone(mtof(deg(pr)-24),spb*6,'triangle',M.bass,t0,AU.m);[0,2,4].forEach(k=>tone(mtof(deg(pr+k)-12),spb*7,'sine',.022,t0,AU.m))}
-  if(st%8===4)for(let k=0;k<3;k++)tone(mtof(deg(pr+k*2)-12),spb*2,'triangle',.028,t0+k*.02,AU.m);
-  if(kind==='tour_atoll'&&st%8===6)for(let k=0;k<3;k++)tone(mtof(deg(pr+k*2)-12),spb*2,'sine',.02,t0+k*.02,AU.m);
-  if(kind==='tour_caldera'&&st%16===0)tone(mtof(deg(pr)-36),spb*4,'sine',.07,t0,AU.m);
-  const r=rngFor('tmel',kind,st%32,Math.floor(st/128))();
-  if(r<M.melP){const n=deg(pr+Math.floor(rngFor('tmn',kind,st%32)()*7)),f=mtof(n);
-    tone(f,spb*(kind==='tour_atoll'?1.1:1.6),kind==='tour_atoll'?'sine':M.wave,.055,t0,AU.m);tone(f*2,spb*.6,'sine',.012,t0,AU.m);
-    if(kind==='tour'&&rngFor('tgr',kind,st%32)()<.18)tone(mtof(n+2),spb*.5,'triangle',.03,t0+spb*.5,AU.m)}
-  const cs=G.cast;
-  if(cs&&cs.st!=='fly'){const low=mtof(deg(pr)-36),hig=mtof(deg(pr+3)-36);
-    if(cs.fish&&cs.fish.st!=='bite'&&st%4===0){tone(cs.fish.st==='nibble'?hig:low,spb*.7,'sine',.03,t0,AU.m);noise(.02,.015,t0,7000,'highpass',AU.m)}
-    else if(!cs.fish&&st%16===0){tone(low,spb*2,'sine',.028,t0,AU.m);tone(hig,spb*1.2,'sine',.018,t0+spb,AU.m)}}
 }
 
 /* =============================== AMBIENCE =============================== */
