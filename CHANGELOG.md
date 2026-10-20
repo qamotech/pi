@@ -336,3 +336,71 @@
   12. Exertion sweat drop — after ~6s of continuous movement, a sweat drop with highlight appears at the temple (front view; dizzy/stung-guarded; clears when the player stops; new G._runSince timer in drawPlayer).
 - Validation: `node --check` passed on the single `<script>` block (all 18 anchors applied clean, first pass; one A15 anchor rewritten after it broke an else-if chain — caught before playtest, file untouched until clean). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; shop pools correct (antlers/skates in Jan pool, maxiskirt in Mar pool, kimono in all); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike (incl. maxiskirt on bike) for the new gear + regression combos (incl. glasses-glint combo); forced ruffle (idle 26s), sweat (run 7s), snap/wave/stretch timing paths rendered clean; mirror screenshots confirm the antlers, kimono, maxi skirt, and skates visually (front + side + back).
 - SHIP STATUS: Drive push OK (file ID …SLcEc, 369,042 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays bc7fad2 (run #8); working.html now carries run #9. Staging recreated at /tmp/pi_staging (paths file /tmp/pi_paths.txt, includes Puddlewick-Isle.html + CHANGELOG.md) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
+
+### 2026-10-19 21:00 EDT (scheduled run — appearance-scope #10, main character only)
+- **Appearance upgrades (4)**:
+  1. Cupid's bow + philtrum groove — vertical groove stroke above the upper lip plus a cupid's-bow curve on the lip line (front view).
+  2. Forehead sheen — soft light radial wash on the forehead beneath the hairline (front view).
+  3. Nostril wing dots — small nostril dots flanking the nose bridge (front view).
+  4. Fingernail dots — tiny light nail marks on all four visible fingertips (ground view; follow stretch/wave arm vars; hidden under gloves as before).
+- **New clothing items (4, all registered in CLOTH_RAW with IDs, auto-flowing into Wren's Rack shop pool via clothPool, wardrobe slots, and the mirror preview)**:
+  5. ❄️ Tundra ushanka (`cl_ushanka`, hat slot, new `ushanka` shape in wearHead: domed crown + fur band + ear flaps + chin straps + center medallion; front/side/up; Oct–Mar).
+  6. 🥋 Dojo karate gi (`cl_karategi`, top slot, new `karategi` shape in wearBody: white wrap body + V-lapel seams + black belt strip + hem band; all season).
+  7. 🏃 Harbor joggers (`cl_joggers`, bot slot, new `joggers` shape in drawPerson: tapered legs + ribbed ankle cuffs + drawstring waistband; ground view; bike view falls back to the plain-pants branch; all season).
+  8. 🥾 Dune desert boots (`cl_desertboot`, shoe slot, new `desertboot` shape in drawPerson: mid boot + lace-row strokes + crepe sole line; walk offsets tracked; gets the ankle-sock band; all season).
+- **Of my choosing (4, all main-character)**:
+  9. Idle yawn emote — after ~28s standing still, on a 40s cycle the mouth opens briefly on a sine pulse (front view; moving/on-bike/dizzy/stung-guarded; snap/wave/stretch/glance timers safe).
+  10. Sock ribbing — two stitch lines across every ankle-sock band (all sock-band shoe shapes).
+  11. Watch strap stitching — light dashed stitch lines along the wristwatch band (under the dial).
+  12. Side-view hair flyaway — one curved strand lifting off the side hair mass, tracking the hair sway.
+- Validation: `node --check` passed on the single `<script>` block (all 15 anchors applied clean, first pass). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; all in the shop pool (ushanka in Jan pool via 10-3, the rest all-season); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike for the new gear + regression combos (incl. gloves/backpack/glasses combos, forced yawn + glance/snap/wave/ruffle timing paths, joggers on bike); mirror screenshots confirm the ushanka, karate gi, joggers, and desert boots visually (front + side + back).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 373,260 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays 7544c34 (run #9); working.html now carries run #10. Staging refreshed at /tmp/pi_staging (paths file /tmp/pi_paths.txt, includes Puddlewick-Isle.html + CHANGELOG.md) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
+
+### 2026-10-19 21:25 EDT (scheduled run — appearance-scope #11, main character only)
+- PRE-RUN FIX: this run's goggles patch initially landed its `else if` outside wearHead's closing brace (dangling else-if, caught by node --check before playtest); also the CLOTH_RAW emoji escapes were written literally (`\U0001F97D`) instead of decoded — both fixed, working copy restored from backup and all 18 anchors re-applied clean, file untouched until clean.
+- **Appearance upgrades (4)**:
+  1. Eyelash flick strokes — short angled lash flicks at the outer eye corners (open-eyes branch, front + side).
+  2. Cheek contour shading — soft under-cheekbone shadow arcs beneath the blush (front view).
+  3. Earlobe crease — small notch strokes at each earlobe (front view).
+  4. Hairline root shadow — translucent darker band at the crown hairline beneath the fringe (front view).
+- **New clothing items (4, all registered in CLOTH_RAW with IDs, auto-flowing into Wren's Rack shop pool via clothPool, wardrobe slots, and the mirror preview)**:
+  5. 🥽 Alpine ski goggles (`cl_goggles`, hat slot, new `goggles` shape in wearHead: strap band + twin lenses + highlight + center bridge; front/side/up; Dec–Mar).
+  6. 🦺 Safari utility vest (`cl_safarivest`, top slot, new `safarivest` shape in wearBody: open front + 4 pocket flaps + buttons + top highlight; Apr–Oct).
+  7. 👖 Dusk bell-bottoms (`cl_bellbottom`, bot slot, new `bellbottom` shape in drawPerson: flared legs + hem strokes + waistband/brass buckle; side view gets the waistband treatment; all season).
+  8. 👟 Drift canvas slip-ons (`cl_slipon`, shoe slot, new `slipon` shape in drawPerson: low shoe + elastic gore curve + toe highlight + dark sole line; walk offsets tracked; gets the ankle-sock band; Apr–Sep).
+- **Of my choosing (4, all main-character)**:
+  9. Idle hat-tip emote — after ~32s standing still with a hat equipped (not dizzy/stung/on-bike/moving), the hand rises to the hat brim on a 48s cycle (~2s window); stretch/wave/snap/ruffle/yawn timers safe.
+  10. Breathing idle variation — gentle 4s chest-rise cycle while standing still: arms ride up ~1.1px and a soft highlight band breathes at the collarbone (distinct from the 16s stretch).
+  11. Time-of-day shadow shift — the ground shadow now offsets and softens with the in-game clock (clk), longer/sideways at morning/evening, tighter at midday.
+  12. Up-view collar detail — back-of-head (up) view now renders the worn top's collar ellipse + shoulder seam + collar highlight (hoodie keeps its own rendering).
+- Validation: `node --check` passed on the single `<script>` block (all 18 anchors applied clean, second pass after the pre-run fix). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; all in the shop pool (goggles/bellbottom in Jan pool, safarivest/slipon in Apr pool); drawPerson rendered with zero errors across front/side-L/side-R/back × idle/moving × dizzy × stung × on-bike for the new gear + regression combos; forced hat-tip/yawn/glance/snap/wave/ruffle timing paths rendered clean; mirror screenshots confirm the goggles, safari vest, bell-bottoms, and slip-ons visually (front + side + back).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 378,492 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays 7544c34 (run #9); working.html now carries runs #10 and #11. Staging refreshed at /tmp/pi_staging (paths file /tmp/pi_paths.txt, includes Puddlewick-Isle.html + CHANGELOG.md) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
+
+### 2026-10-19 21:35 EDT (scheduled run — appearance-scope #12, main character only)
+- **Appearance upgrades (4)**:
+  1. Pupil detail — dark pupil dots with white catch lights inside the open eyes (front + side; blink/dizzy/stung/wink branches untouched).
+  2. Temple shadows — soft darker arcs at the temples flanking the forehead sheen (front view).
+  3. Up-view nape shadow — soft shadow wash at the nape under the hair-tie knot (up view).
+  4. Foot contact shadows — soft dark ovals under each foot in the ground view (track walk offsets).
+- **New clothing items (4, all registered in CLOTH_RAW with IDs, auto-flowing into Wren's Rack shop pool via clothPool, wardrobe slots, and the mirror preview)**:
+  5. 🧿 Ember fez (`cl_fez`, hat slot, new `fez` shape in wearHead: domed trapezoid + dark band + top highlight + tassel string with gold bead; front/side/up; all season).
+  6. 🦙 Canyon poncho (`cl_poncho`, top slot, new `poncho` shape in wearBody: draped trapezoid + double stripe rows + neck band + drape folds; all season).
+  7. 👖 Stone chinos (`cl_chinos`, bot slot, new `chinos` shape in drawPerson: straight legs + cuff-roll bands + waistband/brass buckle; ground view; side/bike views get the waistband treatment; all season).
+  8. 👞 Oxblood brogues (`cl_brogue`, shoe slot, new `brogue` shape in drawPerson: low shoe + brogue perforation dot rows + light toe seam + dark sole line; walk offsets tracked; gets the ankle-sock band; all season).
+- **Of my choosing (4, all main-character)**:
+  9. Idle foot-tap emote — after ~36s standing still, on a 46s cycle the right foot taps briefly with motion arcs (front view; moving/on-bike/dizzy/stung-guarded; stretch/wave/snap/ruffle/yawn/glance/hat-tip timers safe).
+  10. Watch crown knob — tiny crown nub on the side of the wristwatch case (pairs with the second hand, minute ticks, and date window).
+  11. Backpack strap buckles — light buckle rectangles across the backpack shoulder straps (front + side).
+  12. Up-view shoulder highlight — soft light shoulder arcs in the back-of-head view when no top is worn (hoodie keeps its own rendering).
+- Validation: `node --check` passed on the single `<script>` block (all 16 anchors applied clean, third pass after 2 anchor-text fixes — working copy untouched until clean). Full headless-Chrome playtest (title → creator → new game → intro → walk → tools → panels → NPC dialogue → 6 seasonal events → save → soak → reload → continue): **zero console/page errors**. Targeted render check: all 4 new item IDs registered with correct slot/shape/name; all in the shop pool (all-season → Jan pool); 84 drawPerson renders with zero failures across front/side-L/side-R/back × idle/moving × dizzy × stung × up-view × on-bike for the new gear + regression combos (incl. backpack-buckles, watch-crown, tap-arcs paths; forced 40s-idle drawPerson for the foot-tap arm exercised clean).
+- SHIP STATUS: Drive push OK (file ID …SLcEc, 382,752 bytes). GitHub push NOT attempted on this detached run — per standing guidance (user approval card required, unavailable to scheduled runs), repo HEAD stays 7544c34 (run #9); working.html now carries runs #10, #11, and #12. Staging refreshed at /tmp/pi_staging (paths file /tmp/pi_paths.txt, includes Puddlewick-Isle.html + CHANGELOG.md) — a live chat can push: `github push-files --owner qamotech --repo pi --branch main --source-dir /tmp/pi_staging --paths-file /tmp/pi_paths.txt`, then verify HEAD movement via git ls-remote.
+
+### 2026-10-19 21:55 EDT (user-directed; appearance loop REMOVED per user order)
+- **Per-island default music** (user request: "a nice and fun default music per island"). Previously all islands shared the home island's hour-based generative tunes (playStep); tours now get their own themes via a new `playTourStep` engine in the same generative style (tone/mtof/SCALES/rngFor):
+  - 🏝️ Mystery Island (Classic, `tour`) — "Island Hopper": major pentatonic, root 60, 104 BPM, bouncy melody (melP .62) + playful grace notes + chord stabs on the half-bar.
+  - 🪸 Coral Atoll (`tour_atoll`) — "Reef Calypso": major scale, root 62, 116 BPM, steel-drum-style sine melody (fast decay + 2x harmonic), offbeat chord answers on step 6.
+  - 🌋 Ancient Caldera (`tour_caldera`) — "Caldera Groove": minor pentatonic, root 48, 92 BPM, deep low thump each 2 bars, sparse plucky melody (melP .42).
+  - 🏠 Home island keeps its existing hour-based default music (unchanged). Piper gigs and record-player songs still take priority everywhere (songNow path untouched).
+  - musicTick: tours route to playTourStep at fixed per-island BPMs; the track-change bridge motif now also fires on island changes (bridge key includes W.kind), so flying gets the same soft transition as house↔outdoors.
+  - Fishing-tension motif included in playTourStep so bobber tension works on tours like at home.
+- Validation: `node --check` passed. Full headless-Chrome playtest: **zero console/page errors**. Targeted music check (audit/music_check.py, real engine via PW.startTour + oscillator counting): tour 29 notes (131–2349 Hz), atoll 26 notes (69–1480 Hz), caldera 21 notes (16–751 Hz), home 16 notes — all three themes active and audibly distinct, zero page errors.
