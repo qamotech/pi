@@ -416,3 +416,6 @@
 
 ### 2026-10-20 22:41 EDT (hourly appearance run)
 - Added softly shaded ears and fine inner-ear curves to the main character, following front and side views. Villager rendering is unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.5.
+
+### 2026-10-20 23:43 EDT (hourly appearance run)
+- Added soft smile dimples and tiny cheek highlights to the main character's expression. The detail appears only on the player when smiling. Bumped APP_VERSION and the service-worker cache to 1.6.6.

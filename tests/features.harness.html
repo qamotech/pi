@@ -605,7 +605,7 @@ try{
      t.hidden=wh;ok(!bad.length,'kbd: touch buttons have labels and 44px targets',bad.join(';'))}
     key('KeyI');ok(P.PAN.open&&P.PAN.kind==='inv','kbd: I opens pockets');key('KeyI');ok(!P.PAN.open,'kbd: I closes pockets');
     // 6. version and save health
-    ok(P.APP_VERSION==='1.6.5','save: APP_VERSION is 1.6.5');
+    ok(P.APP_VERSION==='1.6.6','save: APP_VERSION is 1.6.6');
     const tb=document.getElementById('toasts'),nWarn=()=>[...tb.children].filter(d=>/Couldn't save/.test(d.textContent)).length;tb.innerHTML='';
     const oSI=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new Error('QuotaExceededError')};let thrown=false;
     try{P.save();P.save();P.save()}catch(e){thrown=true}finally{Storage.prototype.setItem=oSI}
