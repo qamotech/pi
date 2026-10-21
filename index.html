@@ -2464,7 +2464,9 @@ function floatIcon(e,x=G.px,y=G.py-44){parts.push({x,y,vx:0,vy:-24,l:1,ml:1,c:''
 function hearts(x,y){for(let k=0;k<3;k++)parts.push({x:x+(k-1)*8,y,vx:(k-1)*10,vy:-30-k*6,l:1.1,ml:1.1,txt:'💗',g:0,r:0})}
 function showCatch(e,text,sub){const c=$('cap');c.innerHTML=`<div><span class="e">${esc(e)}</span>${esc(text)}${sub?`<small>${esc(sub)}</small>`:''}</div>`;c.hidden=false;clearTimeout(G.capT);G.capT=setTimeout(()=>{c.hidden=true},2700)}
 function fillT(s,P){const m=effMonth();return s.replace(/\{name\}/g,S.name).replace(/\{island\}/g,S.island).replace(/\{cp\}/g,P&&P.cp||'').replace(/\{fruit\}/g,IT[ISLE.native.fruit].n.toLowerCase()).replace(/\{season\}/g,seasonOf(m))}
-const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. Hold Ctrl to tiptoe!','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!'];
+const TIPTOE_TIP=()=>isTouch?'Push the stick gently to tiptoe':'Hold Ctrl to tiptoe';
+const tipText=t=>t.replace('__TIPTOE__',TIPTOE_TIP());
+const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. __TIPTOE__! ','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!'];
 function act(){
   if(!S||G.faint>0||G.fade>0)return;
   if(DLG.on){dlgAdvance();return}
@@ -2787,7 +2789,7 @@ async function talkVillager(a){
     if(ch===0){removeItem(v.req.id,1);earn(v.req.rw);v.req.done=1;v.fr=Math.min(255,v.fr+4);stat('requests');hearts(a.x,a.y-40);await say(P,T('Yay! You\'re the best, {name}! Thanks a bunch, {cp}!'))}}
   const opts=['Let\'s chat'];if(v.req&&!v.req.done)opts.push('Need anything?');opts.push('Give a gift','See you!');
   const pickd=opts[await ask(P,T(pick(Math.random,['What\'s up, {name}?','Need something, {name}?','Hey, hey! What\'s new?'])),opts)];
-  if(pickd==='Let\'s chat'){await say(P,T(pick(Math.random,LINES[P.p])));if(Math.random()<.45)await say(P,T('Oh, and here\'s a tip: '+pick(Math.random,TIPS)))}
+  if(pickd==='Let\'s chat'){await say(P,T(pick(Math.random,LINES[P.p])));if(Math.random()<.45)await say(P,T('Oh, and here\'s a tip: '+tipText(pick(Math.random,TIPS))))}
   else if(pickd==='Need anything?')await say(P,T(`I've been craving a ${IT[v.req.id].n.toLowerCase()} lately... If you find one, I'll pay ${fmt(v.req.rw)} chimes!`));
   else if(pickd==='Give a gift')await giftFlow(a,bday);
   else await say(P,T(pick(Math.random,['See you around, {name}!','Later, {cp}!','Bye-bye! Come chat again!'])));
@@ -3272,7 +3274,7 @@ function openBoard(){openPanel('📌','Bulletin board',()=>{const c=clk(),ev=eve
     <h3>Today</h3><div class="list">${(ev.length?ev:['A peaceful day on the island.']).map(e=>li('📣',esc(e),'','')).join('')}${li('🌸',`Island rating: ${S.bloom.stars}★`,'Ask Hazel at Town Hall how to raise it','')}</div>
     <h3>Forecast</h3><div class="list">${forecastLis()}</div>
     <h3>Birthdays this month</h3><div class="list">${bd.length?bd.map(P=>li(P.e,esc(P.n),`${MONTHS[c.mo-1]} ${P.bd[1]}`,'')).join(''):'<p class="mute">No birthdays this month.</p>'}</div>
-    <h3>Notice</h3><p>${esc(pick(rngFor(S.seed,'tip',today()),TIPS))}</p>`},{kind:'board'})}
+    <h3>Notice</h3><p>${esc(tipText(pick(rngFor(S.seed,'tip',today()),TIPS)))}</p>`},{kind:'board'})}
 
 /* ---------- ShellPhone ---------- */
 // Neighbors app: heart tiers and friendship gifts in the order they unlock [friendship, flag on the villager, name, how to get it once reached]
@@ -3679,7 +3681,7 @@ function startGame(isNew){
 let FOOT0=null;
 function boot(){
   {const ft=document.querySelector('#title .foot');if(FOOT0==null)FOOT0=ft.innerHTML;ft.style.color='';
-    ft.innerHTML=isTouch?'<span id="tVer"></span>Drag the stick to move · 🏃 to run · A button for action · 🔧 button to switch tools · 🎒 for pockets · 📱 for phone<br>Original fan-made game inspired by cozy island life sims. Progress saves in this browser.':FOOT0}
+    ft.innerHTML=isTouch?'<span id="tVer"></span>Drag the stick to move (push gently to tiptoe) · 🏃 to run · A button for action · 🔧 button to switch tools · 🎒 for pockets · 📱 for phone<br>Original fan-made game inspired by cozy island life sims. Progress saves in this browser.':FOOT0}
   $('tVer').textContent=`v${APP_VERSION} · `;swatches('swSkin',SKINS,'skin');swatches('swHair',HAIRS,'hair');swatches('swShirt',SHIRTS,'shirt');drawPreview();resize();
   // rawSaved keeps the stored string even when it is damaged, so New Game still asks twice before overwriting it
   let rawSaved=null,saved=null,bak=null;try{rawSaved=localStorage.getItem(SAVE_KEY);bak=localStorage.getItem(BAK_KEY)}catch(e){}
