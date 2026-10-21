@@ -410,3 +410,6 @@
 
 ### 2026-10-20 20:38 EDT (hourly appearance run)
 - Refined the main character's eyes with warm iris color and small dual catchlights. The detail is limited to the player, mirror, and appearance preview; villagers keep their existing look. Bumped APP_VERSION and the service-worker cache to 1.6.3.
+
+### 2026-10-20 21:38 EDT (hourly appearance run)
+- Added a brief, natural blink to the main character's eyes, with the iris and catchlights compressing smoothly during each blink. Other characters and all game state remain unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.4.

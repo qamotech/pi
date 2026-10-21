@@ -287,7 +287,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
 <script>
 'use strict';
 (()=>{
-const APP_VERSION='1.6.3';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
+const APP_VERSION='1.6.4';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -1523,14 +1523,15 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     if(o.dizzy){
       g.font='700 7px sans-serif';g.textAlign='center';g.fillText('x  x',x+ex,hy+2);
     }else{
-      E(x-3.6+ex,hy+1,1.4,2);E(x+3.6+ex,hy+1,1.4,2);
+      const eyeOpen=Math.max(.08,1-(o.player?o.blink||0:0));
+      E(x-3.6+ex,hy+1,1.4,2*eyeOpen);E(x+3.6+ex,hy+1,1.4,2*eyeOpen);
       if(o.player){
-        g.fillStyle='#80583d';E(x-3.6+ex,hy+1,1,1.5);E(x+3.6+ex,hy+1,1,1.5);
-        g.fillStyle='#241b17';E(x-3.6+ex,hy+1.2,.55,1.1);E(x+3.6+ex,hy+1.2,.55,1.1);
+        g.fillStyle='#80583d';E(x-3.6+ex,hy+1,1,1.5*eyeOpen);E(x+3.6+ex,hy+1,1,1.5*eyeOpen);
+        g.fillStyle='#241b17';E(x-3.6+ex,hy+1.2,.55,1.1*eyeOpen);E(x+3.6+ex,hy+1.2,.55,1.1*eyeOpen);
       }
       g.fillStyle='#ffffff';
-      E(x-3.0+ex,hy+0.6,0.5,0.6);E(x+4.2+ex,hy+0.6,0.5,0.6);
-      if(o.player){g.fillStyle='rgba(255,255,255,.72)';E(x-4.1+ex,hy+1.8,.3,.35);E(x+3.1+ex,hy+1.8,.3,.35)}
+      E(x-3.0+ex,hy+0.6,0.5,0.6*eyeOpen);E(x+4.2+ex,hy+0.6,0.5,0.6*eyeOpen);
+      if(o.player){g.fillStyle='rgba(255,255,255,.72)';E(x-4.1+ex,hy+1.8,.3,.35*eyeOpen);E(x+3.1+ex,hy+1.8,.3,.35*eyeOpen)}
     }
     g.fillStyle='rgba(239,123,123,.45)';
     E(x-6+ex,hy+4.5,2.2,1.3);E(x+6+ex,hy+4.5,2.2,1.3);
@@ -1576,7 +1577,8 @@ function drawPlayer(){
   const dizzy=G.faint>0;
   const onBike=t==='bike';
   const bikeKind=onBike?(tool.id==='t_bike_stunt'?'stunt':'cruiser'):null;
-  drawPerson(ctx,G.px,G.py,S.look,G.fx,G.fy,G.step,G.moving,{stung:G.stung>0,dizzy,bike:bikeKind,hopZ:G.hopZ||0,wk:wearK(),player:true});
+  const blinkPhase=(G.t+1.7)%4.8,blink=blinkPhase<.16?Math.sin(Math.PI*blinkPhase/.16):0;
+  drawPerson(ctx,G.px,G.py,S.look,G.fx,G.fy,G.step,G.moving,{stung:G.stung>0,dizzy,bike:bikeKind,hopZ:G.hopZ||0,wk:wearK(),player:true,blink});
   if(dizzy){for(let k=0;k<3;k++){const a=G.t*4+k*2.1;drawEmo('⭐',G.px+Math.cos(a)*12,G.py-44+Math.sin(a)*4,8)}return}
   if(!t||onBike)return;
   const side=Math.abs(G.fx)>Math.abs(G.fy)*.9?Math.sign(G.fx):(G.fy<0?-1:1);
