@@ -419,3 +419,6 @@
 
 ### 2026-10-20 23:43 EDT (hourly appearance run)
 - Added soft smile dimples and tiny cheek highlights to the main character's expression. The detail appears only on the player when smiling. Bumped APP_VERSION and the service-worker cache to 1.6.6.
+
+### 2026-10-21 00:46 EDT (hourly appearance run)
+- Added a fine curved fringe strand that sways subtly with the main character's walking animation. Villagers remain unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.7.
