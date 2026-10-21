@@ -422,3 +422,6 @@
 
 ### 2026-10-21 00:46 EDT (hourly appearance run)
 - Added a fine curved fringe strand that sways subtly with the main character's walking animation. Villagers remain unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.7.
+
+### 2026-10-21 01:48 EDT (hourly appearance run)
+- Added fine palm creases to the main character's hands, following their walk swing. Villager and bicycle hand rendering remain unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.8.

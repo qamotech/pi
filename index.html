@@ -287,7 +287,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
 <script>
 'use strict';
 (()=>{
-const APP_VERSION='1.6.7';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
+const APP_VERSION='1.6.8';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -1491,6 +1491,10 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   }else{
     const ax=moving?Math.sin(step)*2:0;
     E(x-8.5,by-12-bob+ax,2.6,3.2);E(x+8.5,by-12-bob-ax,2.6,3.2);
+    if(o.player&&!up){
+      g.strokeStyle='rgba(105,68,49,.3)';g.lineWidth=.5;g.lineCap='round';
+      for(const s of [-1,1]){const hy=by-12-bob+(s<0?ax:-ax),hx=x+s*8.5;g.beginPath();g.moveTo(hx-1,hy+1.2);g.quadraticCurveTo(hx,hy+1.8,hx+1,hy+1.2);g.stroke()}
+    }
   }
   const hy=by-(onBike?27:29)-bob;
   if(o.player&&!up){
