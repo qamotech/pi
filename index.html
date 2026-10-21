@@ -1901,14 +1901,13 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     if(!side){g.strokeStyle=shade(look.hair,-30);g.lineWidth=.7;g.lineCap='round';g.beginPath();
       g.moveTo(x-4,hy-4.5);g.quadraticCurveTo(x-4.6,hy-2.8,x-3.8,hy-1.8);
       g.moveTo(x+4,hy-4.5);g.quadraticCurveTo(x+4.6,hy-2.8,x+3.8,hy-1.8);g.stroke()}
+    // Cleaned up side hair (option B) - short, natural, no hanging strands
     g.fillStyle=shade(look.hair,-26);
-    E(x-9.5,hy+2,1.5,3.2);E(x+9.5,hy+2,1.5,3.2);
-    if(!side){g.strokeStyle=shade(look.hair,-40);g.lineWidth=.8;g.beginPath();
-      g.moveTo(x-10,hy+3);g.quadraticCurveTo(x-13,hy+5+swayI,x-11.5,hy+8.5);
-      g.moveTo(x+10,hy+3);g.quadraticCurveTo(x+13,hy+5+swayI,x+11.5,hy+8.5);g.stroke()}
-    if(!side){g.strokeStyle=shade(look.hair,-56);g.lineWidth=.7;g.lineCap='round';g.beginPath();
-      g.moveTo(x-7,hy);g.quadraticCurveTo(x-11.5,hy+3+swayI,x-9.5,hy+7.5);
-      g.moveTo(x+7,hy);g.quadraticCurveTo(x+11.5,hy+3+swayI,x+9.5,hy+7.5);g.stroke()}
+    if(!side){E(x-8.5+swayI*.5,hy-1,2.5,3.5);E(x+8.5+swayI*.5,hy-1,2.5,3.5)}
+    else{E(x-side*9+swayI*.5,hy-1,2.5,3.5)}
+    // Subtle hair highlight
+    g.fillStyle='rgba(255,255,255,.12)';
+    if(!side){E(x-3,hy-7,4,2.5)}
   }
   if(!up){
     const ex=side*3.5;
