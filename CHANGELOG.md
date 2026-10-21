@@ -407,3 +407,6 @@
 
 ### 2026-10-20 (published character-art polish)
 - Added soft cel-shading, shoulder highlights, shirt seams and buttons, plus face and hair accents to the main player renderer in index.html. Bumped APP_VERSION and the service-worker cache to 1.6.2.
+
+### 2026-10-20 20:38 EDT (hourly appearance run)
+- Refined the main character's eyes with warm iris color and small dual catchlights. The detail is limited to the player, mirror, and appearance preview; villagers keep their existing look. Bumped APP_VERSION and the service-worker cache to 1.6.3.
