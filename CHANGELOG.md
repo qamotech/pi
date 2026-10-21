@@ -413,3 +413,6 @@
 
 ### 2026-10-20 21:38 EDT (hourly appearance run)
 - Added a brief, natural blink to the main character's eyes, with the iris and catchlights compressing smoothly during each blink. Other characters and all game state remain unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.4.
+
+### 2026-10-20 22:41 EDT (hourly appearance run)
+- Added softly shaded ears and fine inner-ear curves to the main character, following front and side views. Villager rendering is unchanged. Bumped APP_VERSION and the service-worker cache to 1.6.5.

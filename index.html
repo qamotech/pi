@@ -287,7 +287,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
 <script>
 'use strict';
 (()=>{
-const APP_VERSION='1.6.4';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
+const APP_VERSION='1.6.5';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -1493,6 +1493,10 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     E(x-8.5,by-12-bob+ax,2.6,3.2);E(x+8.5,by-12-bob-ax,2.6,3.2);
   }
   const hy=by-(onBike?27:29)-bob;
+  if(o.player&&!up){
+    g.fillStyle=shade(look.skin,-12);
+    if(side)E(x+side*9.6,hy+1.3,2.2,3.1);else{E(x-9.6,hy+1.3,2.2,3.1);E(x+9.6,hy+1.3,2.2,3.1)}
+  }
   g.fillStyle=shade(look.skin,-15);E(x,hy+.5,10.5,10);
   g.fillStyle=look.skin;E(x,hy,10.2,9.8);
   g.fillStyle='rgba(255,255,255,.2)';E(x-3.5,hy-4.8,3.3,1.2);
@@ -1505,6 +1509,10 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     else E(x-side*8,hy-1,3.5,6);
     g.strokeStyle='rgba(255,245,215,.42)';g.lineWidth=.85;g.lineCap='round';g.beginPath();
     g.moveTo(x-5.8,hy-8.1);g.quadraticCurveTo(x-1.7,hy-10.7,x+3.2,hy-9.5);g.stroke();
+  }
+  if(o.player&&!up){
+    g.strokeStyle='rgba(113,65,46,.48)';g.lineWidth=.55;g.lineCap='round';
+    for(const s of (side?[side]:[-1,1])){g.beginPath();g.arc(x+s*10.4,hy+1.3,1.2,s<0?Math.PI/2:-Math.PI/2,s<0?3*Math.PI/2:Math.PI/2);g.stroke()}
   }
   if(!up){
     const ex=side*3.5;
