@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src data: blob:; manifest-src 'self'; worker-src 'self'; frame-src 'self'; connect-src 'none'">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#2a6f97">
@@ -27,7 +27,7 @@
   --lift:0 4px 0 rgba(74,58,40,.2);--deep:0 6px 0 rgba(74,58,40,.18),0 22px 50px -18px rgba(30,20,5,.55)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{margin:0;height:100%;overflow:hidden;background:#2a6f97;color:var(--ink);font:700 15px/1.35 var(--font);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#2a6f97;color:var(--ink);font:700 15px/1.35 var(--font);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:10px}
@@ -87,7 +87,7 @@ input,select{font:inherit;color:inherit}
 #pHead h2{margin:0;font-size:21px;flex:1}
 #pHead .e{font-size:26px}
 #pClose{width:38px;height:38px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);font-size:16px}
-#pBody{font-size:calc(15px*var(--fs));overflow-wrap:break-word;padding:16px 20px 22px;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text}
+#pBody{font-size:calc(15px*var(--fs));overflow-wrap:break-word;padding:16px 20px 22px;overflow:auto;touch-action:pan-y;-webkit-user-select:text;user-select:text}
 #pBody h3{margin:14px 0 8px;font-size:calc(15px*var(--fs));color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
 #pBody p{margin:6px 0}
 .mute{color:var(--ink2);font-weight:600}
@@ -144,7 +144,7 @@ input[type=range]{accent-color:var(--leaf)}
 .sw{display:flex;gap:6px;flex-wrap:wrap}
 .sw button{width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
 .map{width:100%;height:auto;border-radius:18px;image-rendering:pixelated;background:#3f9fd2}
-#radarMap{display:block;width:110px;height:110px;flex:none;border-radius:24px;border:3px solid rgba(255,255,255,.85);box-shadow:var(--deep);background:rgba(30,80,120,.78);backdrop-filter:blur(6px);pointer-events:none}
+#radarMap{display:block;width:110px;height:110px;flex:none;border-radius:24px;border:3px solid rgba(255,255,255,.85);box-shadow:var(--deep);background:rgba(30,80,120,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);pointer-events:none}
 .inv-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
 .inv-chips button{padding:4px 10px;border-radius:12px;font-size:12px;font-weight:700;background:var(--paper2);border:none;cursor:pointer}
 .inv-chips button.on{background:var(--leaf);color:#fff}
@@ -153,6 +153,11 @@ input[type=range]{accent-color:var(--leaf)}
 /* ---------- title ---------- */
 #title{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 10%,#bfe6f7 0%,#7cc6e8 45%,#3f9fd2 100%);overflow:auto;padding:16px}
 #title .card{width:min(94vw,520px);background:var(--paper);border-radius:32px;box-shadow:var(--deep);padding:26px 26px 22px;text-align:center}
+#title .mute-lead{margin:4px 0 0}
+#title .arcade-ann{margin:8px 0 0}
+#tContinue,#tDmg{margin-top:14px}
+#tDmgT{margin:0 0 8px;color:#c45656}
+#arcB{right:auto;left:-4px;background:#e75480}
 #title h1{margin:0;font-size:clamp(34px,8vw,50px);letter-spacing:-.02em;color:var(--leafd);line-height:1}
 #title h1 small{display:block;font-size:14px;letter-spacing:.3em;color:var(--sea);margin-bottom:6px}
 #title .isle{font-size:56px;margin:4px 0 2px;animation:bob 2.4s ease-in-out infinite}
@@ -217,7 +222,7 @@ body.touch #dlg{bottom:calc(236px + env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 button{touch-action:manipulation}
-#hud{user-select:none;-webkit-user-select:none}
+#hud{-webkit-user-select:none;user-select:none}
 :focus-visible{outline:3px solid #f0a840;outline-offset:2px}
 #bikeGame{position:fixed;inset:0;z-index:300;background:#0b2a4a;display:flex;flex-direction:column}
 #bikeGame[hidden]{display:none}
@@ -266,7 +271,7 @@ button{touch-action:manipulation}
     <button class="round" id="bRadar" title="Toggle radar (N)" aria-label="Toggle radar" aria-pressed="false"><span class="e">🧭</span></button>
     <button class="round" id="bBike" title="Ride bike (B)" aria-label="Ride bike"><span class="e">🚲</span></button>
     <button class="round" id="bBag" title="Pockets (I)" aria-label="Pockets"><span class="e">🎒</span></button>
-    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span><span class="badge" id="arcB" hidden style="right:auto;left:-4px;background:#e75480" title="Arcade daily bonus waiting">🎮</span></button>
+    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span><span class="badge" id="arcB" hidden title="Arcade daily bonus waiting">🎮</span></button>
   </div>
 </div>
 
@@ -297,10 +302,10 @@ button{touch-action:manipulation}
   <div class="card">
     <h1><small>WELCOME TO</small>Puddlewick Isle</h1>
     <div class="isle e">🏝️</div>
-    <p class="mute" style="margin:4px 0 0">A slow-life island getaway. Fish, catch bugs, dig fossils, befriend neighbors and grow a home, all on your real-world clock.</p>
-    <p style="margin:8px 0 0">🎮 <b>New — the Arcade!</b> Marlowe's full Fishing Derby at the Derby Dock, and Bike Blitz on Spoke Island, playable right inside your island.</p>
-    <div id="tContinue" hidden class="acts" style="margin-top:14px"><button class="btn" id="btnCont">▶ Continue</button></div>
-    <div id="tDmg" hidden style="margin-top:14px"><p id="tDmgT" role="alert" style="margin:0 0 8px;color:#c45656"></p><div class="acts"><button class="btn" id="btnBak" hidden>Restore backup</button></div></div>
+    <p class="mute mute-lead">A slow-life island getaway. Fish, catch bugs, dig fossils, befriend neighbors and grow a home, all on your real-world clock.</p>
+    <p class="arcade-ann">🎮 <b>New — the Arcade!</b> Marlowe's full Fishing Derby at the Derby Dock, and Bike Blitz on Spoke Island, playable right inside your island.</p>
+    <div id="tContinue" hidden class="acts"><button class="btn" id="btnCont">▶ Continue</button></div>
+    <div id="tDmg" hidden><p id="tDmgT" role="alert"></p><div class="acts"><button class="btn" id="btnBak" hidden>Restore backup</button></div></div>
     <form id="newForm" autocomplete="off">
       <canvas id="preview" width="84" height="96" aria-hidden="true"></canvas>
       <div class="two">
