@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a3a52">
+<meta name="description" content="Marlowe's Fishing Derby — a Puddlewick Isle mini-game. 24 fish species, 4 spots, a 3-minute tournament.">
 <title>Puddlewick Isle: Marlowe's Fishing Derby</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -940,6 +942,7 @@ function endTourney(){
   if(place===1){SV.stats.wins++;AU.sfx('rare');}else AU.sfx('catch');
   save();
   G.screen='results';G.results={board,place,purse};
+  try{parent.postMessage({pw:'fish',place,purse,pts:T.me.pts|0},'*')}catch(_){}
   G.tourney=null;G.phase='idle';
 }
 function scrResults(){
@@ -947,6 +950,7 @@ function scrResults(){
   const R=G.results;
   txt('🏆 Tournament Results',W/2,60,34,'#fff','center',true);
   txt('🦦 "'+(R.place===1?'SPLISH! A new derby champion!':R.place===2?'"So close! The fish fear you now."':'"Good effort out there, angler!"')+'"',W/2,104,17,'#bfe0f5','center');
+  if(window.parent!==window)txt('🏝 Playing inside Puddlewick Isle — your daily bonus (and a trophy, if you won!) land on your island.',W/2,126,13,'#ffe9a8','center');
   panel(W/2-260,130,520,300);
   R.board.forEach((p,i)=>{
     const y=170+i*62;

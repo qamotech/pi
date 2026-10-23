@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0b2a4a">
+<meta name="description" content="Bike Blitz — a Puddlewick Isle mini-game. Joy Ride, Time Trials and Trick Park on the Spoke Island trails.">
 <title>Puddlewick Isle: Bike Blitz</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -714,6 +716,7 @@ function endRide(done){
   }
   save();
   G.results2={earned,newBest,dist:Math.floor(G.dist),stars:G.stars,score:G.score,time:G.trialTime,mode:G.mode,track:G.track};
+  try{parent.postMessage({pw:'bike',mode:G.mode,score:G.score|0,dist:Math.floor(G.dist),time:G.trialTime||0,done:!!done},'*')}catch(_){}
   G.screen='results2';
   if(newBest)AU.sfx('win');else AU.sfx('coin');
 }
@@ -732,6 +735,7 @@ function scrResults2(){
   if(R.mode==='trial')row('Time',R.time.toFixed(1)+' s');
   row('Coins earned','+'+R.earned+' 🪙');
   if(R.newBest)txt('🎉 NEW BEST! 🎉',W/2,352,22,'#ffd97a','center',true);
+  if(window.parent!==window)txt('🏝 Playing inside Puddlewick Isle — your daily bonus (and a trophy, if you earned it!) land on your island.',W/2,H-112,14,'#ffe9a8','center');
   if(button(W/2-150,H-90,300,54,'Back to Menu',{fs:20})){G.screen='menu';G.mode='joy';}
 }
 </script>

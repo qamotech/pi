@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src data: blob:; manifest-src 'self'; worker-src 'self'; connect-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; media-src data: blob:; manifest-src 'self'; worker-src 'self'; frame-src 'self'; connect-src 'none'">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#2a6f97">
-<meta name="description" content="A cozy island life sim in your browser — fish, catch bugs, dig fossils, befriend neighbors, play the sunroot market and grow a tent into a manor. No install, no ads, works offline.">
+<meta name="description" content="A cozy island life sim in your browser — fish, catch bugs, dig fossils, befriend neighbors, play the sunroot market and grow a tent into a manor. No install, no ads, works offline. Now with an Arcade inside: Marlowe's full Fishing Derby and Bike Blitz, playable without leaving your island!">
 <meta property="og:title" content="Puddlewick Isle">
 <meta property="og:description" content="A cozy island life sim in your browser. Fish, catch bugs, befriend neighbors, decorate your home and play the sunroot market.">
 <meta property="og:image" content="https://qamotech.github.io/pi/docs/og-image.png">
@@ -216,20 +216,35 @@ body.touch #dlg{bottom:calc(236px + env(safe-area-inset-bottom))}
 @media (max-width:400px){#clock b{font-size:calc(19px*min(var(--fs),1.1))}#clock small{font-size:calc(12.5px*min(var(--fs),1.1))}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+button{touch-action:manipulation}
+#hud{user-select:none;-webkit-user-select:none}
+:focus-visible{outline:3px solid #f0a840;outline-offset:2px}
 #bikeGame{position:fixed;inset:0;z-index:300;background:#0b2a4a;display:flex;flex-direction:column}
 #bikeGame[hidden]{display:none}
 #bikeGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0d2f4a;color:#fff;font-weight:700;font-size:17px}
 #bikeGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
 #bikeGameClose:active{transform:scale(.96)}
 #bikeGameFrame{flex:1;border:none;width:100%;min-height:0}
+#bikeGameBar,#fishGameBar{padding-top:calc(10px + env(safe-area-inset-top))}
+#fishGame{position:fixed;inset:0;z-index:300;background:#08304a;display:flex;flex-direction:column}
+#fishGame[hidden]{display:none}
+#fishGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0a3a52;color:#fff;font-weight:700;font-size:17px}
+#fishGameClose{background:#3fa7d6;border:none;border-radius:10px;padding:9px 18px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
+#fishGameClose:active{transform:scale(.96)}
+#fishGameFrame{flex:1;border:none;width:100%;min-height:0}
 </style>
 </head>
 <body>
 <canvas id="cv" tabindex="0" aria-label="Puddlewick Isle game world"></canvas>
 
 <div id="bikeGame" hidden>
-  <div id="bikeGameBar"><span>🚲 Bike Blitz — Spoke Island Trails</span><button id="bikeGameClose">✖ Close</button></div>
+  <div id="bikeGameBar"><span>🚲 Bike Blitz — Spoke Island Trails</span><button id="bikeGameClose" aria-label="Close Bike Blitz">✖ Close</button></div>
   <iframe id="bikeGameFrame" title="Bike Blitz mini-game" allow="autoplay"></iframe>
+</div>
+
+<div id="fishGame" hidden>
+  <div id="fishGameBar"><span>🎣 Marlowe's Fishing Derby — Derby Dock</span><button id="fishGameClose" aria-label="Close Fishing Derby">✖ Close</button></div>
+  <iframe id="fishGameFrame" title="Fishing Derby mini-game" allow="autoplay"></iframe>
 </div>
 
 <div id="hud" hidden>
@@ -251,7 +266,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
     <button class="round" id="bRadar" title="Toggle radar (N)" aria-label="Toggle radar" aria-pressed="false"><span class="e">🧭</span></button>
     <button class="round" id="bBike" title="Ride bike (B)" aria-label="Ride bike"><span class="e">🚲</span></button>
     <button class="round" id="bBag" title="Pockets (I)" aria-label="Pockets"><span class="e">🎒</span></button>
-    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span></button>
+    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span><span class="badge" id="arcB" hidden style="right:auto;left:-4px;background:#e75480" title="Arcade daily bonus waiting">🎮</span></button>
   </div>
 </div>
 
@@ -283,6 +298,7 @@ body.calm *,body.calm *::before,body.calm *::after{animation-duration:.01ms!impo
     <h1><small>WELCOME TO</small>Puddlewick Isle</h1>
     <div class="isle e">🏝️</div>
     <p class="mute" style="margin:4px 0 0">A slow-life island getaway. Fish, catch bugs, dig fossils, befriend neighbors and grow a home, all on your real-world clock.</p>
+    <p style="margin:8px 0 0">🎮 <b>New — the Arcade!</b> Marlowe's full Fishing Derby at the Derby Dock, and Bike Blitz on Spoke Island, playable right inside your island.</p>
     <div id="tContinue" hidden class="acts" style="margin-top:14px"><button class="btn" id="btnCont">▶ Continue</button></div>
     <div id="tDmg" hidden style="margin-top:14px"><p id="tDmgT" role="alert" style="margin:0 0 8px;color:#c45656"></p><div class="acts"><button class="btn" id="btnBak" hidden>Restore backup</button></div></div>
     <form id="newForm" autocomplete="off">
@@ -455,13 +471,18 @@ SHELLS.forEach(([id,n,p,col])=>def(id,{n,e:'🐚',p,c:'shell',s:10,col}));
 FLOWER_SP.forEach(([sp,n,e])=>{Object.keys(FCOL).forEach(c=>def(`fw_${sp}_${c}`,{n:`${c[0].toUpperCase()+c.slice(1)} ${n.toLowerCase()}`,e,p:FCOL_PRICE[c],c:'flower',s:10,col:FCOL[c],sp,fc:c}));
   ['red','white','yellow'].forEach(c=>def(`sd_${sp}_${c}`,{n:`${n} seeds (${c})`,e:'🌾',p:60,c:'seed',s:10,col:FCOL[c],sp,fc:c}))});
 const TOOLS={net:'🥅',rod:'🎣',axe:'🪓',shovel:'⛏️',can:'🪣',sling:'🏹',bike:'🚲'};
-[['t_net0','Flimsy net','net',10,100],['t_net1','Net','net',30,400],['t_rod0','Flimsy fishing rod','rod',10,100],['t_rod1','Fishing rod','rod',30,400],
+[['t_net0','Flimsy net','net',10,100],['t_net1','Net','net',30,400],['t_rod0','Flimsy fishing rod','rod',10,100],['t_rod1','Fishing rod','rod',30,400],['t_rod2','Golden fishing rod','rod',60,2500],
  ['t_axe0','Flimsy axe','axe',40,200],['t_axe1','Axe','axe',100,625],['t_sho0','Flimsy shovel','shovel',40,200],['t_sho1','Shovel','shovel',100,625],
  ['t_can0','Flimsy watering can','can',20,100],['t_can1','Watering can','can',60,400],['t_sli','Slingshot','sling',20,225],
  ['t_bike','Cruiser Bike','bike',300,2500],['t_bike_stunt','Stunt Hopper Bike','bike',500,6000]]
  .forEach(([id,n,tool,dur,p])=>def(id,{n,e:TOOLS[tool],p,c:'tool',tool,dur}));
 def('bike_frame',{n:'Bike frame',e:'🚲',p:600,c:'mat',s:5,desc:'A lightweight tubular frame for building a bicycle.'});
 def('bike_wheel',{n:'Bike wheel',e:'⚙️',p:300,c:'mat',s:10,desc:'A spoked rubber tire and steel rim for bicycles.'});
+def('tacklebox',{n:'Tackle box',e:'🧰',p:450,c:'mat',s:5,desc:'Hooks, line and lures, kept derby-legal. Marlowe asks Derby anglers to carry one.'});
+def('lure_gold',{n:'Golden lure',e:'🪝',p:900,c:'mat',s:5,desc:'A glittering lure. While it rides in your pockets, trophy-size fish bite more often.'});
+def('bike_bell',{n:'Bike bell',e:'🔔',p:350,c:'mat',s:5,desc:'A bright brass bell. While you carry it, your bike rolls 12% faster. Ring ring!'});
+def('fu_mgfish',{n:'Derby Champion trophy',e:'🏆',p:3000,c:'furn',desc:'Won at Marlowe\'s full Fishing Derby. Splish!'});
+def('fu_mgbike',{n:'Trail Blazer trophy',e:'🚵',p:3000,c:'furn',desc:'Won at Bike Blitz on the Spoke Island trails.'});
 FURN_RAW.forEach(([id,n,e,b])=>def('fu_'+id,{n,e,p:Math.round(b/4),buy:b,c:'furn'}));
 SEASONAL_FURN.forEach(([id,n,e,b,ms])=>def('fu_'+id,{n,e,p:Math.round(b/4),buy:b,c:'furn',ms:parseRanges(ms)}));
 CRAFT_FURN.forEach(([id,n,e])=>def('fu_'+id,{n,e,p:300,c:'furn'}));
@@ -559,6 +580,8 @@ const RECIPES={
  r_frame:{out:'fu_frame',m:{softwood:2,hardwood:1}},r_flag:{out:'fu_flag',m:{wood:2,weeds:3}},r_flowerarch:{out:'fu_flowerarch',m:{wood:4,flowers:3}},r_phono:{out:'fu_phono',m:{iron:2,hardwood:3}},
  r_bike_frame:{out:'bike_frame',m:{iron:4,hardwood:2}},r_bike_wheel:{out:'bike_wheel',m:{iron:2,clay:1,softwood:1}},
  r_bike:{out:'t_bike',m:{bike_frame:1,bike_wheel:2}},r_bike_stunt:{out:'t_bike_stunt',m:{t_bike:1,gold:2,star:2}},
+ r_tacklebox:{out:'tacklebox',m:{hardwood:2,iron:1,clay:1}},r_lure:{out:'lure_gold',m:{iron:1,cowrie:2,gold:1}},
+ r_rod2:{out:'t_rod2',m:{t_rod1:1,lure_gold:1,gold:2}},r_bike_bell:{out:'bike_bell',m:{iron:1,gold:1}},
  r_blossomlamp:{out:'fu_blossomlamp',m:{petal:5,wood:2},ss:'petal'},r_petalrug:{out:'fl_fpetal',m:{petal:6},ss:'petal'},r_blossomwall:{out:'wl_wblossom',m:{petal:6,softwood:2},ss:'petal'},
  r_mapleumb:{out:'fu_mapleumb',m:{maple:5,branch:3},ss:'maple'},r_leafpile:{out:'fu_leafpile',m:{maple:6},ss:'maple'},r_maplewall:{out:'wl_wmaple',m:{maple:6,hardwood:2},ss:'maple'},
  r_frostlamp:{out:'fu_frostlamp',m:{flake:5,iron:1},ss:'flake'},r_icechair:{out:'fu_icechair',m:{flake:6,wood:2},ss:'flake'},r_flakewreath:{out:'fu_flakewreath',m:{flake:6,branch:2},ss:'flake'},
@@ -568,7 +591,7 @@ const RECIPES={
  r_birdhouse:{out:'fu_birdhouse',m:{wood:3,branch:2,softwood:1}},
  r_scarecrow:{out:'fu_scarecrow',m:{weeds:8,wood:2,branch:2}}};
 for(const k in RECIPES){RECIPES[k].id=k}
-const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike','r_phono','r_windchime','r_well','r_birdhouse','r_scarecrow'];
+const SHOP_RECIPES=['r_sli','r_logstool','r_stonestool','r_birdbath','r_basket','r_shelllamp','r_lantern','r_claypot','r_bench','r_chair','r_frame','r_flag','r_med','r_bike_frame','r_bike_wheel','r_bike','r_bike_bell','r_phono','r_windchime','r_well','r_birdhouse','r_scarecrow'];
 // Seasonal forage: [material, months (effMonth), badge, events line]. Petals/leaves/flakes drift by and are caught with the net; sunshells wash up on the beach
 const FORAGE=[['petal','3-4','🌸','🌸 Blossom petals are drifting! Catch them with your net.'],['maple','10-11','🍂','🍁 Maple leaves are falling! Catch them with your net.'],
  ['flake','12-2','❄️','❄️ Snowflakes drift by on snowy and cloudy days. Catch them with your net!'],['sunshell','6-8','☀️','🐚 Sunshells are washing up on the beach!']].map(([id,ms,b,ev])=>({id,mo:parseRanges(ms),ms,b,ev}));
@@ -728,6 +751,7 @@ function events(){
   for(const v of S.vill){const P=VPOOL[v.p];if(P.bd[0]===c.mo&&P.bd[1]===c.dd)out.push(`🎂 It's ${P.n}'s birthday today!`)}
   if(c.dow===0&&c.h>=5&&c.h<12)out.push('🥔 Rosie is selling sunroots in the plaza until noon.');
   if(c.dow===6&&c.h>=9&&c.h<18)out.push(`${DERBY_N[derbyWeek()]} in the plaza until 6 PM! Talk to Marlowe.`);
+  if(S.arcade&&(S.arcade.bonus.fish!==today()||S.arcade.bonus.bike!==today()))out.push('🎮 An Arcade daily bonus is waiting! Open the Arcade app on your ShellPhone.');
   else if(c.dow===5)out.push(`${DERBY_N[derbyWeek()]} tomorrow from 9 AM in the plaza!`);
   if(c.dow===6)out.push(c.h>=20?'🎵 Piper the heron is playing guitar in the plaza until midnight. Request a song!':'🎵 Tonight from 8 PM, Piper the heron plays guitar in the plaza.');
   {const sp=IT[spotlightId()];if(sp)out.push(`🌟 Museum Spotlight: donate a ${sp.n} this season for bonus Tide Points!`)}{const f=forageNow();if(f)out.push(f.ev)}
@@ -837,6 +861,8 @@ function tryGen(seed,kind){
   const home=B.find(b=>b.t==='home');
   if(home){const mx=home.door.x+2,my=home.door.y;if(!isLandT(ter[I(mx,my)])||obj[I(mx,my)])return null;obj[I(mx,my)]={k:'mail'}}
   if(!tour){const h=B.find(b=>b.t==='hall'),bx=h.door.x+2,by=h.door.y+1;obj[I(bx,by)]={k:'board'}}
+  if(!tour){const cands=[];for(let dy=-3;dy<=3;dy++)for(let dx=-5;dx<=5;dx++){const x=dock.door.x+dx,y=dock.door.y+dy;if(inb(x,y)&&ter[I(x,y)]===T_SAND&&!obj[I(x,y)]&&!(x===dock.door.x&&y===dock.door.y+1))cands.push([x,y,Math.abs(dx)+Math.abs(dy)])}
+    if(cands.length){cands.sort((a,b)=>b[2]-a[2]);obj[I(cands[0][0],cands[0][1])]={k:'derbysign'}}}
   // reachability + paths
   const walk=i=>isLandT(ter[i])&&(!obj[i]||obj[i].k==='rsv');
   const par=new Int32Array(N).fill(-1),st=I(plaza.x,plaza.y);par[st]=st;const q=[st];
@@ -871,7 +897,7 @@ function blockedTile(x,y){
   if(G.scene==='vhouse'){const R=G.vh.room,L=HOUSE_LV[R.lv];if(x<0||y<0||x>=L.w||y>=L.h)return !(y===L.h&&x===(L.w>>1));return (x===R.nx&&y===R.ny)||R.items.some(f=>f.x===x&&f.y===y)}
   const t=terAt(x,y);if(!isLandT(t))return true;
   const o=objAt(x,y);if(!o)return false;
-  return o.k==='bld'||o.k==='tree'||o.k==='palm'||o.k==='rock'||o.k==='mail'||o.k==='board'||o.k==='bikerack'||o.k==='furn';
+  return o.k==='bld'||o.k==='tree'||o.k==='palm'||o.k==='rock'||o.k==='mail'||o.k==='board'||o.k==='bikerack'||o.k==='derbysign'||o.k==='furn';
 }
 function randTile(w,r,pred,tries=600){for(let k=0;k<tries;k++){const x=Math.floor(r()*w.W),y=Math.floor(r()*w.H);if(pred(x,y,w.ter[y*w.W+x],w.obj[y*w.W+x]))return [x,y]}return null}
 
@@ -1096,7 +1122,7 @@ function newState(o){
     house:{wall:'wl_wcream',floor:'fl_fwood',items:[]},recipes:Object.keys(RECIPES).filter(k=>RECIPES[k].start),
     pedia:{fish:{},bug:{},fossil:{}},don:{fish:{},bug:{},fossil:{}},stats:{},ach:{},dly:null,tasks:[],lastDay:null,vill:[],mail:[],sun:null,
     flags:{},timeOff:0,at:0,set:{music:.45,sfx:.7,rm:null,radar:0,ts:1,fs:1},wishes:0,objs:null,pos:null,moveIn:null,lastMonth:null,met:{},
-    derby:{best:{fish:0,bug:0},last:{fish:-1,bug:-1},rounds:0},bloom:{stars:0,best:0,score:0,day:-1},cat:{},orders:[],catSets:{},gig:{last:-1,heard:{}},musRw:{fish:0,bug:0,fossil:0},rec:{fish:{},bug:{},tro:0,ms:0},
+    derby:{best:{fish:0,bug:0},last:{fish:-1,bug:-1},rounds:0},arcade:{plays:{fish:0,bike:0},best:{fish:0,bike:0},bonus:{fish:-1,bike:-1},trophies:{}},bloom:{stars:0,best:0,score:0,day:-1},cat:{},orders:[],catSets:{},gig:{last:-1,heard:{}},musRw:{fish:0,bug:0,fossil:0},rec:{fish:{},bug:{},tro:0,ms:0},
     wear:{hat:null,top:null,bot:null,shoe:null,acc:null},closet:[]};
 }
 function newGame(o){
@@ -1118,7 +1144,7 @@ function serialize(){const objs=[];ISLE.obj.forEach((o,i)=>{if(o)objs.push([i,o]
 // backup slot SAVE_KEY+'.bak': the last good JSON, copied once per island day (processDays) and on every 10th save; dropped first if storage is full
 const BAK_KEY=SAVE_KEY+'.bak',okSave=s=>!!s&&s.v===1&&typeof s.seed==='number'&&Array.isArray(s.inv)&&Array.isArray(s.vill);
 function bakUp(j){try{if(j==null)j=localStorage.getItem(SAVE_KEY);if(!j)return false;const s=JSON.parse(j);if(!okSave(s)||(S&&s.seed!==S.seed))return false;localStorage.setItem(BAK_KEY,j);return true}catch(e){return false}}
-function save(){if(!S)return;let ok=true,j=null;S.at=Date.now();try{j=serialize();localStorage.setItem(SAVE_KEY,j)}catch(e){S.objs=null;try{localStorage.removeItem(BAK_KEY);if(j==null)throw e;localStorage.setItem(SAVE_KEY,j)}catch(e2){ok=false}}G.lastSave=performance.now();
+function save(){if(!S)return;let ok=true,j=null;S.at=Date.now();try{j=serialize();try{const prev=localStorage.getItem(SAVE_KEY);if(prev&&prev!==j)localStorage.setItem(BAK_KEY,prev)}catch(_){}localStorage.setItem(SAVE_KEY,j)}catch(e){S.objs=null;try{localStorage.removeItem(BAK_KEY);if(j==null)throw e;localStorage.setItem(SAVE_KEY,j)}catch(e2){ok=false}}G.lastSave=performance.now();
   if(ok){G.saveOk=true;G.savedAt=Date.now();G.saveWarn=0;if((G.saveN=(G.saveN|0)+1)%10===0)bakUp(j)}else{G.saveOk=false;if(!G.saveWarn){G.saveWarn=1;toast("Couldn't save in this browser. Use Settings > Export save.")}}}
 const hmTxt=t=>{const d=new Date(t),h=d.getHours();return `${h%12||12}:${String(d.getMinutes()).padStart(2,'0')} ${h<12?'AM':'PM'}`};
 function loadFrom(json){
@@ -1126,7 +1152,7 @@ function loadFrom(json){
   if(!okSave(s))throw new Error('Not a Puddlewick Isle save');
   const base=newState({name:s.name,island:s.island,hemi:s.hemi,look:s.look});
   for(const k in base)if(!(k in s))s[k]=base[k];
-  const dd=s.derby=Object.assign({},base.derby,s.derby);dd.best=Object.assign({fish:0,bug:0},dd.best);dd.last=Object.assign({fish:-1,bug:-1},dd.last);s.bloom=Object.assign({},base.bloom,s.bloom);s.gig=Object.assign({},base.gig,s.gig);s.musRw=Object.assign({},base.musRw,s.musRw&&typeof s.musRw==='object'?s.musRw:{});for(const k in base.musRw)s.musRw[k]=clamp(s.musRw[k]|0,0,4);if(!s.gig.heard||typeof s.gig.heard!=='object')s.gig.heard={};const rr=s.rec=Object.assign({},base.rec,s.rec&&typeof s.rec==='object'&&!Array.isArray(s.rec)?s.rec:{});for(const k of ['fish','bug'])if(!rr[k]||typeof rr[k]!=='object'||Array.isArray(rr[k]))rr[k]={};rr.tro=Math.max(0,rr.tro|0);rr.ms=clamp(rr.ms|0,0,REC_MS.length);s.set=Object.assign({},base.set,s.set||{});if(![0,1,2,3].includes(s.set.ts))s.set.ts=1;if(!FS_STEPS.includes(s.set.fs))s.set.fs=1;
+  const dd=s.derby=Object.assign({},base.derby,s.derby);dd.best=Object.assign({fish:0,bug:0},dd.best);dd.last=Object.assign({fish:-1,bug:-1},dd.last);s.arcade=(s.arcade&&typeof s.arcade==='object')?s.arcade:{plays:{fish:0,bike:0},best:{fish:0,bike:0},bonus:{fish:-1,bike:-1},trophies:{}};for(const k of['plays','best','bonus'])if(!s.arcade[k]||typeof s.arcade[k]!=='object')s.arcade[k]=k==='bonus'?{fish:-1,bike:-1}:{fish:0,bike:0};if(!s.arcade.trophies||typeof s.arcade.trophies!=='object')s.arcade.trophies={};s.bloom=Object.assign({},base.bloom,s.bloom);s.gig=Object.assign({},base.gig,s.gig);s.musRw=Object.assign({},base.musRw,s.musRw&&typeof s.musRw==='object'?s.musRw:{});for(const k in base.musRw)s.musRw[k]=clamp(s.musRw[k]|0,0,4);if(!s.gig.heard||typeof s.gig.heard!=='object')s.gig.heard={};const rr=s.rec=Object.assign({},base.rec,s.rec&&typeof s.rec==='object'&&!Array.isArray(s.rec)?s.rec:{});for(const k of ['fish','bug'])if(!rr[k]||typeof rr[k]!=='object'||Array.isArray(rr[k]))rr[k]={};rr.tro=Math.max(0,rr.tro|0);rr.ms=clamp(rr.ms|0,0,REC_MS.length);s.set=Object.assign({},base.set,s.set||{});if(![0,1,2,3].includes(s.set.ts))s.set.ts=1;if(!FS_STEPS.includes(s.set.fs))s.set.fs=1;
   for(const k of ['cat','catSets','flags'])if(!s[k]||typeof s[k]!=='object'||Array.isArray(s[k]))s[k]={};s.orders=Array.isArray(s.orders)?s.orders.filter(id=>IT[id]):[];
   s.inv=s.inv.map(x=>x&&IT[x.id]?x:null);while(s.inv.length<s.invSize)s.inv.push(null);
   s.stor=s.stor.filter(x=>x&&IT[x.id]);s.recipes=s.recipes.filter(k=>RECIPES[k]);
@@ -1374,7 +1400,7 @@ function updatePlayer(dt){
   G.fx=v.x;G.fy=v.y;
   const sneak=!onBike&&(keys.has('ControlLeft')||keys.has('ControlRight')||(G.joy&&G.joy.m>.12&&G.joy.m<.45));
   const run=!onBike&&(keys.has('ShiftLeft')||keys.has('ShiftRight')||G.runT)&&!sneak;G.run=run;G.sneak=sneak;
-  const baseSp=onBike?(isStunt?11.2:9.6):(run?5.4:sneak?1.3:2.9);
+  const baseSp=onBike?(isStunt?11.2:9.6)*(invCount('bike_bell')?1.12:1):(run?5.4:sneak?1.3:2.9);
   const sp=baseSp*TS*(G.stung?.85:1);
   const isAir=(G.hopZ||0)>4;
   let moved=false;const nx=G.px+v.x*sp*dt,ny=G.py+v.y*sp*dt;
@@ -1524,6 +1550,10 @@ function drawBikeRack(x,y){const cx=(x+.5)*TS,by=(y+1)*TS-6;ctx.fillStyle='rgba(
   ctx.fillStyle='#7a5230';ctx.fillRect(cx-16,by-20,4,20);ctx.fillRect(cx+12,by-20,4,20);
   ctx.fillStyle='#b98250';rrect(cx-20,by-44,40,26,4);ctx.fillStyle='#8a5a33';rrect(cx-20,by-44,40,7,4);
   drawEmo('🚲',cx,by-28,17);drawEmo('⭐',cx+14,by-40,9)}
+function drawDerbySign(x,y){const cx=(x+.5)*TS,by=(y+1)*TS-6;ctx.fillStyle='rgba(40,40,20,.2)';ell(cx,by+1,12,3.5);
+  ctx.fillStyle='#5a7a3a';ctx.fillRect(cx-16,by-20,4,20);ctx.fillRect(cx+12,by-20,4,20);
+  ctx.fillStyle='#2a6f97';rrect(cx-20,by-44,40,26,4);ctx.fillStyle='#1d4e66';rrect(cx-20,by-44,40,7,4);
+  drawEmo('🎣',cx-8,by-28,15);drawEmo('🏆',cx+10,by-29,13)}
 function drawBld(b){
   const x=b.x*TS,y=b.y*TS,w=b.w*TS,h=b.h*TS,cx=x+w/2,night=isNightLight();
   ctx.fillStyle='rgba(30,40,20,.25)';ell(cx,y+h-2,w/2+4,9);
@@ -2376,13 +2406,13 @@ function renderWorld(){
   const tall=[];
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){const i=y*w.W+x,o=w.obj[i];if(!o)continue;
     switch(o.k){case 'flw':drawFlower(x,y,o);break;case 'weed':drawWeed(x,y);break;case 'dig':drawDig(x,y,o);break;case 'it':drawGroundItem(x,y,o);break;
-      case 'tree':case 'palm':case 'rock':case 'mail':case 'board':case 'bikerack':case 'furn':tall.push({y:(y+1)*TS-6,x,ty:y,o,i});break}}
+      case 'tree':case 'palm':case 'rock':case 'mail':case 'board':case 'bikerack':case 'derbysign':case 'furn':tall.push({y:(y+1)*TS-6,x,ty:y,o,i});break}}
   if(G.hintTile&&!G.busy){const [hx,hy]=G.hintTile;ctx.strokeStyle='rgba(255,250,240,.75)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.beginPath();ctx.ellipse((hx+.5)*TS,(hy+.78)*TS,12,5,0,0,6.283);ctx.stroke();ctx.setLineDash([])}
   for(const b of w.B)if(!(b.x*TS>cx0+vw+TS||(b.x+b.w)*TS<cx0-TS||b.y*TS>cy0+vh+TS||(b.y+b.h)*TS<cy0-3*TS))tall.push({y:(b.y+b.h)*TS-4,b});
   tall.push({y:G.py,p:1});for(const a of npcs())tall.push({y:a.y,a});for(const o of bugs)tall.push({y:o.sp==='tree'?o.y+TS*.5:o.y,bug:o});
   tall.sort((a,b)=>a.y-b.y);
   for(const t of tall){if(t.p)drawPlayer();else if(t.a)drawNpc(t.a);else if(t.bug)drawBug(t.bug);else if(t.b)drawBld(t.b);
-    else{const o=t.o;if(o.k==='tree')drawTree(t.x,t.ty,o,t.i);else if(o.k==='palm')drawPalm(t.x,t.ty,o);else if(o.k==='rock')drawRock(t.x,t.ty,o);else if(o.k==='mail')drawMail(t.x,t.ty);else if(o.k==='bikerack')drawBikeRack(t.x,t.ty);else if(o.k==='furn')drawOutdoorFurn(t.x,t.ty,o);else drawBoard(t.x,t.ty)}}
+    else{const o=t.o;if(o.k==='tree')drawTree(t.x,t.ty,o,t.i);else if(o.k==='palm')drawPalm(t.x,t.ty,o);else if(o.k==='rock')drawRock(t.x,t.ty,o);else if(o.k==='mail')drawMail(t.x,t.ty);else if(o.k==='bikerack')drawBikeRack(t.x,t.ty);else if(o.k==='derbysign')drawDerbySign(t.x,t.ty);else if(o.k==='furn')drawOutdoorFurn(t.x,t.ty,o);else drawBoard(t.x,t.ty)}}
   for(const d of drifts)if(d.on)drawEmo(IT[d.id].e,d.x,d.y,14,clamp(Math.min(d.t*2,8-d.t),0,1));
   drawFlies();
   for(const s of shots){ctx.fillStyle='#7a5230';circ(s.x,s.y,2.5)}
@@ -2480,7 +2510,7 @@ function showCatch(e,text,sub){const c=$('cap');c.innerHTML=`<div><span class="e
 function fillT(s,P){const m=effMonth();return s.replace(/\{name\}/g,S.name).replace(/\{island\}/g,S.island).replace(/\{cp\}/g,P&&P.cp||'').replace(/\{fruit\}/g,IT[ISLE.native.fruit].n.toLowerCase()).replace(/\{season\}/g,seasonOf(m))}
 const TIPTOE_TIP=()=>isTouch?'Push the stick gently to tiptoe':'Hold Ctrl to tiptoe';
 const tipText=t=>t.replace('__TIPTOE__',TIPTOE_TIP());
-const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. __TIPTOE__! ','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!'];
+const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. __TIPTOE__! ','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!','Marlowe\'s Derby Dock sign stands by the dock: his full Fishing Derby runs any day — just bring a rod and a Tackle box!','A Bike bell in your pockets makes any bike roll faster. Bramble\'s sells the DIY recipe!'];
 function act(){
   if(!S||G.faint>0||G.fade>0)return;
   if(DLG.on){dlgAdvance();return}
@@ -2493,7 +2523,7 @@ function act(){
   for(const [x,y] of [[ptx,pty],...C]){const o=objAt(x,y);if(o&&o.k==='it'){pickupGround(x,y,o);return}}
   for(const [x,y] of C){const o=objAt(x,y);if(!o)continue;
     if(o.k==='furn'){if(o.id==='fu_well'){useWell(x,y);return}if(o.id==='fu_campfire'){cookAtCampfire(x,y);return}if(o.id==='fu_birdhouse'){watchBird(x,y);return}if(!canAdd(o.id)){toast('Your pockets are full!');return}addItem(o.id);setObj(x,y,null);sfx('pick');dust((x+.5)*TS,(y+.5)*TS);toast(`Picked up the ${IT[o.id].n.toLowerCase()}.`);return}
-    if(o.k==='bld'){enterBuilding(W.B[o.b]);return}if(o.k==='mail'){openMail();return}if(o.k==='board'){openBoard();return}if(o.k==='bikerack'){openBikeTrail();return}}
+    if(o.k==='bld'){enterBuilding(W.B[o.b]);return}if(o.k==='mail'){openMail();return}if(o.k==='board'){openBoard();return}if(o.k==='derbysign'){openDerbyDock();return}if(o.k==='bikerack'){openBikeTrail();return}}
   const tool=eqTool(),t=tool?IT[tool.id].tool:null;
   const first=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o)||{x:C[0][0],y:C[0][1],o:null};
   const treeAt=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o&&(c.o.k==='tree'||c.o.k==='palm'));
@@ -2560,7 +2590,7 @@ function catchBug(b){if(G.tr&&G.tr.k==='bug')derbyScore(1+(b.p>=1000?2:0));const
   showCatch(b.e,line,first?'New to your Critterpedia!':`Sells for ${fmt(b.p)} chimes`);sfx('fanfare');critDone('bug',b,rc);if(first)pediaChk('bug')}
 /* Record Book: sizes roll only on catch events */
 const tri=()=>(Math.random()+Math.random())/2,sizeRoll=base=>base*(.72+.56*tri()),recFmt=(c,v)=>`${(+v).toFixed(1)} ${c==='fish'?'cm':'mm'}`;
-function critRoll(c,x){const b=recBase(c,x),v=sizeRoll(b);return {sz:Math.round(v*10)/10,tr:v>=b*TROPHY*(bless('luck')?.82:1)}}
+function critRoll(c,x){const b=recBase(c,x),v=sizeRoll(b);return {sz:Math.round(v*10)/10,tr:v>=b*TROPHY*(bless('luck')?.82:1)*(invCount('lure_gold')?.85:1)}}
 function critDone(c,x,r){if(r.tr){S.rec.tro++;stat('trophies');toast('🏆 Trophy-size! It sells for 1.5x.','big');if(G.tr&&G.tr.k===c)derbyScore(1)}recCatch(c,x.i,r.sz)}
 function recCount(){return Object.keys(S.rec.fish).length+Object.keys(S.rec.bug).length}
 function recCatch(c,i,size){const R=S.rec[c],L=c==='fish'?FISH:BUGS,x=L[i];if(!R||!x||!(size>0))return false;const old=R[i];
@@ -2859,6 +2889,7 @@ function derbyCancel(){if(!G.tr)return;G.tr=null;toast('🏆 You left the contes
 function endDerby(){const r=G.tr,k=r.k,sc=r.score,D=S.derby,P=TOURNEY.P;G.tr=null;D.rounds++;
   const pb=sc>D.best[k];if(pb)D.best[k]=sc;const pts=sc*50;if(pts){S.pts+=pts;toast(`🌊 Derby: +${fmt(pts)} Tide Points`);sfx('points')}
   const tier=sc>=15?3:sc>=10?2:sc>=5?1:0,id=tier&&`fu_dt${k[0]}${tier}`,give=tier&&D.last[k]!==today();if(give){D.last[k]=today();giveOrDrop(id)}
+  if(k==='fish'&&tier>=1)learn('r_rod2');
   stat('derby');save();
   convo(async()=>{await say(P,`Time's up! You scored ${sc} point${sc===1?'':'s'}${pb?', a new personal best':''}, ${P.cp}!`);
     if(give)await say(P,`That earns you the ${IT[id].n}! Display it proudly.`);
@@ -2912,9 +2943,39 @@ function openHall(){return convo(async()=>{
   if(!S.flags.hall){S.flags.hall=1;await say(CLERK,`Hi, ${S.name}! Welcome to Resident Services. You can craft at our workbench, redeem Tide Points, take out a home loan, or use the bank.`)}
   else await say(CLERK,pick(Math.random,[`Hello, ${S.name}! How can I help today?`,'Good to see you! Need anything?',`Everyone on ${S.island} seems so cheerful lately!`]));
   closeDlg();openPanel('🏛️','Town Hall',renderHall,{tab:'craft',kind:'hall'})})}
-function openBikeGame(){$('bikeGameFrame').src='bike-blitz.html';$('bikeGame').hidden=false;sfx('fanfare')}
-function closeBikeGame(){$('bikeGame').hidden=true;$('bikeGameFrame').src='about:blank'}
+function openBikeGame(){if(DLG.on)return;$('bikeGameFrame').src='bike-blitz.html';$('bikeGame').hidden=false;sfx('fanfare')}
+function closeBikeGame(){$('bikeGame').hidden=true;$('bikeGameFrame').src='about:blank';cv.focus({preventScroll:true})}
+function openFishGame(){if(DLG.on)return;$('fishGameFrame').src='fishing-derby.html';$('fishGame').hidden=false;sfx('fanfare')}
+function closeFishGame(){$('fishGame').hidden=true;$('fishGameFrame').src='about:blank';cv.focus({preventScroll:true})}
+function rodOwned(){return invCount('t_rod0')+invCount('t_rod1')+invCount('t_rod2')>0}
+function bikeOwned(){return invCount('t_bike')+invCount('t_bike_stunt')>0}
+function arcLaunch(g){if(G.busy||DLG.on)return;
+  if(g==='fish'){if(!rodOwned()){toast('🎣 You need a fishing rod first — craft a Flimsy rod from 5 branches!');return}
+    if(!invCount('tacklebox')){toast('🧰 Marlowe wants you carrying a Tackle box. He teaches the DIY at the Derby Dock sign by the dock!');return}
+    openFishGame()}
+  else{if(!bikeOwned()){toast('🚲 You need your own bike first — the Spoke Island trailhead teaches the DIY recipes!');return}
+    openBikeGame()}}
+function arcadeResult(g,d){if(!S||!S.arcade)return;const A=S.arcade;A.plays[g]++;
+  const sc=g==='fish'?(d.pts|0):(d.score|0);if(sc>A.best[g])A.best[g]=sc;
+  if(A.bonus[g]!==today()){A.bonus[g]=today();S.pts+=50;toast('🎮 Arcade daily bonus: +50 Tide Points!');sfx('points')}
+  const win=g==='fish'?d.place===1:(d.mode==='trick'&&(d.score|0)>=1500)||(d.mode==='joy'&&(d.dist|0)>=1500)||(d.mode==='trial'&&!!d.done);
+  if(win){if(!A.trophies[g]){A.trophies[g]=today();mail(g==='fish'?'Marlowe':'Island Arcade',g==='fish'?'You WON my full Fishing Derby! This champion trophy is yours — display it proudly, splish!':'You conquered Bike Blitz! This Trail Blazer trophy is yours — display it proudly!',g==='fish'?'fu_mgfish':'fu_mgbike');toast('🏆 Mini-game trophy won! Check your mailbox!','big');vibrate(200)}
+    else{S.pts+=100;toast('🎮 Arcade win: +100 Tide Points!');sfx('points')}}
+  save();uiDirty()}
+addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;if(d.pw==='fish')arcadeResult('fish',d);else if(d.pw==='bike')arcadeResult('bike',d)});
+function openDerbyDock(){return convo(async()=>{const P=TOURNEY.P;
+  if(!S.flags.derbyDock){S.flags.derbyDock=1;await say(P,`Ahoy-hoy, ${S.name}! This here's my Derby Dock. Saturdays stay friendly up in the plaza, but THIS dock runs my full Fishing Derby any day, ${P.cp}!`);
+    learn('r_tacklebox');await say(P,'Every derby angler carries a Tackle box — I just taught you the DIY: 2 hardwood, 1 iron and 1 clay at any workbench. Bring any fishing rod too!')}
+  if(!rodOwned()){await say(P,'No rod, no derby! Craft a Flimsy fishing rod from 5 branches at a workbench, then come back.');return}
+  if(!invCount('tacklebox')){if(!S.recipes.includes('r_tacklebox'))learn('r_tacklebox');await say(P,'Fine rod! Now craft that Tackle box (2 hardwood, 1 iron, 1 clay) so your gear stays derby-legal.');return}
+  if(!S.recipes.includes('r_lure')){learn('r_lure');await say(P,'One more Marlowe secret before you cast: the Golden Lure DIY. Carry one and trophy-size fish bite more often — everywhere, not just here!')}
+  const ch=await ask(P,'Ready for the full Derby? 24 species, 4 fishing spots and a 3-minute tournament against Rosie, Piper and Wren!',['Cast off! 🎣','Not now']);
+  if(ch===0){closeDlg();openFishGame()}})}
 function openBikeTrail(){return convo(async()=>{
+  if(!bikeOwned()){for(const k of['r_bike_frame','r_bike_wheel','r_bike'])learn(k);
+    await say({n:'🚲 Trailhead'},'These trails need your own bike, rider! I just taught you the DIY recipes: a Bike frame (4 iron + 2 hardwood), two Bike wheels (2 iron + 1 clay + 1 softwood each), then the Cruiser Bike at a workbench. Craft it and roll back!');
+    return}
+  if(invCount('t_bike'))learn('r_bike_stunt');
   const ch=await ask({n:'🚲 Trailhead'},'Welcome to the Spoke Island bike trails! Ready to shred?', ['Ride Bike Blitz!','Not right now']);
   if(ch===0){closeDlg();openBikeGame()}
 })}
@@ -2983,7 +3044,7 @@ function redeem(id){const R=REDEEM.find(r=>r.id===id);if(!R||S.pts<R.pts||(R.nee
 function homeScore(){const items=S.house.items,uniq=new Set(items.map(f=>f.id)).size;return S.houseLv*600+items.length*45+uniq*110+(S.house.wall!=='wl_wcream'?250:0)+(S.house.floor!=='fl_fwood'?250:0)}
 
 /* =============================== UI: toasts, dialog, panels =============================== */
-function toast(msg,cls){const box=$('toasts');const d=document.createElement('div');d.className='toast'+(cls?' '+cls:'');d.textContent=msg;box.appendChild(d);
+function toast(msg,cls){const box=$('toasts');if([...box.children].some(c=>c.textContent===msg))return;const d=document.createElement('div');d.className='toast'+(cls?' '+cls:'');d.textContent=msg;box.appendChild(d);
   while(box.children.length>4)box.firstChild.remove();setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),400)},3600)}
 let uiD=true;const uiDirty=()=>{uiD=true};
 const DLG={on:false,full:'',shown:0,choices:null,sel:0,res:null,who:null,acc:0};
@@ -3117,6 +3178,8 @@ const PA={
   clearm:()=>{S.mail=S.mail.filter(m=>!m.read||m.gift)},
   // phone
   app:d=>{PAN.tab=d.t;PAN.sub=null;$('pBody').scrollTop=0},
+  arcFish:()=>{closePanel();arcLaunch('fish');return false},
+  arcBike:()=>{closePanel();arcLaunch('bike');return false},
   songpv:d=>{if(G.gig&&!G.gig.pv){toast('🎵 Piper is playing for you right now. Listen to the end!');return}if(startGig(d.id,1))toast(`🎵 Previewing "${SONG_BY[d.id][1]}"`)},
   sub:d=>{PAN.sub=d.s},
   pf:d=>{PAN.pf=d.f},
@@ -3312,7 +3375,7 @@ function openBoard(){openPanel('📌','Bulletin board',()=>{const c=clk(),ev=eve
 // Neighbors app: heart tiers and friendship gifts in the order they unlock [friendship, flag on the villager, name, how to get it once reached]
 const HEART_T=[8,25,60,100,150],FR_GIFTS=[[45,'rcp','secret DIY','talk to them!'],[60,'fav','favorite keepsake','visit their home!'],[100,'photo','framed photo','talk to them!']];
 const APPS=[['tasks','🌊','Tide Points','#d6ecfa'],['pedia','📖','Critterpedia','#d8f1e0'],['diy','📜','DIY Recipes','#fbe0c8'],['map','🗺️','Map','#e8f3d0'],
-  ['sun','🥔','Sunroots','#f6e3c4'],['neigh','🏡','Neighbors','#fbe0e6'],['cal','📅','Calendar','#e8e0f8'],['cam','📷','Camera','#e2e8ef'],['cat','📒','Catalog','#efe4d0'],['songs','🎵','Songbook','#e6f0ff'],['set','⚙️','Settings','#ece6d8'],['help','❔','Guide','#fff0c8']];
+  ['sun','🥔','Sunroots','#f6e3c4'],['neigh','🏡','Neighbors','#fbe0e6'],['cal','📅','Calendar','#e8e0f8'],['cam','📷','Camera','#e2e8ef'],['cat','📒','Catalog','#efe4d0'],['songs','🎵','Songbook','#e6f0ff'],['arcade','🎮','Arcade','#ffd9ec'],['set','⚙️','Settings','#ece6d8'],['help','❔','Guide','#fff0c8']];
 function openPhone(app){if(PAN.open&&PAN.kind==='phone'){closePanel();return}if(PAN.open||DLG.on||G.busy)return;openPanel('📱','ShellPhone',renderPhone,{kind:'phone',tab:app||null})}
 function renderPhone(){
   const back='<button class="btn alt" data-a="app" data-t="" style="margin-bottom:12px">← Apps</button>';
@@ -3359,6 +3422,14 @@ function renderPhone(){
     case 'songs':{const own=id=>{const r='rec_'+id;return S.inv.some(s=>s&&s.id===r)||S.stor.some(s=>s.id===r)||S.house.items.some(f=>f.id===r)};let nh=0;for(const g of SONGS)if(S.gig.heard[g[0]])nh++;
       return back+`<p><b>${nh}/${SONGS.length}</b> songs heard. Piper plays guitar in the plaza Saturdays 8 PM-midnight: hear a whole song to get its record (one a night). Place a record and a record player at home to play it.</p><div class="list">`+
       SONGS.map(([id,nm,,,bpm])=>{const o=own(id),hd=S.gig.heard[id];return li(o?'💿':hd?'🎵':'❔',o||hd?esc(nm):'???',o?`Owned · ${bpm} bpm`:hd?'Heard at a Saturday concert':'Not heard yet',o?`<button class="btn alt" data-a="songpv" data-id="${id}">▶ Preview</button>`:'')}).join('')+'</div>'}
+    case 'arcade':{const A=S.arcade,td=today(),bf=A.bonus.fish===td,bb=A.bonus.bike===td;
+      let h=back+`<p>Two mini-games live right on your island. The first play of each, every day, pays <b>+50 🌊 Tide Points</b>. Win one and a trophy arrives by mail!</p><div class="list">`;
+      h+=li('🎣',"Marlowe's Fishing Derby",`Plays ${A.plays.fish} · Best ${fmt(A.best.fish)} pts${A.trophies.fish?' · 🏆 trophy won!':''} · ${bf?'bonus claimed today':'daily bonus waiting'}`,rodOwned()&&invCount('tacklebox')?`<button class="btn" data-a="arcFish">▶ Play</button>`:'<span class="mute">Needs a rod + Tackle box</span>');
+      h+=li('🚲','Bike Blitz',`Plays ${A.plays.bike} · Best score ${fmt(A.best.bike)}${A.trophies.bike?' · 🏆 trophy won!':''} · ${bb?'bonus claimed today':'daily bonus waiting'}`,bikeOwned()?`<button class="btn" data-a="arcBike">▶ Play</button>`:'<span class="mute">Needs your own bike</span>');
+      h+='</div><h3>How to unlock</h3><div class="list">';
+      h+=li('🎣','Fishing Derby','Carry any fishing rod and a Tackle box. Marlowe at the Derby Dock sign (by the island dock) teaches the Tackle box DIY — and later the Golden Lure. Win a Saturday plaza Fishing Derby to learn the Golden fishing rod DIY.','');
+      h+=li('🚲','Bike Blitz','Own a Cruiser Bike: Bike frame (4 iron + 2 hardwood) + 2 Bike wheels (2 iron + 1 clay + 1 softwood). The Spoke Island trailhead launches the full game, and Cruiser owners learn the Stunt Hopper DIY there. A Bike bell (DIY at Bramble\'s) makes any bike 12% faster.','');
+      return h+'</div>'}
     case 'cam':return back+'<p>Photo mode hides all menus so you can take a screenshot of your island.</p><button class="btn" data-a="photo">📷 Start photo mode</button>';
     case 'set':{const local=new Date(nowMs()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
       return back+`<h3>Sound</h3>${[['music','Music'],['sfx','Effects']].map(([k,l])=>{const v=pct(S.set[k]);return `<label class="row">${l} <input type="range" min="0" max="1" step="0.05" value="${S.set[k]}" data-set="${k}" aria-valuetext="${v}"><output>${v}</output></label>`}).join('')}
@@ -3370,7 +3441,7 @@ function renderPhone(){
       <h3>Save data</h3><p class="mute" id="saveSt">${G.saveOk===false?"⚠️ Couldn't save in this browser. Use Export save to keep your island safe.":G.savedAt?`Saves automatically in this browser. Last saved ${hmTxt(G.savedAt)}.`:'Saves automatically in this browser.'} · v${APP_VERSION}</p><div class="row"><button class="btn" data-a="savenow">Save now</button><button class="btn alt" data-a="exp">Export save</button><button class="btn alt" data-a="imp">Import save</button><button class="btn warn" data-a="reset">${PAN.confirm==='reset'?'Tap again to erase everything':'Start over'}</button></div>`}
     case 'help':return back+`<div class="list">${[isTouch?['🕹️','Move','Drag the stick at the bottom left. Tap 🏃 to toggle running, or push the stick gently to tiptoe.']:['🕹️','Move','WASD or arrow keys. Hold Shift to run, Ctrl to tiptoe. On touch screens, use the stick.'],isTouch?['🅰️','Action','A button: talk, pick up, shake trees, use your tool.']:['🅰️','Action','Space or E: talk, pick up, shake trees, use your tool.'],isTouch?['🔧','Tools','🔧 button (or tap the tool chip) cycles tools; cycle to ✋ Hands to put them away. Tap 📱 for your ShellPhone and 🎒 for pockets.']:['🔧','Tools','Q / R to switch, 1-6 for net, rod, shovel, axe, can, slingshot. F puts tools away.'],
         ['🎣','Fishing','Cast in front of a shadow. Wait through the nibbles. When the bobber sinks with a splash, press Action fast!'],['🦋','Bugs','Walk or tiptoe close, face the bug and swing your net. Running scares them off.'],['📏','Record Book','Every fish and bug has a size. The Critterpedia keeps your personal best for each species. About 3% of catches are Trophy-size (🏆): they sell for 1.5x and score a bonus derby point. Measure 10, 25, 50 and all species for Tide Points.'],['🦴','Fossils','Dig up star-shaped cracks with a shovel. The museum assesses them.'],['📖','Critterpedia','The Critterpedia on your ShellPhone tracks every fish, bug and fossil you have logged. Dr. Quillfeather mails you Tide Points at 25%, 50%, 75% and 100% of each category.'],
-        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['👗','Clothes','Wren\'s Rack at Bramble\'s sells 4 new clothes every morning. Tap clothing in your Pockets and choose Dress. Your wardrobe and dressing mirror are in home storage. Neighbors notice your style!'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['📒','Catalog','Every furniture, wallpaper and flooring item you get is cataloged on your ShellPhone. Order cataloged items at Bramble\'s (5 a day, delivered by mail tomorrow). Completing a furniture series pays 1,000 Tide Points.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies.'],['🎵','Saturday night music','Saturdays 8 PM-midnight, Piper the heron plays guitar in the plaza. Request a song and stay to the end for a record (one a night). Craft a record player and place it with a record at home to play it. Track songs in the Songbook app.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['💧','Wishing well','Craft a wishing well, place it outside and face it to toss in 100 chimes. You get one random blessing for the day: Lucky Catch (trophy-size catches come easier), Midas Day (sell for 25% more), or Bounty Day (more fish and bugs around). Watch for the badge by your clock.'],['🍢','Campfire cooking','Face your placed campfire and cook a fish from your pockets into grilled fish, worth 1.75x the raw price.'],['🪹','Birdhouse','Craft a birdhouse, place it outside, and most mornings a feathered visitor will perch on it. Face it and press Action to listen: the bird sings, drops 25 chimes and flies off.'],['✨','Fireflies','On clear nights from 8 PM to 5 AM, fireflies drift over the grass. Swing your net to catch them — they sell for 200 chimes and count toward the Nightlight achievement.'],['🎃','Spooky Night','Oct 31 from 5 PM: villagers trick-or-treat! Hand out candy for friendship and the Trick-or-Treater achievement. Bramble sells candy all October, and spooky furniture stocks the shop.'],['🦃','Turkey Day','Nov 26: the island feasts! A Turkey platter lands in your mailbox, and harvest furniture stocks Bramble\'s shelves all November.'],['❄️','Winter Solstice','Dec 21: the longest night of the year! A Cozy stocking lands in your mailbox, wintry furniture and clothes stock Bramble\'s all season, and neighbors may request seasonal forage like snowflakes.'],['🌸','Blossom Festival','May 1: petals fill the air! A Blossom lantern lands in your mailbox, spring furniture and raincoats stock Bramble\'s all season, and neighbors are extra keen on seasonal-forage requests during bloom week (Apr 24–May 1).'],['☀️','Midsummer Fair','Jun 21: the longest day of the year! A Beach umbrella lands in your mailbox, summery furniture and sunhats stock Bramble\'s all season, and neighbors are extra keen on seasonal-forage requests during sunburst week (Jun 14–21).'],['🌕','Harvest Moon Festival','Sep 22: the biggest moon of the year! A Harvest moon lamp lands in your mailbox, moon-viewing furniture and wheat crowns stock Bramble\'s all fall, and neighbors are extra keen on seasonal-forage requests during harvest week (Sep 15–22).'],['🌟','Seasonal Spotlight','Each season Dr. Quillfeather spotlights one signature critter: Glacier smelt (winter), Petal butterfly (spring), Sunflare grouper (summer) or Russet carp (fall). Donate it for +150 bonus Tide Points and the Seasonal Star achievement. The current spotlight is named on the museum\'s Donate tab and the bulletin board.'],['🎆','Tide-Over Day','Jan 1: the island starts the year fresh! A Frostfire sculpture lands in your mailbox, frosty furniture and boots stock Bramble\'s all winter, and neighbors are extra keen on seasonal-forage requests during tide-over week (Dec 25\u2013Jan 1). Buy in-season clothes at Wren\'s Rack for the Seasonal Shopper achievement.'],['🪲','Snowhorn beetle','A winter tree bug (Dec\u2013Feb, 8 AM\u20135 PM) \u2014 look for it on trunks during the cold months.'],['🏄','Sandcastle Day','Aug 15: the beach-build championship! A Surfboard lands in your mailbox, beachy furniture and summer tees stock Bramble\'s all summer, and neighbors are extra keen on seasonal-forage requests during sandcastle week (Aug 8–15).'],['🦀','Fiddler crab','A summer beach bug (Jun–Aug, 8 AM–7 PM) — look for it scuttling along the shoreline.'],['🪼','Harvest jellyfish','An autumn sea jellyfish (Sep–Nov, 7 PM–4 AM) — it pulses gently under the harvest moon.'],['🌸','Petal minnow','A spring river fish (Mar\u2013May, 8 AM\u20135 PM) \u2014 its pink fins trail like fallen blossoms.'],
+        ['🍂','Seasonal forage','Spring blossom petals, fall maple leaves and winter snowflakes drift over the grass by day: swing your net to catch them. Summer sunshells wash up on the beach. They craft seasonal DIY, which you learn from neighbors, presents and bottles.'],['👗','Clothes','Wren\'s Rack at Bramble\'s sells 4 new clothes every morning. Tap clothing in your Pockets and choose Dress. Your wardrobe and dressing mirror are in home storage. Neighbors notice your style!'],['🌸','Flowers','Water flowers. Neighboring watered flowers of the same kind can grow hybrid colors.'],['🥔','Sunroots','Buy from Rosie on Sunday mornings, then sell at Bramble\'s Mon-Sat when the price is high.'],['🌊','Tide Points','Earned from achievements and daily tasks. Redeem them at Town Hall.'],['📒','Catalog','Every furniture, wallpaper and flooring item you get is cataloged on your ShellPhone. Order cataloged items at Bramble\'s (5 a day, delivered by mail tomorrow). Completing a furniture series pays 1,000 Tide Points.'],['🌸','Island rating','Hazel at Town Hall rates your island up to 5 stars. Flowers, trees, outdoor furniture, neighbors, museum and home help; weeds and litter hurt. Each new star mails a gift.'],['🏆','Saturday Derby','Saturdays 9 AM-6 PM, talk to Marlowe in the plaza for a 3-minute Fishing Derby or Bug-Off (they alternate weekly). Win Tide Points and trophies — a Fishing Derby trophy also teaches you the Golden fishing rod DIY!'],['🎮','Arcade','The ShellPhone Arcade (and the Derby Dock sign by the dock) launch Marlowe\'s full Fishing Derby and Bike Blitz without leaving your island. The Derby needs a fishing rod + Tackle box; Bike Blitz needs your own bike. First play of each game every day pays +50 Tide Points, and wins earn trophies by mail!'],['🪝','Golden Lure','Marlowe teaches this DIY at the Derby Dock. While a Golden Lure rides in your pockets, trophy-size fish bite more often.'],['🔔','Bike bell','Craft the bell (DIY recipe at Bramble\'s) and carry it to roll 12% faster on any bike.'],['🎵','Saturday night music','Saturdays 8 PM-midnight, Piper the heron plays guitar in the plaza. Request a song and stay to the end for a record (one a night). Craft a record player and place it with a record at home to play it. Track songs in the Songbook app.'],['🏠','Home','Pockets → Place to decorate. Upgrade your home with a loan at Town Hall.'],['🏡','Visits','Neighbors are home for a couple of hours each day (and on some rainy hours). Knock to go in! Furniture you gift them shows up in their room, and close friends may share a favorite piece.'],['💧','Wishing well','Craft a wishing well, place it outside and face it to toss in 100 chimes. You get one random blessing for the day: Lucky Catch (trophy-size catches come easier), Midas Day (sell for 25% more), or Bounty Day (more fish and bugs around). Watch for the badge by your clock.'],['🍢','Campfire cooking','Face your placed campfire and cook a fish from your pockets into grilled fish, worth 1.75x the raw price.'],['🪹','Birdhouse','Craft a birdhouse, place it outside, and most mornings a feathered visitor will perch on it. Face it and press Action to listen: the bird sings, drops 25 chimes and flies off.'],['✨','Fireflies','On clear nights from 8 PM to 5 AM, fireflies drift over the grass. Swing your net to catch them — they sell for 200 chimes and count toward the Nightlight achievement.'],['🎃','Spooky Night','Oct 31 from 5 PM: villagers trick-or-treat! Hand out candy for friendship and the Trick-or-Treater achievement. Bramble sells candy all October, and spooky furniture stocks the shop.'],['🦃','Turkey Day','Nov 26: the island feasts! A Turkey platter lands in your mailbox, and harvest furniture stocks Bramble\'s shelves all November.'],['❄️','Winter Solstice','Dec 21: the longest night of the year! A Cozy stocking lands in your mailbox, wintry furniture and clothes stock Bramble\'s all season, and neighbors may request seasonal forage like snowflakes.'],['🌸','Blossom Festival','May 1: petals fill the air! A Blossom lantern lands in your mailbox, spring furniture and raincoats stock Bramble\'s all season, and neighbors are extra keen on seasonal-forage requests during bloom week (Apr 24–May 1).'],['☀️','Midsummer Fair','Jun 21: the longest day of the year! A Beach umbrella lands in your mailbox, summery furniture and sunhats stock Bramble\'s all season, and neighbors are extra keen on seasonal-forage requests during sunburst week (Jun 14–21).'],['🌕','Harvest Moon Festival','Sep 22: the biggest moon of the year! A Harvest moon lamp lands in your mailbox, moon-viewing furniture and wheat crowns stock Bramble\'s all fall, and neighbors are extra keen on seasonal-forage requests during harvest week (Sep 15–22).'],['🌟','Seasonal Spotlight','Each season Dr. Quillfeather spotlights one signature critter: Glacier smelt (winter), Petal butterfly (spring), Sunflare grouper (summer) or Russet carp (fall). Donate it for +150 bonus Tide Points and the Seasonal Star achievement. The current spotlight is named on the museum\'s Donate tab and the bulletin board.'],['🎆','Tide-Over Day','Jan 1: the island starts the year fresh! A Frostfire sculpture lands in your mailbox, frosty furniture and boots stock Bramble\'s all winter, and neighbors are extra keen on seasonal-forage requests during tide-over week (Dec 25\u2013Jan 1). Buy in-season clothes at Wren\'s Rack for the Seasonal Shopper achievement.'],['🪲','Snowhorn beetle','A winter tree bug (Dec\u2013Feb, 8 AM\u20135 PM) \u2014 look for it on trunks during the cold months.'],['🏄','Sandcastle Day','Aug 15: the beach-build championship! A Surfboard lands in your mailbox, beachy furniture and summer tees stock Bramble\'s all summer, and neighbors are extra keen on seasonal-forage requests during sandcastle week (Aug 8–15).'],['🦀','Fiddler crab','A summer beach bug (Jun–Aug, 8 AM–7 PM) — look for it scuttling along the shoreline.'],['🪼','Harvest jellyfish','An autumn sea jellyfish (Sep–Nov, 7 PM–4 AM) — it pulses gently under the harvest moon.'],['🌸','Petal minnow','A spring river fish (Mar\u2013May, 8 AM\u20135 PM) \u2014 its pink fins trail like fallen blossoms.'],
         ['🎏','Blossom koi','A spring pond koi (Mar\u2013May, all hours) \u2014 its pink-and-white scales look hand-painted like festival eggs.'],
 ['🪁','Sky-Kite Festival','Jul 7: kites soar over the plaza! A Sky kite lands in your mailbox, summery furniture and kite-dye tees stock Bramble’s all July, and neighbors are extra keen on seasonal-forage requests during kite week (Jul 1–7).'],
 ['🪲','Jewel scarab','A summer tree bug (Jun\u2013Aug, 8 AM\u20137 PM) \u2014 its shell glints like a kite string in the sun.'],
@@ -3418,6 +3489,7 @@ function updateHUD(){
   else{const ev=events();hHid('evt',!ev.length);if(ev.length)hTxt('evt',ev[Math.floor(G.t/6)%ev.length])}
   hHid('bWish',!(meteorNight()&&!inHouse()));syncRadar();
   {const n=unreadMail();if(n!==G.mailN){G.mailN=n;const b=$('mailB');b.textContent=n>99?'99+':String(n);b.hidden=!n;$('bPhone').setAttribute('aria-label',n?`ShellPhone, ${n} unread letter${n>1?'s':''}`:'ShellPhone')}}   // written only when the count changes
+  {const ab=$('arcB');if(ab&&S.arcade)ab.hidden=S.arcade.bonus.fish===today()&&S.arcade.bonus.bike===today()}
   const hn=computeHint();G.hintTile=hn&&hn.tile;const show=!!(hn&&!DLG.on&&!PAN.open&&!G.busy);
   if(show){const k=(isTouch?'A':'Space')+'|'+hn.t;if(HUDC.hint!==k){HUDC.hint=k;$('hint').innerHTML=`<kbd>${isTouch?'A':'Space'}</kbd>${esc(hn.t)}`}}hHid('hint',!show);
 }
@@ -3434,6 +3506,7 @@ function computeHint(){
     if(o.k==='furn')return {t:o.id==='fu_well'?'Make a wish (100 chimes)':o.id==='fu_campfire'?'Cook fish over the fire':o.id==='fu_birdhouse'?(o.bird===today()?'Watch the bird 🐦':'Pick up birdhouse'):`Pick up ${IT[o.id].n.toLowerCase()}`,tile:[x,y]};
     if(o.k==='bld'){const b=W.B[o.b],vv=b.t==='vh'&&W===ISLE&&S.vill.find(q=>q.h===o.b);return {t:vv&&indoorNow(vv)?`Visit ${VPOOL[vv.p].n} (home now)`:b.t==='vh'?'Knock on the door':b.t==='home'?'Go inside':`Enter ${BLD[b.t].n}`}}
     if(o.k==='mail'){const n=unreadMail();return {t:n?`Check mail (${n} new)`:'Check mail',tile:[x,y]}}if(o.k==='board')return {t:'Read the bulletin board',tile:[x,y]}
+    if(o.k==='derbysign')return {t:"Marlowe's Fishing Derby 🎣",tile:[x,y]}
     if(o.k==='bikerack')return {t:'Ride Bike Blitz 🚲',tile:[x,y]}}
   const s=eqTool(),t=s?IT[s.id].tool:null,first=C.map(([x,y])=>({x,y,o:objAt(x,y)})).find(c=>c.o),o=first&&first.o,tl=first?[first.x,first.y]:null;
   if(t==='bike')return {t:'Stunt Hop & Bell'};
@@ -3626,6 +3699,8 @@ for(const [id,fn] of [['bBag',openInv],['bPhone',()=>openPhone()]])$(id).onclick
 $('bRadar').onclick=toggleRadar;
 $('bBike').onclick=toggleBikeMount;
 $('bikeGameClose').onclick=closeBikeGame;
+$('fishGameClose').onclick=closeFishGame;
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
 {const stick=$('stick'),knob=$('knob');let jid=null;
   const moveJ=e=>{const r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),R=r.width/2-12,d=Math.hypot(dx,dy),m=Math.min(1,d/R),nx=d?dx/d:0,ny=d?dy/d:0;
     G.joy={x:nx,y:ny,m};knob.style.transform=`translate(${nx*m*R}px,${ny*m*R}px)`};
