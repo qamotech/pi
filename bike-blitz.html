@@ -12,11 +12,16 @@
   #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#0b2a4a; }
   canvas { display:block; background:#0e3a5c; touch-action:none; cursor:pointer; }
   #rotate { display:none; position:fixed; inset:0; z-index:50; background:#0b2a4a; color:#fff; align-items:center; justify-content:center; text-align:center; padding:24px; font-size:18px; }
-  @media (orientation:portrait) and (max-width:700px) { #rotate { display:flex; } }
+  #touchUI { position:fixed; left:0; right:0; bottom:0; z-index:40; display:none; justify-content:space-between; align-items:flex-end; padding:0 14px calc(14px + env(safe-area-inset-bottom)); pointer-events:none; }
+  #touchUI .cluster { display:flex; gap:14px; align-items:flex-end; }
+  .tbtn { pointer-events:auto; touch-action:none; user-select:none; -webkit-user-select:none; width:78px; height:78px; border-radius:50%; border:2px solid rgba(255,255,255,.65); background:rgba(8,32,54,.55); color:#fff; font-size:14px; font-weight:bold; font-family:inherit; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
+  .tbtn .ic { font-size:27px; line-height:1.05; }
+  .tbtn.on { background:rgba(46,139,58,.8); }
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="game"></canvas></div>
+<div id="touchUI"><div class="cluster"><button class="tbtn" id="tBrake" aria-label="Brake"><span class="ic">◀</span>BRAKE</button></div><div class="cluster"><button class="tbtn" id="tHop" aria-label="Hop"><span class="ic">⤒</span>HOP</button><button class="tbtn" id="tPedal" aria-label="Pedal"><span class="ic">▶</span>PEDAL</button></div></div>
 <div id="rotate">🔄<br>Rotate your device<br>to landscape to play!</div>
 <script>
 'use strict';
@@ -118,6 +123,7 @@ function terrainY(x,seed){
   // ramps: smooth bumps every ~900px
   const rx=((x%900)+900)%900;
   if(rx<160){const t=rx/160;y-=Math.sin(t*Math.PI)*46;}
+  if(x<320){const t=clamp(x/320,0,1);y=H*0.72+(y-H*0.72)*t;} // gentle flat start: never spawn stuck on a hill
   return y;
 }
 function terrainSlope(x,seed){return (terrainY(x+6,seed)-terrainY(x-6,seed))/12;}
@@ -346,8 +352,8 @@ function scrShop(){
   if(G.msg&&G.msgT>0)txt(G.msg,W/2,H-58,17,'#ffd97a','center',true);
 }
 const HOWTO2=[
- ['🚲 Pedal & Brake','HOLD right side / → to pedal. Hold LEFT side / ← to brake. Uphills slow you, downhills speed you up!'],
- ['🦘 Hop','TAP / SPACE to hop! Clear rocks, logs and water pools. Like the bike in Puddlewick Isle, a good hop sails over anything.'],
+ ['🚲 Pedal & Brake','HOLD the big ▶ PEDAL button to pedal (or hold the right side of the screen / → key). Hold ◀ BRAKE (or left side / ←) to slow down. Uphills slow you, downhills speed you up!'],
+ ['🦘 Hop','Tap the HOP button (or TAP the screen / SPACE) to hop! Clear rocks, logs and water pools. Like the bike in Puddlewick Isle, a good hop sails over anything.'],
  ['⭐ Stars','Grab stars for points and coins. They love hiding over ramps…'],
  ['✨ Tricks','Big air off ramps = points! Land on a downslope for a Smooth Landing bonus. Chain them for a combo multiplier.'],
  ['💥 Crashes','Smack an obstacle and you\'ll eat dirt — you lose speed but keep going. Water without a hop = splash slowdown.'],
@@ -436,7 +442,7 @@ function rideUpdate(dt){
   if(pedaling)G.vx+=bike.accel*dt;
   if(braking)G.vx-=300*dt;
   G.vx-=G.vx*0.25*dt;              // drag
-  G.vx-=slope*900*dt;              // hills
+  G.vx-=clamp(slope,-0.3,0.3)*520*dt; // hills (capped: a pedaling bike can always climb)
   G.vx=clamp(G.vx,0,bike.max*(G.flashT>0?1.25:1));
   if(pedaling&&Math.random()<dt*10)AU.sfx('pedal');
   // hop
@@ -692,10 +698,10 @@ function scrRide(dt){
     txt(G.mode==='trial'?'Reach the flag!':G.mode==='trick'?'Score tricks for 2 min!':'How far can you ride?',W/2,H/2+40,20,'#fff','center');
   }
   // touch controls hint
-  if(!G.go||G.t<2)txt('HOLD right = pedal • HOLD left = brake • TAP = hop',W/2,H-24,15,'rgba(255,255,255,0.85)','center');
+  if(!G.go||G.t<2)txt('HOLD ▶ PEDAL to ride • ◀ BRAKE slows • HOP button jumps',W/2,H-24,15,'rgba(255,255,255,0.85)','center');
   if(G.msg&&G.msgT>0){G.msgT-=dt;txt(G.msg,W/2,H-52,18,'#ffd97a','center',true);}
   // pause / quit
-  if(button(W-104,H-52,90,38,'Quit',{fs:15})){quitRide();}
+  if(button(W-104,10,90,36,'Quit',{fs:15})){quitRide();}
   rideUpdate(dt);
 }
 function quitRide(){
@@ -751,12 +757,24 @@ window.addEventListener('keydown',e=>{
   if(['Space','ArrowUp','KeyW'].includes(e.code)&&G.screen==='ride'&&G.go)G.hopTap=true;
 });
 
+/* ================= on-screen touch controls ================= */
+const touchUI=document.getElementById('touchUI');
+const TCH={pedal:false,brake:false};
+function bindHold(id,on,off){const el=document.getElementById(id);if(!el)return;
+  const dn=e=>{e.preventDefault();e.stopPropagation();try{AU.init();AU.resume()}catch(_){} el.classList.add('on');try{el.setPointerCapture(e.pointerId)}catch(_){} on();};
+  const up=()=>{el.classList.remove('on');off();};
+  el.addEventListener('pointerdown',dn);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);el.addEventListener('lostpointercapture',up);el.addEventListener('contextmenu',e=>e.preventDefault());}
+bindHold('tPedal',()=>{TCH.pedal=true;G.down=true;G.px=W-10;G.py=H-10;},()=>{TCH.pedal=false;if(!TCH.brake)G.down=false;});
+bindHold('tBrake',()=>{TCH.brake=true;G.down=true;G.px=10;G.py=H-10;},()=>{TCH.brake=false;if(!TCH.pedal)G.down=false;});
+bindHold('tHop',()=>{if(G.screen==='ride'&&G.go&&G.finishT<=0)G.hopTap=true;},()=>{});
+
 /* ================= main loop ================= */
 let lastT=performance.now();
 function frame(now){
   let dt=(now-lastT)/1000;lastT=now;
   dt=clamp(dt,0,0.05);
   G.t+=dt;
+  if(touchUI)touchUI.style.display=(G.screen==='ride')?'flex':'none';
   if(G.msgT>0&&G.screen!=='ride')G.msgT-=dt;
   g.clearRect(0,0,W,H);
   switch(G.screen){
