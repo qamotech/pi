@@ -7,6 +7,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bike Blitz">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Bike Blitz — a Puddlewick Isle mini-game. Joy Ride, Time Trials and Trick Park on the Spoke Island trails.">
 <title>Puddlewick Isle: Bike Blitz</title>
@@ -21,16 +22,18 @@
   .tbtn { pointer-events:auto; touch-action:none; user-select:none; -webkit-user-select:none; width:78px; height:78px; border-radius:50%; border:2px solid rgba(255,255,255,.65); background:rgba(8,32,54,.55); color:#fff; font-size:14px; font-weight:bold; font-family:inherit; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
   .tbtn .ic { font-size:27px; line-height:1.05; }
   .tbtn.on { background:rgba(46,139,58,.8); }
+  :focus-visible { outline:3px solid #f0a840; outline-offset:2px; }
   .tbtn:focus-visible { outline:3px solid #f0a840; outline-offset:2px; }
+  ::selection { background:#ffe1a8; color:#0b2a4a; }
   .tbtn:active { transform:scale(.96); }
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.tbtn:active{transform:none}}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.tbtn:active{transform:none}}
 </style>
 </head>
 <body>
-<noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0b2a4a;color:#fff;font-size:18px;padding:24px;text-align:center">Bike Blitz needs JavaScript to play.</div></noscript>
+<noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0b2a4a;color:#fff;font-size:18px;line-height:1.5;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));text-align:center">Bike Blitz needs JavaScript to play.</div></noscript>
 <div id="wrap"><canvas id="game" role="img" aria-label="Bike Blitz game canvas" tabindex="0"></canvas></div>
-<div id="touchUI"><div class="cluster"><button class="tbtn" id="tBrake" aria-label="Brake"><span class="ic">◀</span>BRAKE</button></div><div class="cluster"><button class="tbtn" id="tHop" aria-label="Hop"><span class="ic">⤒</span>HOP</button><button class="tbtn" id="tPedal" aria-label="Pedal"><span class="ic">▶</span>PEDAL</button></div></div>
-<div id="rotate" role="status">🔄<br>Rotate your device<br>to landscape to play!</div>
+<div id="touchUI"><div class="cluster"><button class="tbtn" id="tBrake" aria-label="Brake"><span class="ic" aria-hidden="true">◀</span>BRAKE</button></div><div class="cluster"><button class="tbtn" id="tHop" aria-label="Hop"><span class="ic" aria-hidden="true">⤒</span>HOP</button><button class="tbtn" id="tPedal" aria-label="Pedal"><span class="ic" aria-hidden="true">▶</span>PEDAL</button></div></div>
+<div id="rotate" role="status"><span aria-hidden="true">🔄</span><br>Rotate your device<br>to landscape to play!</div>
 <script>
 'use strict';
 /* =========================================================================
@@ -363,9 +366,15 @@ const HOWTO2=[
  ['🚲 Pedal & Brake','HOLD the big ▶ PEDAL button to pedal (or hold the right side of the screen / → key). Hold ◀ BRAKE (or left side / ←) to slow down. Uphills slow you, downhills speed you up!'],
  ['🦘 Hop','Tap the HOP button (or TAP the screen / SPACE) to hop! Clear rocks, logs and water pools. Like the bike in Puddlewick Isle, a good hop sails over anything.'],
  ['⭐ Stars','Grab stars for points and coins. They love hiding over ramps…'],
+['🔔 Bells','Golden bells float over the trail too — ring one for a SPEED BOOST, +50 points and +5 coins!'],
  ['✨ Tricks','Big air off ramps = points! Land on a downslope for a Smooth Landing bonus. Chain them for a combo multiplier.'],
  ['💥 Crashes','Smack an obstacle and you\'ll eat dirt — you lose speed but keep going. Water without a hop = splash slowdown.'],
  ['🏁 Modes','Joy Ride: go as far as you can. Time Trial: beat the clock over 3 distances. Trick Park: 2 minutes, max style points!'],
+['🏝️ Arcade Bonus','Playing inside Puddlewick Isle? Your first Bike Blitz ride each day earns +50 Tide Points back on the island!'],
+['🛒 Bike Shop','Coins from distance, stars and tricks buy faster, higher-hopping bikes in the Bike Shop — tap an owned bike there to make it yours on the trail!'],
+['🪙 Coins','Your ride pays out at the finish: 1 coin for every 10 m ridden, 2 coins per star, and 1 coin per 20 trick points — spend them in the Bike Shop!'],
+['🏆 Records','Your best Joy Ride distance and Time Trial times are saved and shown on the mode buttons — beat one and the finish screen flags a NEW BEST!'],
+['🚪 Quitting Early','Need to stop mid-ride? Tap Quit (top-right) — you still bank coins for your distance, stars and tricks, and a Joy Ride best distance still counts!'],
 ];
 function scrHowto(){
   drawSky(0.016,false);g.fillStyle='#5da24f';g.fillRect(0,H*0.78,W,H*0.22);
