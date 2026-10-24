@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2e7d32">
+<meta name="color-scheme" content="dark light">
+<title>Puddlewick Isle: Dr. Quillfeather's Critter Safari</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; touch-action:none; user-select:none; -webkit-user-select:none; background:#1b3d1c; font-family:'Trebuchet MS','Segoe UI',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#5fa84d; touch-action:none; cursor:crosshair; box-shadow:0 12px 40px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" aria-label="Critter Safari canvas" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const AU = {
+  c: null,
+  init() { if (!this.c) { const AC = window.AudioContext||window.webkitAudioContext; if (AC) this.c = new AC(); } if (this.c&&this.c.state==='suspended') this.c.resume(); },
+  play(type) {
+    if (!this.c) return;
+    try {
+      const t = this.c.currentTime;
+      if (type === 'swing') {
+        const osc = this.c.createOscillator(), gn = this.c.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(380, t); osc.frequency.exponentialRampToValueAtTime(120, t + 0.12);
+        gn.gain.setValueAtTime(0.3, t); gn.gain.linearRampToValueAtTime(0, t + 0.12);
+        osc.connect(gn); gn.connect(this.c.destination); osc.start(t); osc.stop(t + 0.12);
+      } else if (type === 'catch') {
+        [587.33, 880, 1174.66].forEach((f, i) => {
+          const osc = this.c.createOscillator(), gn = this.c.createGain();
+          osc.type = 'sine'; osc.frequency.value = f;
+          gn.gain.setValueAtTime(0.25, t + i * 0.08); gn.gain.linearRampToValueAtTime(0, t + i * 0.08 + 0.15);
+          osc.connect(gn); gn.connect(this.c.destination); osc.start(t + i * 0.08); osc.stop(t + i * 0.08 + 0.15);
+        });
+      }
+    } catch (_) {}
+  }
+};
+
+const G = { state: 'title', score: 0, time: 90, caught: 0, combo: 0, net: { x: W/2, y: H/2, swinging: false, swingT: 0 }, critters: [], flowers: [] };
+for (let i = 0; i < 28; i++) G.flowers.push({ x: Math.random()*W, y: 70 + Math.random()*(H-140), col: ['#e84855','#ffd152','#ffffff','#a29bfe'][Math.floor(Math.random()*4)] });
+
+function spawnCritter() {
+  const types = [
+    { name: 'Common Blue', icon: '🦋', pts: 100, spd: 45, r: 20 },
+    { name: 'Emperor Butterfly', icon: '✨🦋', pts: 300, spd: 70, r: 24 },
+    { name: 'Jewel Beetle', icon: '🪲', pts: 250, spd: 35, r: 18 },
+    { name: 'Golden Stag', icon: '👑🪲', pts: 600, spd: 85, r: 26 },
+    { name: 'Dragonfly', icon: '🛸', pts: 200, spd: 95, r: 20 }
+  ];
+  const rand = Math.random();
+  const c = rand < 0.1 ? types[3] : rand < 0.3 ? types[1] : rand < 0.55 ? types[2] : types[0];
+  G.critters.push({ ...c, x: Math.random()*W, y: 70+Math.random()*(H-140), vx: (Math.random()-0.5)*c.spd*2, vy: (Math.random()-0.5)*c.spd*2, t: 0, startled: false });
+}
+
+function getPos(e) {
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (cx - r.left) * (W / r.width), y: (cy - r.top) * (H / r.height) };
+}
+
+function swingNet() {
+  if (G.net.swinging) return;
+  AU.play('swing');
+  G.net.swinging = true;
+  G.net.swingT = 0.22;
+  // Hit check
+  G.critters.forEach(c => {
+    if (c.caught) return;
+    const d = Math.hypot(G.net.x - c.x, G.net.y - c.y);
+    if (d < 45) {
+      c.caught = true;
+      G.caught++;
+      G.combo++;
+      G.score += c.pts * Math.min(3, G.combo);
+      AU.play('catch');
+    }
+  });
+}
+
+function onDown(e) {
+  e.preventDefault(); AU.init();
+  const p = getPos(e);
+  if (G.state !== 'play') { startGame(); return; }
+  G.net.x = p.x; G.net.y = p.y;
+  swingNet();
+}
+function onMove(e) {
+  const p = getPos(e);
+  G.net.x = p.x; G.net.y = p.y;
+}
+cv.addEventListener('mousedown', onDown);
+window.addEventListener('mousemove', onMove);
+cv.addEventListener('touchstart', onDown, { passive: false });
+window.addEventListener('touchmove', onMove, { passive: false });
+
+function startGame() {
+  G.state = 'play'; G.score = 0; G.time = 90; G.caught = 0; G.combo = 0; G.critters = [];
+  for (let i = 0; i < 7; i++) spawnCritter();
+}
+
+function endGame() {
+  G.state = 'gameover';
+  const win = G.score >= 1000;
+  try {
+    parent.postMessage({ pw: 'critter', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: win, title: "Dr. Quillfeather's Critter Safari" }, '*');
+  } catch (_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    G.time -= dt; if (G.time <= 0) endGame();
+    if (G.net.swinging) { G.net.swingT -= dt; if (G.net.swingT <= 0) G.net.swinging = false; }
+    if (G.critters.length < 8 && Math.random() < dt * 1.5) spawnCritter();
+    G.critters.forEach(c => {
+      c.t += dt; c.x += c.vx * dt; c.y += c.vy * dt;
+      if (c.x < 30 || c.x > W-30) c.vx *= -1;
+      if (c.y < 70 || c.y > H-70) c.vy *= -1;
+    });
+    G.critters = G.critters.filter(c => !c.caught);
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0, 0, W, H);
+  // Lush Meadow Grass
+  g.fillStyle = '#559c44'; g.fillRect(0, 0, W, H);
+  // Flowers
+  G.flowers.forEach(f => {
+    g.fillStyle = f.col; g.beginPath(); g.arc(f.x, f.y, 4, 0, Math.PI*2); g.fill();
+  });
+  // Critters
+  g.font = '26px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  G.critters.forEach(c => { g.fillText(c.icon, c.x, c.y); });
+  // Net
+  g.save(); g.translate(G.net.x, G.net.y);
+  if (G.net.swinging) g.rotate(0.5);
+  g.strokeStyle = '#c8a165'; g.lineWidth = 5; g.beginPath(); g.moveTo(-10, 30); g.lineTo(0, 0); g.stroke();
+  g.strokeStyle = '#e0f7fa'; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, 24, 0, Math.PI*2); g.stroke();
+  g.restore();
+  // HUD
+  g.fillStyle = '#ffffff'; g.font = 'bold 20px "Trebuchet MS", sans-serif'; g.textAlign = 'left';
+  g.fillText(`🦋 Score: ${G.score}`, 20, 36);
+  g.fillText(`⏱️ Time: ${Math.ceil(G.time)}s`, W - 140, 36);
+  if (G.combo > 1) g.fillText(`🔥 Combo x${G.combo}!`, W/2 - 60, 36);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(20,50,20,0.8)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🦋 Dr. Quillfeather's Critter Safari", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Move net over butterflies and bugs, tap/click to catch!", W/2, H/2 + 10);
+    g.fillStyle = '#ffd152'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 80);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(20,50,20,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Expedition Complete!", W/2, H/2 - 50);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts · Critters: ${G.caught}`, W/2, H/2);
+    g.fillStyle = G.score >= 1000 ? '#2ecc71' : '#ffd152';
+    g.fillText(G.score >= 1000 ? "🏆 Golden Net Trophy Unlocked! Check mailbox!" : "Score 1,000 for the Golden Net trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#ffd152'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
