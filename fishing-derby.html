@@ -8,9 +8,11 @@
 <title>Puddlewick Isle: Marlowe's Fishing Derby</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { width:100%; height:100%; overflow:hidden; background:#06283d; font-family:'Trebuchet MS','Segoe UI',Verdana,sans-serif; }
+  html,body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; background:#06283d; font-family:'Trebuchet MS','Segoe UI',Verdana,sans-serif; }
   #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#06283d; }
   canvas { display:block; background:#0a3a5c; touch-action:none; cursor:pointer; }
+  :focus-visible { outline:3px solid #f0a840; outline-offset:2px; }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   #rotate { display:none; position:fixed; inset:0; z-index:50; background:#06283d; color:#fff; align-items:center; justify-content:center; text-align:center; padding:24px; font-size:18px; }
   @media (orientation:portrait) and (max-width:700px) {
     #rotate { display:flex; }
@@ -18,7 +20,7 @@
 </style>
 </head>
 <body>
-<div id="wrap"><canvas id="game"></canvas></div>
+<div id="wrap"><canvas id="game" role="img" aria-label="Fishing Derby game canvas"></canvas></div>
 <div id="rotate">🔄<br>Rotate your device<br>to landscape to play!</div>
 <script>
 'use strict';
