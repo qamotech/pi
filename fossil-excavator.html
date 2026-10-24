@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#5c4033">
+<meta name="color-scheme" content="dark light">
+<title>Puddlewick Isle: Quillfeather's Fossil Excavator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; touch-action:none; user-select:none; -webkit-user-select:none; background:#2c1d11; font-family:'Trebuchet MS','Segoe UI',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#8b5a2b; touch-action:none; cursor:pointer; box-shadow:0 12px 40px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" aria-label="Fossil Excavator canvas" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const AU = {
+  c: null,
+  init() { if (!this.c) { const AC = window.AudioContext||window.webkitAudioContext; if (AC) this.c = new AC(); } if (this.c&&this.c.state==='suspended') this.c.resume(); },
+  play(t) {
+    if (!this.c) return;
+    try {
+      const now = this.c.currentTime;
+      const osc = this.c.createOscillator(), gn = this.c.createGain();
+      osc.type = t==='chisel'?'square':'sine';
+      osc.frequency.setValueAtTime(t==='chisel'?180:440, now);
+      gn.gain.setValueAtTime(0.25, now); gn.gain.linearRampToValueAtTime(0, now+0.1);
+      osc.connect(gn); gn.connect(this.c.destination); osc.start(now); osc.stop(now+0.1);
+    } catch(_) {}
+  }
+};
+
+const COLS = 12, ROWS = 7, TILE = 56;
+const OX = (W - COLS * TILE) / 2, OY = 80;
+const G = { state: 'title', score: 0, tool: 'chisel', grid: [], specimensFound: 0 };
+
+function initGrid() {
+  G.grid = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      G.grid.push({ r, c, hp: Math.floor(Math.random()*3)+1, fossil: Math.random()<0.22, revealed: false });
+    }
+  }
+}
+
+function getPos(e) {
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (cx - r.left) * (W / r.width), y: (cy - r.top) * (H / r.height) };
+}
+
+function onDown(e) {
+  e.preventDefault(); AU.init();
+  if (G.state !== 'play') { startGame(); return; }
+  const p = getPos(e);
+  const c = Math.floor((p.x - OX) / TILE), r = Math.floor((p.y - OY) / TILE);
+  if (c >= 0 && c < COLS && r >= 0 && r < ROWS) {
+    const tile = G.grid[r * COLS + c];
+    if (!tile.revealed) {
+      tile.hp--;
+      AU.play('chisel');
+      if (tile.hp <= 0) {
+        tile.revealed = true;
+        if (tile.fossil) { G.specimensFound++; G.score += 250; AU.play('brush'); }
+        else G.score += 25;
+      }
+    }
+  }
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+
+function startGame() { G.state = 'play'; G.score = 0; G.specimensFound = 0; initGrid(); }
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'fossil', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1200, title: "Quillfeather's Fossil Excavator" }, '*');
+  } catch (_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  if (G.state === 'play') {
+    const unmined = G.grid.filter(t => !t.revealed).length;
+    if (unmined <= 6) endGame();
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  g.fillStyle = '#654321'; g.fillRect(0,0,W,H);
+  // Grid
+  G.grid.forEach(t => {
+    const x = OX + t.c * TILE, y = OY + t.r * TILE;
+    if (t.revealed) {
+      g.fillStyle = '#d7ba89'; g.fillRect(x+1, y+1, TILE-2, TILE-2);
+      if (t.fossil) {
+        g.font = '28px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText('🦴', x+TILE/2, y+TILE/2);
+      }
+    } else {
+      g.fillStyle = t.hp === 3 ? '#503823' : t.hp === 2 ? '#7a5433' : '#9c6f44';
+      g.fillRect(x+1, y+1, TILE-2, TILE-2);
+      g.fillStyle = 'rgba(0,0,0,0.15)'; g.fillRect(x+TILE-8, y+TILE-8, 6, 6);
+    }
+  });
+
+  // HUD
+  g.fillStyle = '#fff'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🦴 Fossils: ${G.specimensFound}`, 24, 38);
+  g.fillText(`Score: ${G.score}`, W - 160, 38);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(30,15,5,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🦴 Quillfeather's Fossil Excavator", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Chisel through ancient limestone to unearth prehistoric fossils!", W/2, H/2 + 10);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(30,15,5,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Dig Site Cleared!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts · Fossils Uncovered: ${G.specimensFound}`, W/2, H/2);
+    g.fillStyle = G.score >= 1200 ? '#2ecc71' : '#f0a840';
+    g.fillText(G.score >= 1200 ? "🏆 Golden Shovel Trophy Unlocked!" : "Score 1,200 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
