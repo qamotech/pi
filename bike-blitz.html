@@ -19,10 +19,11 @@
   .tbtn.on { background:rgba(46,139,58,.8); }
   .tbtn:focus-visible { outline:3px solid #f0a840; outline-offset:2px; }
   .tbtn:active { transform:scale(.96); }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.tbtn:active{transform:none}}
 </style>
 </head>
 <body>
-<div id="wrap"><canvas id="game" role="img" aria-label="Bike Blitz game canvas"></canvas></div>
+<div id="wrap"><canvas id="game" role="img" aria-label="Bike Blitz game canvas" tabindex="0"></canvas></div>
 <div id="touchUI"><div class="cluster"><button class="tbtn" id="tBrake" aria-label="Brake"><span class="ic">◀</span>BRAKE</button></div><div class="cluster"><button class="tbtn" id="tHop" aria-label="Hop"><span class="ic">⤒</span>HOP</button><button class="tbtn" id="tPedal" aria-label="Pedal"><span class="ic">▶</span>PEDAL</button></div></div>
 <div id="rotate">🔄<br>Rotate your device<br>to landscape to play!</div>
 <script>
