@@ -27,7 +27,7 @@
   --lift:0 4px 0 rgba(74,58,40,.2);--deep:0 6px 0 rgba(74,58,40,.18),0 22px 50px -18px rgba(30,20,5,.55)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{margin:0;height:100%;overflow:hidden;background:#2a6f97;color:var(--ink);font:700 15px/1.35 var(--font);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#2a6f97;color:var(--ink);text-size-adjust:100%;-webkit-text-size-adjust:100%;font:700 15px/1.35 var(--font);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 input,select{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px;border-radius:10px}
@@ -75,7 +75,7 @@ input,select{font:inherit;color:inherit}
 #dName{position:absolute;left:26px;top:-16px;background:var(--acc);color:#fff;padding:4px 16px;border-radius:999px;font-size:15px;transform:rotate(-3deg);box-shadow:var(--lift)}
 #dNext{position:absolute;right:24px;bottom:12px;color:var(--acc);animation:bob .8s infinite;font-size:14px}
 #dCh{display:flex;flex-direction:column;gap:6px;align-items:flex-end;margin-bottom:10px}
-#dCh button{background:var(--paper);border-radius:999px;padding:8px 18px;box-shadow:var(--lift);text-align:right;min-width:160px}
+#dCh button{background:var(--paper);border-radius:999px;padding:8px 18px;box-shadow:var(--lift);text-align:right;min-width:160px;min-height:44px}
 #dCh button:hover,#dCh button.sel{background:#fff0c8}
 #dCh button.sel::before{content:"▶ ";color:var(--acc)}
 #dCh .num{display:inline-block;min-width:18px;border-radius:6px;background:var(--paper2);color:var(--ink2);font-size:12px;text-align:center;margin-right:4px}
@@ -87,7 +87,7 @@ input,select{font:inherit;color:inherit}
 #pHead h2{margin:0;font-size:21px;flex:1}
 #pHead .e{font-size:26px}
 #pClose{width:44px;height:44px;border-radius:50%;background:var(--paper);box-shadow:var(--lift);font-size:16px}
-#pBody{font-size:calc(15px*var(--fs));overflow-wrap:break-word;padding:16px 20px 22px;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;overscroll-behavior:contain}
+#pBody{font-size:calc(15px*var(--fs));overflow-wrap:break-word;padding:16px 20px 22px;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 #pBody h3{margin:14px 0 8px;font-size:calc(15px*var(--fs));color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
 #pBody p{margin:6px 0}
 .mute{color:var(--ink2);font-weight:600}
@@ -238,6 +238,7 @@ button{touch-action:manipulation}
 </style>
 </head>
 <body>
+<noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#2a6f97;color:#fff;font-size:18px;padding:24px;text-align:center">Puddlewick Isle needs JavaScript to play.</div></noscript>
 <canvas id="cv" tabindex="0" aria-label="Puddlewick Isle game world"></canvas>
 
 <div id="bikeGame" hidden>
@@ -262,14 +263,14 @@ button{touch-action:manipulation}
     <canvas id="radarMap" width="110" height="110" role="img" aria-label="Island radar" hidden></canvas>
   </div>
   <div id="toasts" aria-live="polite"></div>
-  <div id="cap" hidden></div>
+  <div id="cap" hidden aria-live="polite"></div>
   <div id="hint" hidden aria-live="polite"></div>
   <div id="dock">
     <button class="round" id="bWish" title="Make a wish (Y)" aria-label="Make a wish" hidden><span class="e">🌠</span></button>
     <button class="round" id="bRadar" title="Toggle radar (N)" aria-label="Toggle radar" aria-pressed="false"><span class="e">🧭</span></button>
     <button class="round" id="bBike" title="Ride bike (B)" aria-label="Ride bike"><span class="e">🚲</span></button>
     <button class="round" id="bBag" title="Pockets (I)" aria-label="Pockets"><span class="e">🎒</span></button>
-    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span><span class="badge" id="arcB" hidden style="right:auto;left:-4px;background:#e75480" title="Arcade daily bonus waiting">🎮</span></button>
+    <button class="round" id="bPhone" title="ShellPhone (P)" aria-label="ShellPhone"><span class="e">📱</span><span class="badge" id="mailB" aria-hidden="true" hidden></span><span class="badge" id="arcB" aria-hidden="true" hidden style="right:auto;left:-4px;background:#e75480" title="Arcade daily bonus waiting">🎮</span></button>
   </div>
 </div>
 
@@ -1842,6 +1843,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   if(wk&&wk.s)wearBody(g,wk,x,ty,side,up);
   g.fillStyle='rgba(0,0,0,.08)';E(x,ty+1.2,6.5,1.6);
   g.strokeStyle='rgba(0,0,0,.07)';g.lineWidth=1;g.lineCap='round';g.beginPath();g.moveTo(x-4.5,ty+5);g.quadraticCurveTo(x-4,ty+8,x-4.6,ty+11);g.moveTo(x+4.5,ty+5);g.quadraticCurveTo(x+4,ty+8,x+4.6,ty+11);g.stroke();
+  g.fillStyle='rgba(255,255,255,.10)';g.fillRect(x-7,ty+10.4,14,1);g.fillStyle='rgba(0,0,0,.12)';g.fillRect(x-7.5,ty+11.5,15,1.5);
   g.fillStyle=look.skin;
   if(onBike){
     const dir=side||1;
@@ -1849,7 +1851,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
   }else{
     const ax=moving?Math.sin(step)*2:0,asw=moving?Math.sin(step+Math.PI)*1.5:0;
     const aLX=x-8.5-asw-st*2,aRX=x+8.5-asw+st*2+wvA*3,aLY=by-12-bob+ax-11*st+Math.abs(ax)*.6,aRY=by-12-bob-ax-11*st+Math.abs(ax)*.6-wvA*9;
-    if(wk&&wk.topS){g.fillStyle=wk.topC;E(aLX,aLY-2.4,2.9,1.9);E(aRX,aRY-2.4,2.9,1.9);g.fillStyle=look.skin}
+    if(wk&&wk.topS){g.fillStyle=wk.topC;E(aLX,aLY-2.4,2.9,1.9);E(aRX,aRY-2.4,2.9,1.9);g.fillStyle='rgba(255,255,255,.13)';E(aLX-.6,aLY-3.9,2,.55);E(aRX-.6,aRY-3.9,2,.55);g.fillStyle='rgba(0,0,0,.15)';E(aLX+2.3,aLY-2.4,.6,1.7);E(aRX+2.3,aRY-2.4,.6,1.7);g.fillStyle=look.skin}
     E(aLX,aLY-brA,2.6,3.2);E(aRX,aRY-brA,2.6,3.2);
     g.fillStyle='rgba(255,250,240,.6)';
     E(aLX-1,aLY-1.7,.7,.5);E(aLX+1,aLY-1.7,.7,.5);E(aRX-1,aRY-1.7,.7,.5);E(aRX+1,aRY-1.7,.7,.5);
@@ -1914,6 +1916,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     g.moveTo(x-10,hy+3.2);g.lineTo(x-9.2,hy+4.1);
     g.moveTo(x+10,hy+3.2);g.lineTo(x+9.2,hy+4.1);g.stroke()}
   if(!side&&!up){g.fillStyle='#dfe8f2';E(x-10,hy+3.7,.55,.55);E(x+10,hy+3.7,.55,.55);g.fillStyle='#ffffff';E(x-10.2,hy+3.5,.2,.2);E(x+9.8,hy+3.5,.2,.2)}
+  if(!side&&!up){g.strokeStyle='rgba(255,214,170,.50)';g.lineWidth=.7;g.lineCap='round';g.beginPath();g.arc(x-10,hy+1,2.6,2.35,4.05);g.arc(x+10,hy+1,2.6,-.85,.85);g.stroke()}
   if(!up){g.fillStyle='rgba(120,60,30,.10)';if(side)E(x-side*7,hy+1,3.2,7);else E(x+7,hy+1,3,7)}
   if(side){g.strokeStyle='rgba(120,70,40,.4)';g.lineWidth=1;g.lineCap='round';g.beginPath();
     g.moveTo(x+side*3.5,hy+5.5);g.quadraticCurveTo(x+side*6,hy+8,x+side*7.6,hy+5.8);g.stroke()}
@@ -1953,6 +1956,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
     else E(x-side*8+swayI,hy-1,3.5,6);
     if(side){g.strokeStyle=shade(look.hair,-24);g.lineWidth=.7;g.lineCap='round';g.beginPath();
       g.moveTo(x-side*9+swayI,hy-4);g.quadraticCurveTo(x-side*13+swayI*1.6,hy-2+swayI*.4,x-side*11.5+swayI,hy+2);g.stroke()}
+    if(side){g.strokeStyle=shade(look.hair,-40);g.lineWidth=.7;g.lineCap='round';g.beginPath();g.moveTo(x-side*7.2+swayI,hy-5.2);g.quadraticCurveTo(x-side*8.6+swayI,hy-1.5,x-side*7.4+swayI,hy+2.6);g.stroke();g.strokeStyle=shade(look.hair,30);g.lineWidth=.55;g.beginPath();g.moveTo(x-side*5.9+swayI,hy-4.8);g.quadraticCurveTo(x-side*7+swayI,hy-1.5,x-side*6+swayI,hy+2);g.stroke()}
     g.strokeStyle=shade(look.hair,36);g.lineWidth=1.6;g.lineCap='round';
     g.beginPath();g.ellipse(x-side*1.5,hy-5.5,6.5,2.6,-0.18,Math.PI*1.08,Math.PI*1.92);g.stroke();
     g.strokeStyle=shade(look.hair,58);g.lineWidth=.9;g.beginPath();
@@ -2052,6 +2056,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
       g.arc(x+3.6+ex+pdx,hy+0.9+pdy,1.7,Math.PI*1.15,Math.PI*1.85);
       g.stroke();
       g.fillStyle='rgba(30,18,10,.20)';E(x-3.6+ex+pdx,hy+0.15+pdy,1.25,.75);E(x+3.6+ex+pdx,hy+0.15+pdy,1.25,.75);
+      g.fillStyle='rgba(255,196,130,.28)';E(x-3.6+ex+pdx,hy+2.05+pdy,.8,.45);E(x+3.6+ex+pdx,hy+2.05+pdy,.8,.45);
       g.fillStyle='rgba(255,255,255,.38)';E(x-3.9+ex+pdx,hy+1.95+pdy,.34,.26);E(x+3.3+ex+pdx,hy+1.95+pdy,.34,.26);
       g.strokeStyle='#2b2118';g.lineWidth=.8;g.lineCap='round';
       g.beginPath();
@@ -2060,6 +2065,7 @@ function drawPerson(g,x,y,look,fx,fy,step,moving,o={}){
       g.moveTo(x-6.6+ex,hy-0.2);g.lineTo(x-7.6+ex,hy-1.3);
       g.moveTo(x+6.6+ex,hy-0.2);g.lineTo(x+7.6+ex,hy-1.3);
       g.stroke();
+      g.strokeStyle='rgba(120,62,32,.10)';g.lineWidth=.6;g.beginPath();g.arc(x-3.6+ex+pdx,hy+2.2+pdy,1.5,Math.PI*.25,Math.PI*.75);g.arc(x+3.6+ex+pdx,hy+2.2+pdy,1.5,Math.PI*.25,Math.PI*.75);g.stroke();
     }
     if(!side){g.fillStyle='rgba(255,246,230,.10)';E(x+ex,hy+2.4,1,1.6);g.fillStyle='rgba(120,62,32,.08)';E(x+ex,hy+4,1.1,.55)}
     g.fillStyle='rgba(240,140,140,.16)';
@@ -2551,7 +2557,7 @@ function showCatch(e,text,sub){const c=$('cap');c.innerHTML=`<div><span class="e
 function fillT(s,P){const m=effMonth();return s.replace(/\{name\}/g,S.name).replace(/\{island\}/g,S.island).replace(/\{cp\}/g,P&&P.cp||'').replace(/\{fruit\}/g,IT[ISLE.native.fruit].n.toLowerCase()).replace(/\{season\}/g,seasonOf(m))}
 const TIPTOE_TIP=()=>isTouch?'Push the stick gently to tiptoe':'Hold Ctrl to tiptoe';
 const tipText=t=>t.replace('__TIPTOE__',TIPTOE_TIP());
-const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. __TIPTOE__! ','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!','Marlowe\'s Derby Dock sign stands by the dock: his full Fishing Derby runs any day — just bring a rod, Marlowe lends Tackle boxes!','A Bike bell in your pockets makes any bike roll faster. Bramble\'s sells the DIY recipe!','Tap the dressing mirror preview to spin it around \u2014 check your outfit from the back before heading out!','In Bike Blitz, hold PEDAL to climb hills, tap HOP over gaps and BRAKE into tight corners \u2014 the big on-screen buttons support multi-touch!','Fish bait is easy DIY: 1 manila clam at a workbench. Face the water, use it from your pockets, and a fish will swim over to investigate!','Too much motion? Open Settings on your ShellPhone and turn Reduce motion on - it calms screen shake, wobble and big particle bursts!','Your ShellPhone Arcade pays +50 Tide Points for the first play of each mini-game every day - a quick Derby or Bike Blitz ride adds up fast!','Toss 100 chimes into a crafted wishing well for a blessing that lasts all day - Lucky Catch, Midas Day (sell for 25% more) or Bounty Day!','Plant a scarecrow near your fruit trees: shaking a tree within 4 tiles of it never drops a wasp nest — it drops a branch instead!','Carry a Golden Lure in your pockets and trophy-size fish bite more often — everywhere, not just in the Derby! Marlowe teaches the DIY at the Derby Dock.','Stuck on a system? Your ShellPhone Guide explains fishing, DIY, the Arcade, radar and more — it grows as you discover new things!'];
+const TIPS=['Fish shadows only notice your bobber if it lands in front of their face. Wait for the bobber to sink before reeling!','Bugs get spooked if you run up to them. Walk slowly. __TIPTOE__! ','Shake trees for fruit, branches and sometimes furniture. But watch out for wasp nests!','The cracks in the ground hide fossils. Dr. Quillfeather can assess them at the museum.','Hit rocks with a shovel to get stone, clay and iron. One rock pays out chimes each day!','Flowers that are watered next to each other can grow new hybrid colors.','Bramble pays double for the hot item of the day. Check the store!','Rosie sells sunroots on Sunday mornings. Sell them during the week, before they spoil.','Bubbling spots on the beach hide manila clams. They make great fish bait!','On clear nights you might see shooting stars. Make a wish!','A tour ticket from Town Hall lets you visit a mystery island. Maybe you\'ll meet someone new.','Balloons drift by during the day. Pop them with a slingshot for presents!','Each season brings something to collect: petals, sunshells, maple leaves or snowflakes. Catch drifting ones with your net!','Marlowe\'s Derby Dock sign stands by the dock: his full Fishing Derby runs any day — just bring a rod, Marlowe lends Tackle boxes!','A Bike bell in your pockets makes any bike roll faster. Bramble\'s sells the DIY recipe!','Tap the dressing mirror preview to spin it around \u2014 check your outfit from the back before heading out!','In Bike Blitz, hold PEDAL to climb hills, tap HOP over gaps and BRAKE into tight corners \u2014 the big on-screen buttons support multi-touch!','Fish bait is easy DIY: 1 manila clam at a workbench. Face the water, use it from your pockets, and a fish will swim over to investigate!','Too much motion? Open Settings on your ShellPhone and turn Reduce motion on - it calms screen shake, wobble and big particle bursts!','Your ShellPhone Arcade pays +50 Tide Points for the first play of each mini-game every day - a quick Derby or Bike Blitz ride adds up fast!','Toss 100 chimes into a crafted wishing well for a blessing that lasts all day - Lucky Catch, Midas Day (sell for 25% more) or Bounty Day!','Plant a scarecrow near your fruit trees: shaking a tree within 4 tiles of it never drops a wasp nest — it drops a branch instead!','Carry a Golden Lure in your pockets and trophy-size fish bite more often — everywhere, not just in the Derby! Marlowe teaches the DIY at the Derby Dock.','Stuck on a system? Your ShellPhone Guide explains fishing, DIY, the Arcade, radar and more — it grows as you discover new things!','Donating new fish and bugs fills your Critterpedia — Dr. Quillfeather mails bonus Tide Points at 25, 50, 75 and 100 percent of each collection!','On clear nights from 8 PM, fireflies drift over the grass — swing your net to catch one; they sell for 200 chimes!','Check the bulletin board each morning — it lists the events for today, the forecast for tomorrow and the next meteor night!'];
 function act(){
   if(!S||G.faint>0||G.fade>0)return;
   if(DLG.on){dlgAdvance();return}
@@ -3499,7 +3505,7 @@ function renderPhone(){
         ['💰','Event-week bonus pay','During any festival week (the teaser week on the bulletin board), neighbors pay 50% more for seasonal-forage requests.'],
         ['💝','Heart Day','Feb 14: the sweetest day on the island! Friends mail chocolate (best friends send furniture too), and neighbors are extra keen on seasonal-forage requests during sweetheart week (Feb 7–14). Buy in-season clothes at Wren\'s Rack for the Seasonal Shopper achievement.'],
         ['🎏','Sunlily koi','A summer pond fish (Jun–Aug) — its golden fins glow like midsummer sunlight on the water.'],
-        ['🦐','Petal prawn','A spring sea fish (Mar–May) — it drifts with the blossom petals just offshore.'],['🎐','Sea-glass wind chime','Craft it from 3 sunshells and 1 iron at a workbench, then place it outside — a cheerful porch piece made from beach finds.'],['🎣','Golden fishing rod','Win a Saturday plaza Fishing Derby and Marlowe teaches you this DIY: combine your rod, a Golden Lure and 2 gold at a workbench for the finest rod on the isle.'],['🚲','Loaner bike','No bike yet? The Spoke Island trailhead lends one free — just walk up and ride. Bike Blitz in the Arcade needs no bike at all.']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
+        ['🦐','Petal prawn','A spring sea fish (Mar–May) — it drifts with the blossom petals just offshore.'],['🎐','Sea-glass wind chime','Craft it from 3 sunshells and 1 iron at a workbench, then place it outside — a cheerful porch piece made from beach finds.'],['🎣','Golden fishing rod','Win a Saturday plaza Fishing Derby and Marlowe teaches you this DIY: combine your rod, a Golden Lure and 2 gold at a workbench for the finest rod on the isle.'],['🚲','Loaner bike','No bike yet? The Spoke Island trailhead lends one free — just walk up and ride. Bike Blitz in the Arcade needs no bike at all.'],['🎈','Balloons','Balloons drift across the isle on fine days — pop one with your slingshot and a wrapped present drops for you to open!'],['📌','Bulletin board','The plaza bulletin board lists the events for today, the weather forecast for tomorrow and the next meteor night — check it each morning to plan your day!'],['🍾','Message bottles','Bottles wash up on the beach — pick one up and open it from your pockets to learn a new DIY recipe for your workbench!']].map(([e,t,d])=>li(e,t,esc(d),'')).join('')}</div>`;
     default:return `<p class="mute">${esc(S.name)} · ${esc(S.island)} · Day ${fmt(S.stats.days||1)}</p><div class="apps">${APPS.map(([k,e,n,c])=>`<button class="app" data-a="app" data-t="${k}"><span class="e" style="--c:${c}">${e}</span>${n}</button>`).join('')}</div>`;
   }
 }
