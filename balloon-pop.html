@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a4d70">
+<meta name="color-scheme" content="dark light">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hazel's Balloon Pop">
+<meta name="description" content="Hazel's Slingshot Balloon Pop — a Puddlewick Isle side game. Aim your slingshot, account for wind, and pop drifting present balloons!">
+<title>Puddlewick Isle: Hazel's Balloon Pop</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; overscroll-behavior:none; text-size-adjust:100%; -webkit-text-size-adjust:100%; touch-action:none; user-select:none; -webkit-user-select:none; background:#102c42; font-family:'Trebuchet MS','Segoe UI',Verdana,sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#102c42; }
+  canvas { display:block; background:#68b3dc; touch-action:none; cursor:crosshair; box-shadow:0 12px 40px rgba(0,0,0,0.5); }
+  :focus-visible { outline:3px solid #f0a840; outline-offset:2px; }
+  ::selection { background:#ffe1a8; color:#102c42; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" aria-label="Hazel's Balloon Pop canvas" tabindex="0"></canvas></div>
+<script>
+'use strict';
+/* =========================================================================
+   PUDDLEWICK ISLE: HAZEL'S SLINGSHOT BALLOON POP 🎈
+   A single-file side game for Puddlewick Isle.
+   Aim the carved island slingshot, pull back for tension, and pop drifting
+   present balloons before they float past!
+   ========================================================================= */
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16;
+  if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Web Audio API Sound Generator
+const AU = {
+  c: null,
+  init() {
+    if (!this.c) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.c = new AC();
+    }
+    if (this.c && this.c.state === 'suspended') this.c.resume();
+  },
+  play(type) {
+    if (!this.c) return;
+    try {
+      const t = this.c.currentTime;
+      if (type === 'snap') {
+        const osc = this.c.createOscillator(), gn = this.c.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(320, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.08);
+        gn.gain.setValueAtTime(0.35, t); gn.gain.linearRampToValueAtTime(0, t + 0.08);
+        osc.connect(gn); gn.connect(this.c.destination);
+        osc.start(t); osc.stop(t + 0.08);
+      } else if (type === 'pop') {
+        const osc = this.c.createOscillator(), gn = this.c.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(540 + Math.random() * 200, t);
+        osc.frequency.exponentialRampToValueAtTime(140, t + 0.09);
+        gn.gain.setValueAtTime(0.45, t); gn.gain.linearRampToValueAtTime(0, t + 0.09);
+        osc.connect(gn); gn.connect(this.c.destination);
+        osc.start(t); osc.stop(t + 0.09);
+      } else if (type === 'catch') {
+        const osc = this.c.createOscillator(), gn = this.c.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(440, t);
+        osc.frequency.exponentialRampToValueAtTime(880, t + 0.14);
+        gn.gain.setValueAtTime(0.3, t); gn.gain.linearRampToValueAtTime(0, t + 0.14);
+        osc.connect(gn); gn.connect(this.c.destination);
+        osc.start(t); osc.stop(t + 0.14);
+      } else if (type === 'fanfare') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          const osc = this.c.createOscillator(), gn = this.c.createGain();
+          osc.type = 'triangle'; osc.frequency.value = f;
+          gn.gain.setValueAtTime(0.2, t + i * 0.1); gn.gain.linearRampToValueAtTime(0, t + i * 0.1 + 0.25);
+          osc.connect(gn); gn.connect(this.c.destination);
+          osc.start(t + i * 0.1); osc.stop(t + i * 0.1 + 0.25);
+        });
+      }
+    } catch (_) {}
+  }
+};
+
+// Game State
+const G = {
+  state: 'title', // 'title', 'play', 'gameover'
+  score: 0,
+  time: 90,
+  balloonsPopped: 0,
+  presentsCaught: 0,
+  combo: 0,
+  maxCombo: 0,
+  wind: 0.5,
+  windTimer: 0,
+  slingshot: { x: W / 2, y: H - 55, dragging: false, pullX: 0, pullY: 0 },
+  pebbles: [],
+  balloons: [],
+  presents: [],
+  particles: [],
+  clouds: []
+};
+
+// Seed clouds
+for (let i = 0; i < 7; i++) {
+  G.clouds.push({
+    x: Math.random() * W,
+    y: 40 + Math.random() * 160,
+    w: 80 + Math.random() * 120,
+    h: 30 + Math.random() * 25,
+    spd: 12 + Math.random() * 18
+  });
+}
+
+function spawnBalloon() {
+  const fromLeft = Math.random() < 0.5;
+  const types = [
+    { type: 'red', col: '#e84855', pts: 100, r: 24, spd: 48 },
+    { type: 'blue', col: '#3f9fd2', pts: 150, r: 22, spd: 65 },
+    { type: 'green', col: '#48b068', pts: 200, r: 20, spd: 80 },
+    { type: 'gold', col: '#ffd152', pts: 500, r: 26, spd: 55, rare: true }
+  ];
+  const rand = Math.random();
+  const def = rand < 0.12 ? types[3] : rand < 0.35 ? types[2] : rand < 0.65 ? types[1] : types[0];
+  const y = 60 + Math.random() * 190;
+  G.balloons.push({
+    ...def,
+    x: fromLeft ? -40 : W + 40,
+    y: y,
+    vy: Math.sin(Math.random() * 6),
+    vx: (fromLeft ? 1 : -1) * def.spd,
+    sway: Math.random() * Math.PI * 2,
+    hit: false
+  });
+}
+
+function shootPebble(vx, vy) {
+  AU.play('snap');
+  G.pebbles.push({
+    x: G.slingshot.x,
+    y: G.slingshot.y - 10,
+    vx: vx * 12,
+    vy: vy * 12,
+    r: 6
+  });
+}
+
+// Input Handling
+function getPointerPos(e) {
+  const rect = cv.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+function onDown(e) {
+  e.preventDefault();
+  AU.init();
+  const p = getPointerPos(e);
+  if (G.state === 'title') {
+    startGame();
+    return;
+  }
+  if (G.state === 'gameover') {
+    if (p.y > H - 120) startGame();
+    return;
+  }
+  G.slingshot.dragging = true;
+  onMove(e);
+}
+
+function onMove(e) {
+  if (!G.slingshot.dragging) return;
+  const p = getPointerPos(e);
+  const dx = p.x - G.slingshot.x;
+  const dy = p.y - G.slingshot.y;
+  const dist = Math.hypot(dx, dy);
+  const maxPull = 75;
+  if (dist > maxPull) {
+    G.slingshot.pullX = (dx / dist) * maxPull;
+    G.slingshot.pullY = (dy / dist) * maxPull;
+  } else {
+    G.slingshot.pullX = dx;
+    G.slingshot.pullY = dy;
+  }
+}
+
+function onUp(e) {
+  if (!G.slingshot.dragging) return;
+  G.slingshot.dragging = false;
+  const pullDist = Math.hypot(G.slingshot.pullX, G.slingshot.pullY);
+  if (pullDist > 14) {
+    shootPebble(-G.slingshot.pullX, -G.slingshot.pullY);
+  }
+  G.slingshot.pullX = 0;
+  G.slingshot.pullY = 0;
+}
+
+cv.addEventListener('mousedown', onDown);
+window.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+cv.addEventListener('touchstart', onDown, { passive: false });
+window.addEventListener('touchmove', onMove, { passive: false });
+window.addEventListener('touchend', onUp, { passive: false });
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'KeyZ') {
+    AU.init();
+    if (G.state === 'title') startGame();
+    else if (G.state === 'gameover') startGame();
+    else if (G.state === 'play') shootPebble(0, -65);
+  }
+});
+
+function startGame() {
+  G.state = 'play';
+  G.score = 0;
+  G.time = 90;
+  G.balloonsPopped = 0;
+  G.presentsCaught = 0;
+  G.combo = 0;
+  G.maxCombo = 0;
+  G.pebbles = [];
+  G.balloons = [];
+  G.presents = [];
+  G.particles = [];
+  for (let i = 0; i < 4; i++) spawnBalloon();
+}
+
+function endGame() {
+  G.state = 'gameover';
+  AU.play('fanfare');
+  const win = G.score >= 1200;
+  const tidePts = Math.min(100, Math.floor(G.score / 20));
+  try {
+    parent.postMessage({
+      pw: 'balloon',
+      score: G.score | 0,
+      pts: tidePts,
+      win: win,
+      title: "Hazel's Slingshot Balloon Pop"
+    }, '*');
+  } catch (_) {}
+}
+
+// Update Loop
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000);
+  lastT = now;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+function update(dt) {
+  // Clouds drift
+  G.clouds.forEach(c => {
+    c.x += c.spd * dt;
+    if (c.x > W + c.w) c.x = -c.w;
+  });
+
+  if (G.state !== 'play') return;
+
+  G.time -= dt;
+  if (G.time <= 0) {
+    G.time = 0;
+    endGame();
+    return;
+  }
+
+  // Wind evolution
+  G.windTimer += dt;
+  if (G.windTimer > 4.5) {
+    G.windTimer = 0;
+    G.wind = (Math.random() - 0.5) * 1.8;
+  }
+
+  // Spawn balloons
+  if (G.balloons.length < 5 && Math.random() < dt * 1.4) {
+    spawnBalloon();
+  }
+
+  // Update balloons
+  G.balloons.forEach(b => {
+    b.sway += dt * 3;
+    b.x += (b.vx + G.wind * 15) * dt;
+    b.y += Math.sin(b.sway) * 12 * dt;
+  });
+  G.balloons = G.balloons.filter(b => b.x > -60 && b.x < W + 60 && !b.hit);
+
+  // Update pebbles
+  G.pebbles.forEach(p => {
+    p.vy += 460 * dt; // gravity
+    p.vx += G.wind * 40 * dt; // wind drift
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+
+    // Check hit against balloons
+    G.balloons.forEach(b => {
+      if (b.hit) return;
+      const d = Math.hypot(p.x - b.x, p.y - b.y);
+      if (d < b.r + p.r) {
+        b.hit = true;
+        p.hit = true;
+        G.balloonsPopped++;
+        G.combo++;
+        if (G.combo > G.maxCombo) G.maxCombo = G.combo;
+        const ptsEarned = b.pts * Math.min(4, G.combo);
+        G.score += ptsEarned;
+        AU.play('pop');
+
+        // Burst particles
+        for (let i = 0; i < 14; i++) {
+          G.particles.push({
+            x: b.x, y: b.y,
+            vx: (Math.random() - 0.5) * 180,
+            vy: (Math.random() - 0.5) * 180,
+            col: b.col,
+            life: 0.6
+          });
+        }
+
+        // Drop present box
+        G.presents.push({
+          x: b.x, y: b.y + 15,
+          vy: 80,
+          rot: 0,
+          col: b.col,
+          pts: ptsEarned
+        });
+      }
+    });
+  });
+  G.pebbles = G.pebbles.filter(p => p.y < H && !p.hit);
+
+  // Update falling presents
+  G.presents.forEach(pr => {
+    pr.y += pr.vy * dt;
+    pr.rot += dt * 2;
+    // Check catch at bottom slingshot area
+    if (Math.hypot(pr.x - G.slingshot.x, pr.y - G.slingshot.y) < 65) {
+      pr.caught = true;
+      G.presentsCaught++;
+      G.score += 150;
+      AU.play('catch');
+    }
+  });
+  G.presents = G.presents.filter(pr => pr.y < H + 30 && !pr.caught);
+
+  // Update particles
+  G.particles.forEach(pt => {
+    pt.x += pt.vx * dt;
+    pt.y += pt.vy * dt;
+    pt.life -= dt;
+  });
+  G.particles = G.particles.filter(pt => pt.life > 0);
+}
+
+// Rendering
+function render() {
+  g.clearRect(0, 0, W, H);
+
+  // Sky Gradient
+  const sky = g.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#58a4d0');
+  sky.addColorStop(0.7, '#a2d6f0');
+  sky.addColorStop(1, '#fde8c0');
+  g.fillStyle = sky;
+  g.fillRect(0, 0, W, H);
+
+  // Clouds
+  g.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  G.clouds.forEach(c => {
+    g.beginPath();
+    g.arc(c.x, c.y, c.h * 0.9, 0, Math.PI * 2);
+    g.arc(c.x + c.w * 0.35, c.y - c.h * 0.25, c.h * 1.1, 0, Math.PI * 2);
+    g.arc(c.x + c.w * 0.7, c.y, c.h * 0.8, 0, Math.PI * 2);
+    g.fill();
+  });
+
+  // Island Horizon Hills & Windmills
+  g.fillStyle = '#4ea150';
+  g.beginPath();
+  g.moveTo(0, H - 35);
+  g.quadraticCurveTo(W * 0.25, H - 75, W * 0.5, H - 40);
+  g.quadraticCurveTo(W * 0.75, H - 85, W, H - 45);
+  g.lineTo(W, H); g.lineTo(0, H);
+  g.fill();
+
+  // Draw Balloons
+  G.balloons.forEach(b => {
+    // String
+    g.strokeStyle = '#ffffff';
+    g.lineWidth = 1.5;
+    g.beginPath();
+    g.moveTo(b.x, b.y + b.r);
+    g.lineTo(b.x, b.y + b.r + 20);
+    g.stroke();
+
+    // Gift box
+    g.fillStyle = '#fceade';
+    g.fillRect(b.x - 10, b.y + b.r + 20, 20, 16);
+    g.fillStyle = b.col;
+    g.fillRect(b.x - 2, b.y + b.r + 20, 4, 16); // ribbon
+
+    // Balloon body
+    g.fillStyle = b.col;
+    g.beginPath();
+    g.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    g.fill();
+    // Highlight
+    g.fillStyle = 'rgba(255,255,255,0.45)';
+    g.beginPath();
+    g.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.25, 0, Math.PI * 2);
+    g.fill();
+  });
+
+  // Draw Falling Presents
+  G.presents.forEach(pr => {
+    g.save();
+    g.translate(pr.x, pr.y);
+    g.rotate(pr.rot);
+    g.fillStyle = '#ffffff';
+    g.fillRect(-12, -10, 24, 20);
+    g.fillStyle = pr.col;
+    g.fillRect(-3, -10, 6, 20);
+    g.fillRect(-12, -3, 24, 6);
+    g.restore();
+  });
+
+  // Draw Particles
+  G.particles.forEach(pt => {
+    g.fillStyle = pt.col;
+    g.beginPath();
+    g.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+    g.fill();
+  });
+
+  // Draw Pebbles
+  g.fillStyle = '#4a3b32';
+  G.pebbles.forEach(p => {
+    g.beginPath();
+    g.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    g.fill();
+  });
+
+  // Draw Slingshot & Aiming Guide
+  const sx = G.slingshot.x, sy = G.slingshot.y;
+  const px = sx + G.slingshot.pullX, py = sy + G.slingshot.pullY;
+
+  // Aiming dotted line
+  if (G.slingshot.dragging) {
+    g.strokeStyle = 'rgba(255, 240, 160, 0.7)';
+    g.setLineDash([6, 6]);
+    g.lineWidth = 2.5;
+    g.beginPath();
+    g.moveTo(sx, sy - 15);
+    let simX = sx, simY = sy - 15;
+    let simVx = -G.slingshot.pullX * 12, simVy = -G.slingshot.pullY * 12;
+    for (let s = 0; s < 18; s++) {
+      simVy += 460 * 0.035;
+      simX += (simVx + G.wind * 40) * 0.035;
+      simY += simVy * 0.035;
+      g.lineTo(simX, simY);
+    }
+    g.stroke();
+    g.setLineDash([]);
+  }
+
+  // Wooden Fork
+  g.strokeStyle = '#8d5b2c';
+  g.lineWidth = 9;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(sx, sy + 35);
+  g.lineTo(sx, sy);
+  g.lineTo(sx - 24, sy - 28);
+  g.moveTo(sx, sy);
+  g.lineTo(sx + 24, sy - 28);
+  g.stroke();
+
+  // Rubber Bands
+  g.strokeStyle = '#d63031';
+  g.lineWidth = 3.5;
+  g.beginPath();
+  g.moveTo(sx - 24, sy - 28);
+  g.lineTo(px, py);
+  g.lineTo(sx + 24, sy - 28);
+  g.stroke();
+
+  // Pebble in pouch
+  g.fillStyle = '#4a3b32';
+  g.beginPath();
+  g.arc(px, py, 6, 0, Math.PI * 2);
+  g.fill();
+
+  // HUD
+  g.fillStyle = '#102c42';
+  g.font = 'bold 20px "Trebuchet MS", sans-serif';
+  g.fillText(`🎈 Score: ${G.score}`, 24, 38);
+  g.fillText(`⏱️ Time: ${Math.ceil(G.time)}s`, W - 150, 38);
+  if (G.combo > 1) {
+    g.fillStyle = '#e67e22';
+    g.fillText(`🔥 Combo x${G.combo}!`, W / 2 - 65, 38);
+  }
+
+  // Wind Indicator
+  g.fillStyle = 'rgba(255,255,255,0.85)';
+  g.fillRect(W / 2 - 70, 52, 140, 26);
+  g.fillStyle = '#102c42';
+  g.font = 'bold 13px "Trebuchet MS", sans-serif';
+  const windDir = G.wind > 0 ? '▶' : '◀';
+  g.fillText(`Wind: ${windDir} ${Math.abs(G.wind).toFixed(1)} m/s`, W / 2 - 50, 70);
+
+  // Title / Game Over Overlays
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(16, 44, 66, 0.72)';
+    g.fillRect(0, 0, W, H);
+
+    g.fillStyle = '#ffffff';
+    g.font = 'bold 38px "Trebuchet MS", sans-serif';
+    g.textAlign = 'center';
+    g.fillText("🎈 Hazel's Slingshot Balloon Pop", W / 2, H / 2 - 40);
+
+    g.font = '19px "Trebuchet MS", sans-serif';
+    g.fillText("Drag back on the slingshot to aim & release!", W / 2, H / 2 + 10);
+    g.fillText("Catch falling gift boxes for combo bonuses.", W / 2, H / 2 + 40);
+
+    g.fillStyle = '#f0a840';
+    g.font = 'bold 24px "Trebuchet MS", sans-serif';
+    g.fillText("Tap or Click to Play", W / 2, H / 2 + 100);
+    g.textAlign = 'left';
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(16, 44, 66, 0.82)';
+    g.fillRect(0, 0, W, H);
+
+    g.fillStyle = '#ffffff';
+    g.font = 'bold 38px "Trebuchet MS", sans-serif';
+    g.textAlign = 'center';
+    g.fillText("Time's Up!", W / 2, H / 2 - 60);
+
+    g.font = '22px "Trebuchet MS", sans-serif';
+    g.fillText(`Final Score: ${G.score} pts`, W / 2, H / 2 - 15);
+    g.fillText(`Balloons Popped: ${G.balloonsPopped}  ·  Max Combo: x${G.maxCombo}`, W / 2, H / 2 + 20);
+
+    const win = G.score >= 1200;
+    g.fillStyle = win ? '#2ecc71' : '#f39c12';
+    g.fillText(win ? "🏆 Trophy Unlocked! Check your island mailbox!" : "Great practice! Score 1,200 for the trophy.", W / 2, H / 2 + 65);
+
+    g.fillStyle = '#f0a840';
+    g.font = 'bold 24px "Trebuchet MS", sans-serif';
+    g.fillText("Tap to Play Again", W / 2, H / 2 + 120);
+    g.textAlign = 'left';
+  }
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

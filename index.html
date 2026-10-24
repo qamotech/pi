@@ -226,6 +226,12 @@ button{touch-action:manipulation}
 #toolchip{min-height:44px}
 #hud{user-select:none;-webkit-user-select:none}
 :focus-visible{outline:3px solid #f0a840;outline-offset:2px}
+#balloonGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
+#balloonGame[hidden]{display:none}
+#balloonGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
+#balloonGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
+#balloonGameClose:active{transform:scale(.96)}
+#balloonGameFrame{flex:1;border:none;width:100%;min-height:0}
 #bikeGame{position:fixed;inset:0;z-index:300;background:#0b2a4a;display:flex;flex-direction:column}
 #bikeGame[hidden]{display:none}
 #bikeGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0d2f4a;color:#fff;font-weight:700;font-size:17px}
@@ -245,6 +251,10 @@ button{touch-action:manipulation}
 <noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#2a6f97;color:#fff;font-size:18px;line-height:1.5;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));text-align:center">Puddlewick Isle needs JavaScript to play.</div></noscript>
 <canvas id="cv" tabindex="0" aria-label="Puddlewick Isle game world"></canvas>
 
+<div id="balloonGame" hidden>
+  <div id="balloonGameBar"><span><span aria-hidden="true">🎈</span> Hazel's Slingshot Balloon Pop</span><button id="balloonGameClose" aria-label="Close Hazel's Slingshot Balloon Pop"><span aria-hidden="true">✖</span> Close</button></div>
+  <iframe id="balloonGameFrame" title="Hazel's Slingshot Balloon Pop mini-game" allow="autoplay"></iframe>
+</div>
 <div id="bikeGame" hidden>
   <div id="bikeGameBar"><span><span aria-hidden="true">🚲</span> Bike Blitz — Spoke Island Trails</span><button id="bikeGameClose" aria-label="Close Bike Blitz"><span aria-hidden="true">✖</span> Close</button></div>
   <iframe id="bikeGameFrame" title="Bike Blitz mini-game" allow="autoplay"></iframe>
@@ -2995,6 +3005,8 @@ function openHall(){return convo(async()=>{
   if(!S.flags.hall){S.flags.hall=1;await say(CLERK,`Hi, ${S.name}! Welcome to Resident Services. You can craft at our workbench, redeem Tide Points, take out a home loan, or use the bank.`)}
   else await say(CLERK,pick(Math.random,[`Hello, ${S.name}! How can I help today?`,'Good to see you! Need anything?',`Everyone on ${S.island} seems so cheerful lately!`]));
   closeDlg();openPanel('🏛️','Town Hall',renderHall,{tab:'craft',kind:'hall'})})}
+function openBalloonGame(){if(DLG.on)return;$('balloonGameFrame').src='balloon-pop.html';$('balloonGame').hidden=false;sfx('fanfare')}
+function closeBalloonGame(){$('balloonGame').hidden=true;$('balloonGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openBikeGame(){if(DLG.on)return;$('bikeGameFrame').src='bike-blitz.html';$('bikeGame').hidden=false;sfx('fanfare')}
 function closeBikeGame(){$('bikeGame').hidden=true;$('bikeGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openFishGame(){if(DLG.on)return;$('fishGameFrame').src='fishing-derby.html';$('fishGame').hidden=false;sfx('fanfare')}
@@ -3012,7 +3024,8 @@ function arcadeResult(g,d){if(!S||!S.arcade)return;const A=S.arcade;A.plays[g]++
   if(win){if(!A.trophies[g]){A.trophies[g]=today();mail(g==='fish'?'Marlowe':'Island Arcade',g==='fish'?'You WON my full Fishing Derby! This champion trophy is yours — display it proudly, splish!':'You conquered Bike Blitz! This Trail Blazer trophy is yours — display it proudly!',g==='fish'?'fu_mgfish':'fu_mgbike');toast('🏆 Mini-game trophy won! Check your mailbox!','big');vibrate(200)}
     else{S.pts+=100;toast('🎮 Arcade win: +100 Tide Points!');sfx('points')}}
   save();uiDirty()}
-addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;if(d.pw==='fish')arcadeResult('fish',d);else if(d.pw==='bike')arcadeResult('bike',d)});
+addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;if(d.pw==='fish')arcadeResult('fish',d);else if(d.pw==='balloon')arcadeResult('balloon',d)
+  else if(d.pw==='bike')arcadeResult('bike',d)});
 function openDerbyDock(){return convo(async()=>{const P=TOURNEY.P;
   if(!S.flags.derbyDock){S.flags.derbyDock=1;await say(P,`Ahoy-hoy, ${S.name}! This here's my Derby Dock. Saturdays stay friendly up in the plaza, but THIS dock runs my full Fishing Derby any day, ${P.cp}!`);
     learn('r_tacklebox');await say(P,'Every derby angler carries a Tackle box — I just taught you the DIY: just 1 hardwood and 1 clay at any workbench. Bring any fishing rod too — and if your box is not ready yet, I will lend you my spare!')}
@@ -3231,6 +3244,7 @@ const PA={
   // phone
   app:d=>{PAN.tab=d.t;PAN.sub=null;$('pBody').scrollTop=0},
   arcFish:()=>{closePanel();arcLaunch('fish');return false},
+  arcBalloon:()=>{closePanel();openBalloonGame();return false},
   arcBike:()=>{closePanel();arcLaunch('bike');return false},
   songpv:d=>{if(G.gig&&!G.gig.pv){toast('🎵 Piper is playing for you right now. Listen to the end!');return}if(startGig(d.id,1))toast(`🎵 Previewing "${SONG_BY[d.id][1]}"`)},
   sub:d=>{PAN.sub=d.s},
@@ -3477,9 +3491,11 @@ function renderPhone(){
     case 'arcade':{const A=S.arcade,td=today(),bf=A.bonus.fish===td,bb=A.bonus.bike===td;
       let h=back+`<p>Two mini-games live right on your island. The first play of each, every day, pays <b>+50 🌊 Tide Points</b>. Win one and a trophy arrives by mail!</p><div class="list">`;
       h+=li('🎣',"Marlowe's Fishing Derby",`Plays ${A.plays.fish} · Best ${fmt(A.best.fish)} pts${A.trophies.fish?' · 🏆 trophy won!':''} · ${bf?'bonus claimed today':'daily bonus waiting'}`,rodOwned()?`<button class="btn" data-a="arcFish">▶ Play</button>`:'<span class="mute">Needs a fishing rod</span>');
+      h+=li('🎈','Hazel's Slingshot Balloon Pop',`Plays ${A.plays.balloon||0} · Best score ${fmt(A.best.balloon||0)}${A.trophies.balloon?' · 🏆 trophy won!':''} · ${A.bonus.balloon===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBalloon">▶ Play</button>`);
       h+=li('🚲','Bike Blitz',`Plays ${A.plays.bike} · Best score ${fmt(A.best.bike)}${A.trophies.bike?' · 🏆 trophy won!':''} · ${bb?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBike">▶ Play</button>`);
       h+='</div><h3>How to unlock</h3><div class="list">';
       h+=li('🎣','Fishing Derby','Just carry any fishing rod — Marlowe lends Tackle boxes at the Derby Dock sign (by the island dock) and teaches the Tackle box DIY (1 hardwood + 1 clay). Carrying your own box earns his Golden Lure lesson. Win a Saturday plaza Fishing Derby to learn the Golden fishing rod DIY.','');
+      h+=li('🎈','Hazel's Slingshot Balloon Pop',`Plays ${A.plays.balloon||0} · Best score ${fmt(A.best.balloon||0)}${A.trophies.balloon?' · 🏆 trophy won!':''} · ${A.bonus.balloon===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBalloon">▶ Play</button>`);
       h+=li('🚲','Bike Blitz','Play right here, or borrow the free loaner at the Spoke Island trailhead! To ride your own: Cruiser Bike — Bike frame (2 iron + 1 hardwood) + 2 Bike wheels (1 iron + 1 clay each). Cruiser owners learn the Stunt Hopper DIY at the trailhead. A Bike bell (DIY at Bramble\'s) makes any bike 12% faster.','');
       return h+'</div>'}
     case 'cam':return back+'<p>Photo mode hides all menus so you can take a screenshot of your island.</p><button class="btn" data-a="photo"><span aria-hidden="true">📷</span> Start photo mode</button>';
@@ -3750,9 +3766,10 @@ $('toolchip').onclick=()=>cycleTool(1);$('bWish').onclick=wish;
 for(const [id,fn] of [['bBag',openInv],['bPhone',()=>openPhone()]])$(id).onclick=e=>{PAN.op=e.currentTarget;try{fn()}finally{PAN.op=null}};
 $('bRadar').onclick=toggleRadar;
 $('bBike').onclick=toggleBikeMount;
+$('balloonGameClose').onclick=closeBalloonGame;
 $('bikeGameClose').onclick=closeBikeGame;
 $('fishGameClose').onclick=closeFishGame;
-addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('balloonGame').hidden)closeBalloonGame();else if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
 {const stick=$('stick'),knob=$('knob');let jid=null;
   const moveJ=e=>{const r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),R=r.width/2-12,d=Math.hypot(dx,dy),m=Math.min(1,d/R),nx=d?dx/d:0,ny=d?dy/d:0;
     G.joy={x:nx,y:ny,m};knob.style.transform=`translate(${nx*m*R}px,${ny*m*R}px)`};
