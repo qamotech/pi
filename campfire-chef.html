@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#b23b20">
+<title>Puddlewick Isle: Marlowe's Campfire Skewer Grill</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; user-select:none; background:#1e0c08; font-family:'Trebuchet MS',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#2c1510; touch-action:none; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const G = { state: 'title', score: 0, time: 70, skewers: [] };
+const ITEMS = [{ name:'River Trout', icon:'🐟', pts:150 }, { name:'Sunroot', icon:'🥔', pts:120 }, { name:'Marshmallow', icon:'🍢', pts:180 }];
+
+function spawnSkewer(lane) {
+  const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+  return { lane, item, heat: 0, flipped: false, done: false };
+}
+
+function onDown(e) {
+  e.preventDefault();
+  if (G.state !== 'play') { startGame(); return; }
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const x = (cx - r.left) * (W / r.width);
+  const lane = Math.floor(x / (W / 3));
+  if (lane >= 0 && lane < 3) {
+    const sk = G.skewers[lane];
+    if (sk.heat > 0.4 && sk.heat < 0.85) {
+      if (!sk.flipped) { sk.flipped = true; sk.heat = 0.2; }
+      else { G.score += sk.item.pts; G.skewers[lane] = spawnSkewer(lane); }
+    } else {
+      G.skewers[lane] = spawnSkewer(lane);
+    }
+  }
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+
+function startGame() {
+  G.state = 'play'; G.score = 0; G.time = 70;
+  G.skewers = [spawnSkewer(0), spawnSkewer(1), spawnSkewer(2)];
+}
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'campfire', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1000, title: "Marlowe's Campfire Skewer Grill" }, '*');
+  } catch(_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    G.time -= dt; if (G.time <= 0) endGame();
+    G.skewers.forEach((s, i) => {
+      s.heat += dt * 0.35;
+      if (s.heat > 1.0) G.skewers[i] = spawnSkewer(i); // burned!
+    });
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  // Campfire background
+  g.fillStyle = '#1e0c08'; g.fillRect(0,0,W,H);
+  // Lanes
+  const laneW = W / 3;
+  G.skewers.forEach((s, i) => {
+    const cx = i * laneW + laneW / 2;
+    // Campfire embers
+    g.fillStyle = s.heat > 0.85 ? '#e74c3c' : s.heat > 0.4 ? '#f39c12' : '#3d1c14';
+    g.beginPath(); g.arc(cx, H - 120, 65, 0, Math.PI*2); g.fill();
+    // Skewer stick
+    g.strokeStyle = '#c8a165'; g.lineWidth = 6;
+    g.beginPath(); g.moveTo(cx, H - 240); g.lineTo(cx, H - 40); g.stroke();
+    // Food icon
+    g.font = '48px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(s.item.icon, cx, H - 160);
+    // Timing bar
+    g.fillStyle = 'rgba(255,255,255,0.2)'; g.fillRect(cx - 50, H - 280, 100, 12);
+    g.fillStyle = s.heat > 0.4 && s.heat < 0.85 ? '#2ecc71' : '#e74c3c';
+    g.fillRect(cx - 50, H - 280, 100 * Math.min(1, s.heat), 12);
+  });
+
+  // HUD
+  g.fillStyle = '#fff'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🍢 Score: ${G.score}`, 24, 38);
+  g.fillText(`⏱️ Time: ${Math.ceil(G.time)}s`, W - 140, 38);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(20,5,3,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🍢 Marlowe's Campfire Skewer Grill", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Tap when skewers sizzle green: flip first, then serve!", W/2, H/2 + 10);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(20,5,3,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Feast Served!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts`, W/2, H/2);
+    g.fillStyle = G.score >= 1000 ? '#2ecc71' : '#f0a840';
+    g.fillText(G.score >= 1000 ? "🏆 Golden Skewer Trophy Unlocked!" : "Score 1,000 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
