@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a6e8b">
+<title>Puddlewick Isle: Tide Pool Shell Sorter</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; user-select:none; background:#0b3848; font-family:'Trebuchet MS',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#e8d19f; touch-action:none; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const G = { state: 'title', score: 0, time: 75, shells: [] };
+const TYPES = [{ icon:'🐚', col:'#fff' }, { icon:'⭐', col:'#f39c12' }, { icon:'🪸', col:'#e74c3c' }, { icon:'✨', col:'#3498db' }];
+
+function spawnShell() {
+  G.shells.push({
+    x: 80 + Math.random() * (W - 160),
+    y: 80 + Math.random() * (H - 160),
+    type: TYPES[Math.floor(Math.random() * TYPES.length)],
+    r: 25
+  });
+}
+
+function onDown(e) {
+  e.preventDefault();
+  if (G.state !== 'play') { startGame(); return; }
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const x = (cx - r.left) * (W / r.width), y = (cy - r.top) * (H / r.height);
+  G.shells.forEach((s, idx) => {
+    if (Math.hypot(x - s.x, y - s.y) < s.r + 15) {
+      G.shells.splice(idx, 1);
+      G.score += 150;
+      spawnShell();
+    }
+  });
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+
+function startGame() {
+  G.state = 'play'; G.score = 0; G.time = 75; G.shells = [];
+  for (let i = 0; i < 9; i++) spawnShell();
+}
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'shell', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1100, title: "Tide Pool Shell Sorter" }, '*');
+  } catch(_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    G.time -= dt; if (G.time <= 0) endGame();
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  // Coastal Shore
+  g.fillStyle = '#e8d19f'; g.fillRect(0,0,W,H);
+  // Surf waves
+  g.fillStyle = 'rgba(74, 185, 219, 0.45)';
+  g.beginPath(); g.arc(W/2, -100, W*0.7, 0, Math.PI); g.fill();
+
+  // Shells
+  g.font = '32px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  G.shells.forEach(s => { g.fillText(s.type.icon, s.x, s.y); });
+
+  // HUD
+  g.fillStyle = '#0b3848'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🐚 Score: ${G.score}`, 24, 38);
+  g.fillText(`⏱️ Time: ${Math.ceil(G.time)}s`, W - 140, 38);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(11,56,72,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🐚 Tide Pool Shell Sorter", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Tap shells, starfish and sea glass before incoming tides!", W/2, H/2 + 10);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(11,56,72,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Tide In!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts`, W/2, H/2);
+    g.fillStyle = G.score >= 1100 ? '#2ecc71' : '#f0a840';
+    g.fillText(G.score >= 1100 ? "🏆 Pearl Nautilus Trophy Unlocked!" : "Score 1,100 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#f0a840'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
