@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1a243b">
+<title>Puddlewick Isle: Piper's Plaza Busker Jam</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; user-select:none; background:#0f172a; font-family:'Trebuchet MS',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#1e293b; touch-action:none; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const G = { state: 'title', score: 0, time: 75, notes: [] };
+const LANES = [W*0.25, W*0.41, W*0.58, W*0.75];
+const ICONS = ['🎵', '🎶', '🎸', '⭐'];
+
+function spawnNote() {
+  const lane = Math.floor(Math.random() * 4);
+  G.notes.push({ lane, y: -30, vy: 240, hit: false });
+}
+
+function onDown(e) {
+  e.preventDefault();
+  if (G.state !== 'play') { startGame(); return; }
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const x = (cx - r.left) * (W / r.width);
+  const lane = LANES.reduce((closest, lx, idx) => Math.abs(x - lx) < Math.abs(x - LANES[closest]) ? idx : closest, 0);
+  G.notes.forEach(n => {
+    if (n.lane === lane && Math.abs(n.y - (H - 90)) < 45 && !n.hit) {
+      n.hit = true;
+      G.score += 150;
+    }
+  });
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+
+function startGame() { G.state = 'play'; G.score = 0; G.time = 75; G.notes = []; }
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'piperjam', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1200, title: "Piper's Plaza Busker Jam" }, '*');
+  } catch(_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    G.time -= dt; if (G.time <= 0) endGame();
+    if (Math.random() < dt * 2.8) spawnNote();
+    G.notes.forEach(n => n.y += n.vy * dt);
+    G.notes = G.notes.filter(n => n.y < H && !n.hit);
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  g.fillStyle = '#0f172a'; g.fillRect(0,0,W,H);
+  // Lanes
+  LANES.forEach((lx, i) => {
+    g.strokeStyle = 'rgba(255,255,255,0.1)'; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(lx, 0); g.lineTo(lx, H); g.stroke();
+    // Hit target circle
+    g.strokeStyle = '#f59e0b'; g.lineWidth = 3;
+    g.beginPath(); g.arc(lx, H - 90, 30, 0, Math.PI*2); g.stroke();
+  });
+
+  // Notes
+  g.font = '32px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  G.notes.forEach(n => {
+    g.fillText(ICONS[n.lane], LANES[n.lane], n.y);
+  });
+
+  // HUD
+  g.fillStyle = '#fff'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🎵 Score: ${G.score}`, 24, 38);
+  g.fillText(`⏱️ Time: ${Math.ceil(G.time)}s`, W - 140, 38);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(15,23,42,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🎵 Piper's Plaza Busker Jam", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Tap lane targets as notes reach the glowing circles!", W/2, H/2 + 10);
+    g.fillStyle = '#f59e0b'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(15,23,42,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Encore!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts`, W/2, H/2);
+    g.fillStyle = G.score >= 1200 ? '#2ecc71' : '#f59e0b';
+    g.fillText(G.score >= 1200 ? "🏆 Golden Ukulele Trophy Unlocked!" : "Score 1,200 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#f59e0b'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
