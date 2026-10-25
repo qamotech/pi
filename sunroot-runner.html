@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#d97706">
+<title>Puddlewick Isle: Rosie's Sunroot Stalk Dash</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; user-select:none; background:#78350f; font-family:'Trebuchet MS',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#fef3c7; touch-action:none; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const G = { state: 'title', score: 0, playerY: H - 110, vy: 0, jumping: false, obstacles: [], roots: [] };
+
+function jump() {
+  if (!G.jumping) { G.vy = -520; G.jumping = true; }
+}
+
+function onDown(e) {
+  e.preventDefault();
+  if (G.state !== 'play') { startGame(); return; }
+  jump();
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+window.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
+
+function startGame() {
+  G.state = 'play'; G.score = 0; G.playerY = H - 110; G.vy = 0; G.jumping = false;
+  G.obstacles = []; G.roots = [];
+}
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'sunroot', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1000, title: "Rosie's Sunroot Stalk Dash" }, '*');
+  } catch(_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    G.score += Math.round(dt * 30);
+    // Physics
+    G.vy += 1200 * dt;
+    G.playerY += G.vy * dt;
+    if (G.playerY > H - 110) { G.playerY = H - 110; G.vy = 0; G.jumping = false; }
+
+    // Spawn obstacles & roots
+    if (Math.random() < dt * 0.9) G.obstacles.push({ x: W + 40, r: 24 });
+    if (Math.random() < dt * 1.5) G.roots.push({ x: W + 40, y: H - 140 - Math.random()*80, r: 18, hit: false });
+
+    G.obstacles.forEach(o => {
+      o.x -= 380 * dt;
+      if (Math.hypot(120 - o.x, G.playerY - (H - 110)) < 35) endGame();
+    });
+    G.roots.forEach(r => {
+      r.x -= 380 * dt;
+      if (Math.hypot(120 - r.x, G.playerY - r.y) < 40 && !r.hit) {
+        r.hit = true; G.score += 200;
+      }
+    });
+
+    G.obstacles = G.obstacles.filter(o => o.x > -50);
+    G.roots = G.roots.filter(r => r.x > -50 && !r.hit);
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  // Sky & Ground
+  g.fillStyle = '#fef3c7'; g.fillRect(0,0,W,H);
+  g.fillStyle = '#92400e'; g.fillRect(0, H - 90, W, 90);
+
+  // Player
+  g.font = '40px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('🏃', 120, G.playerY);
+
+  // Obstacles (mud puddles/fences)
+  g.fillText('🪵', 0, 0); // warm font
+  G.obstacles.forEach(o => g.fillText('🪨', o.x, H - 105));
+
+  // Sunroots
+  G.roots.forEach(r => g.fillText('🥔', r.x, r.y));
+
+  // HUD
+  g.fillStyle = '#78350f'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🥔 Score: ${G.score}`, 24, 38);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(120,53,15,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🥔 Rosie's Sunroot Stalk Dash", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Tap or Space to jump over rocks and collect prized sunroots!", W/2, H/2 + 10);
+    g.fillStyle = '#f59e0b'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(120,53,15,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Dash Over!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts`, W/2, H/2);
+    g.fillStyle = G.score >= 1000 ? '#2ecc71' : '#f59e0b';
+    g.fillText(G.score >= 1000 ? "🏆 Golden Sunroot Trophy Unlocked!" : "Score 1,000 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#f59e0b'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
