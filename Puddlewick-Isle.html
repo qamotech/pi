@@ -268,6 +268,12 @@ button{touch-action:manipulation}
 #sunrootGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
 #sunrootGameClose:active{transform:scale(.96)}
 #sunrootGameFrame{flex:1;border:none;width:100%;min-height:0}
+#diverGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
+#diverGame[hidden]{display:none}
+#diverGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
+#diverGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
+#diverGameClose:active{transform:scale(.96)}
+#diverGameFrame{flex:1;border:none;width:100%;min-height:0}
 #bikeGame{position:fixed;inset:0;z-index:300;background:#0b2a4a;display:flex;flex-direction:column}
 #bikeGame[hidden]{display:none}
 #bikeGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0d2f4a;color:#fff;font-weight:700;font-size:17px}
@@ -314,6 +320,10 @@ button{touch-action:manipulation}
 <div id="sunrootGame" hidden>
   <div id="sunrootGameBar"><span><span aria-hidden="true">🥔</span> Rosie's Sunroot Stalk Dash</span><button id="sunrootGameClose" aria-label="Close Rosie's Sunroot Stalk Dash"><span aria-hidden="true">✖</span> Close</button></div>
   <iframe id="sunrootGameFrame" title="Rosie's Sunroot Stalk Dash mini-game" allow="autoplay"></iframe>
+</div>
+<div id="diverGame" hidden>
+  <div id="diverGameBar"><span><span aria-hidden="true">🤿</span> Coral Atoll Pearl Diver</span><button id="diverGameClose" aria-label="Close Coral Atoll Pearl Diver"><span aria-hidden="true">✖</span> Close</button></div>
+  <iframe id="diverGameFrame" title="Coral Atoll Pearl Diver mini-game" allow="autoplay"></iframe>
 </div>
 <div id="bikeGame" hidden>
   <div id="bikeGameBar"><span><span aria-hidden="true">🚲</span> Bike Blitz — Spoke Island Trails</span><button id="bikeGameClose" aria-label="Close Bike Blitz"><span aria-hidden="true">✖</span> Close</button></div>
@@ -3079,6 +3089,8 @@ function openPiperjamGame(){if(DLG.on)return;$('piperjamGameFrame').src='piper-j
 function closePiperjamGame(){$('piperjamGame').hidden=true;$('piperjamGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openSunrootGame(){if(DLG.on)return;$('sunrootGameFrame').src='sunroot-runner.html';$('sunrootGame').hidden=false;sfx('fanfare')}
 function closeSunrootGame(){$('sunrootGame').hidden=true;$('sunrootGameFrame').src='about:blank';cv.focus({preventScroll:true})}
+function openDiverGame(){if(DLG.on)return;$('diverGameFrame').src='pearl-diver.html';$('diverGame').hidden=false;sfx('fanfare')}
+function closeDiverGame(){$('diverGame').hidden=true;$('diverGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openBikeGame(){if(DLG.on)return;$('bikeGameFrame').src='bike-blitz.html';$('bikeGame').hidden=false;sfx('fanfare')}
 function closeBikeGame(){$('bikeGame').hidden=true;$('bikeGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openFishGame(){if(DLG.on)return;$('fishGameFrame').src='fishing-derby.html';$('fishGame').hidden=false;sfx('fanfare')}
@@ -3103,6 +3115,7 @@ addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;
   else if(d.pw==='campfire')arcadeResult('campfire',d)
   else if(d.pw==='piperjam')arcadeResult('piperjam',d)
   else if(d.pw==='sunroot')arcadeResult('sunroot',d)
+  else if(d.pw==='diver')arcadeResult('diver',d)
   else if(d.pw==='bike')arcadeResult('bike',d)});
 function openDerbyDock(){return convo(async()=>{const P=TOURNEY.P;
   if(!S.flags.derbyDock){S.flags.derbyDock=1;await say(P,`Ahoy-hoy, ${S.name}! This here's my Derby Dock. Saturdays stay friendly up in the plaza, but THIS dock runs my full Fishing Derby any day, ${P.cp}!`);
@@ -3329,6 +3342,7 @@ const PA={
   arcCampfire:()=>{closePanel();openCampfireGame();return false},
   arcPiperjam:()=>{closePanel();openPiperjamGame();return false},
   arcSunroot:()=>{closePanel();openSunrootGame();return false},
+  arcDiver:()=>{closePanel();openDiverGame();return false},
   arcBike:()=>{closePanel();arcLaunch('bike');return false},
   songpv:d=>{if(G.gig&&!G.gig.pv){toast('🎵 Piper is playing for you right now. Listen to the end!');return}if(startGig(d.id,1))toast(`🎵 Previewing "${SONG_BY[d.id][1]}"`)},
   sub:d=>{PAN.sub=d.s},
@@ -3582,6 +3596,7 @@ function renderPhone(){
       h+=li('🍢','Marlowe's Campfire Skewer Grill',`Plays ${A.plays.campfire||0} · Best score ${fmt(A.best.campfire||0)}${A.trophies.campfire?' · 🏆 trophy won!':''} · ${A.bonus.campfire===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCampfire">▶ Play</button>`);
       h+=li('🎵','Piper's Plaza Busker Jam',`Plays ${A.plays.piperjam||0} · Best score ${fmt(A.best.piperjam||0)}${A.trophies.piperjam?' · 🏆 trophy won!':''} · ${A.bonus.piperjam===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcPiperjam">▶ Play</button>`);
       h+=li('🥔','Rosie's Sunroot Stalk Dash',`Plays ${A.plays.sunroot||0} · Best score ${fmt(A.best.sunroot||0)}${A.trophies.sunroot?' · 🏆 trophy won!':''} · ${A.bonus.sunroot===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcSunroot">▶ Play</button>`);
+      h+=li('🤿','Coral Atoll Pearl Diver',`Plays ${A.plays.diver||0} · Best score ${fmt(A.best.diver||0)}${A.trophies.diver?' · 🏆 trophy won!':''} · ${A.bonus.diver===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcDiver">▶ Play</button>`);
       h+=li('🚲','Bike Blitz',`Plays ${A.plays.bike} · Best score ${fmt(A.best.bike)}${A.trophies.bike?' · 🏆 trophy won!':''} · ${bb?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBike">▶ Play</button>`);
       h+='</div><h3>How to unlock</h3><div class="list">';
       h+=li('🎣','Fishing Derby','Just carry any fishing rod — Marlowe lends Tackle boxes at the Derby Dock sign (by the island dock) and teaches the Tackle box DIY (1 hardwood + 1 clay). Carrying your own box earns his Golden Lure lesson. Win a Saturday plaza Fishing Derby to learn the Golden fishing rod DIY.','');
@@ -3592,6 +3607,7 @@ function renderPhone(){
       h+=li('🍢','Marlowe's Campfire Skewer Grill',`Plays ${A.plays.campfire||0} · Best score ${fmt(A.best.campfire||0)}${A.trophies.campfire?' · 🏆 trophy won!':''} · ${A.bonus.campfire===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCampfire">▶ Play</button>`);
       h+=li('🎵','Piper's Plaza Busker Jam',`Plays ${A.plays.piperjam||0} · Best score ${fmt(A.best.piperjam||0)}${A.trophies.piperjam?' · 🏆 trophy won!':''} · ${A.bonus.piperjam===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcPiperjam">▶ Play</button>`);
       h+=li('🥔','Rosie's Sunroot Stalk Dash',`Plays ${A.plays.sunroot||0} · Best score ${fmt(A.best.sunroot||0)}${A.trophies.sunroot?' · 🏆 trophy won!':''} · ${A.bonus.sunroot===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcSunroot">▶ Play</button>`);
+      h+=li('🤿','Coral Atoll Pearl Diver',`Plays ${A.plays.diver||0} · Best score ${fmt(A.best.diver||0)}${A.trophies.diver?' · 🏆 trophy won!':''} · ${A.bonus.diver===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcDiver">▶ Play</button>`);
       h+=li('🚲','Bike Blitz','Play right here, or borrow the free loaner at the Spoke Island trailhead! To ride your own: Cruiser Bike — Bike frame (2 iron + 1 hardwood) + 2 Bike wheels (1 iron + 1 clay each). Cruiser owners learn the Stunt Hopper DIY at the trailhead. A Bike bell (DIY at Bramble\'s) makes any bike 12% faster.','');
       return h+'</div>'}
     case 'cam':return back+'<p>Photo mode hides all menus so you can take a screenshot of your island.</p><button class="btn" data-a="photo"><span aria-hidden="true">📷</span> Start photo mode</button>';
@@ -3869,9 +3885,10 @@ $('shellGameClose').onclick=closeShellGame;
 $('campfireGameClose').onclick=closeCampfireGame;
 $('piperjamGameClose').onclick=closePiperjamGame;
 $('sunrootGameClose').onclick=closeSunrootGame;
+$('diverGameClose').onclick=closeDiverGame;
 $('bikeGameClose').onclick=closeBikeGame;
 $('fishGameClose').onclick=closeFishGame;
-addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('balloonGame').hidden)closeBalloonGame();else if(!$('critterGame').hidden)closeCritterGame();else if(!$('fossilGame').hidden)closeFossilGame();else if(!$('shellGame').hidden)closeShellGame();else if(!$('campfireGame').hidden)closeCampfireGame();else if(!$('piperjamGame').hidden)closePiperjamGame();else if(!$('sunrootGame').hidden)closeSunrootGame();else if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('balloonGame').hidden)closeBalloonGame();else if(!$('critterGame').hidden)closeCritterGame();else if(!$('fossilGame').hidden)closeFossilGame();else if(!$('shellGame').hidden)closeShellGame();else if(!$('campfireGame').hidden)closeCampfireGame();else if(!$('piperjamGame').hidden)closePiperjamGame();else if(!$('sunrootGame').hidden)closeSunrootGame();else if(!$('diverGame').hidden)closeDiverGame();else if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
 {const stick=$('stick'),knob=$('knob');let jid=null;
   const moveJ=e=>{const r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),R=r.width/2-12,d=Math.hypot(dx,dy),m=Math.min(1,d/R),nx=d?dx/d:0,ny=d?dy/d:0;
     G.joy={x:nx,y:ny,m};knob.style.transform=`translate(${nx*m*R}px,${ny*m*R}px)`};

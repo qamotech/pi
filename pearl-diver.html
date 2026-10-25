@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e7490">
+<title>Puddlewick Isle: Coral Atoll Pearl Diver</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { width:100%; height:100%; overflow:hidden; touch-action:none; user-select:none; background:#083344; font-family:'Trebuchet MS',sans-serif; }
+  #wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; }
+  canvas { display:block; background:#0e7490; touch-action:none; cursor:pointer; }
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" role="img" tabindex="0"></canvas></div>
+<script>
+'use strict';
+const cv = document.getElementById('game'), g = cv.getContext('2d');
+let W = 960, H = 540;
+function resize() {
+  const ww = window.innerWidth, wh = window.innerHeight;
+  let cw = ww, ch = ww * 9 / 16; if (ch > wh) { ch = wh; cw = wh * 16 / 9; }
+  cv.style.width = cw + 'px'; cv.style.height = ch + 'px';
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+const G = { state: 'title', score: 0, breath: 100, diver: { x: W/2, y: 80, vy: 0 }, pearls: [], jellies: [] };
+
+function onDown(e) {
+  e.preventDefault();
+  if (G.state !== 'play') { startGame(); return; }
+  const r = cv.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  const tx = (cx - r.left) * (W / r.width), ty = (cy - r.top) * (H / r.height);
+  G.diver.x += (tx - G.diver.x) * 0.4;
+  G.diver.y += (ty - G.diver.y) * 0.4;
+}
+cv.addEventListener('mousedown', onDown); cv.addEventListener('touchstart', onDown, { passive: false });
+
+function startGame() {
+  G.state = 'play'; G.score = 0; G.breath = 100; G.diver = { x: W/2, y: 80 };
+  G.pearls = []; G.jellies = [];
+  for (let i = 0; i < 6; i++) G.pearls.push({ x: 80+Math.random()*(W-160), y: 220+Math.random()*(H-280), hit: false });
+  for (let i = 0; i < 4; i++) G.jellies.push({ x: 80+Math.random()*(W-160), y: 150+Math.random()*(H-250), vx: (Math.random()-0.5)*80 });
+}
+function endGame() {
+  G.state = 'gameover';
+  try {
+    parent.postMessage({ pw: 'diver', score: G.score|0, pts: Math.min(100, Math.floor(G.score/20)), win: G.score >= 1000, title: "Coral Atoll Pearl Diver" }, '*');
+  } catch(_) {}
+}
+
+let lastT = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastT)/1000); lastT = now;
+  if (G.state === 'play') {
+    if (G.diver.y > 100) G.breath -= dt * 6; // uses oxygen underwater
+    else G.breath = Math.min(100, G.breath + dt * 45); // breathe at surface
+    if (G.breath <= 0) endGame();
+
+    G.jellies.forEach(j => {
+      j.x += j.vx * dt;
+      if (j.x < 60 || j.x > W - 60) j.vx *= -1;
+      if (Math.hypot(G.diver.x - j.x, G.diver.y - j.y) < 32) G.breath -= 15 * dt;
+    });
+
+    G.pearls.forEach(p => {
+      if (!p.hit && Math.hypot(G.diver.x - p.x, G.diver.y - p.y) < 36) {
+        p.hit = true; G.score += 250;
+      }
+    });
+
+    if (G.pearls.every(p => p.hit)) {
+      for (let i = 0; i < 6; i++) G.pearls.push({ x: 80+Math.random()*(W-160), y: 220+Math.random()*(H-280), hit: false });
+    }
+  }
+  render();
+  requestAnimationFrame(loop);
+}
+
+function render() {
+  g.clearRect(0,0,W,H);
+  // Ocean Gradient
+  const grad = g.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#06b6d4'); grad.addColorStop(1, '#083344');
+  g.fillStyle = grad; g.fillRect(0,0,W,H);
+
+  // Surface water ripple
+  g.fillStyle = 'rgba(255,255,255,0.3)'; g.fillRect(0, 0, W, 80);
+
+  // Diver
+  g.font = '36px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('🤿', G.diver.x, G.diver.y);
+
+  // Pearls & Jellies
+  G.pearls.forEach(p => { if (!p.hit) g.fillText('🦪', p.x, p.y); });
+  G.jellies.forEach(j => g.fillText('🪼', j.x, j.y));
+
+  // Breath Bar
+  g.fillStyle = 'rgba(0,0,0,0.4)'; g.fillRect(W/2 - 90, 20, 180, 16);
+  g.fillStyle = G.breath > 30 ? '#06b6d4' : '#ef4444';
+  g.fillRect(W/2 - 90, 20, 180 * (G.breath / 100), 16);
+
+  // HUD
+  g.fillStyle = '#fff'; g.font = 'bold 20px "Trebuchet MS"'; g.textAlign = 'left';
+  g.fillText(`🦪 Score: ${G.score}`, 24, 38);
+  g.fillText(`🫧 Oxygen`, W/2 - 40, 52);
+
+  if (G.state === 'title') {
+    g.fillStyle = 'rgba(8,51,68,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("🤿 Coral Atoll Pearl Diver", W/2, H/2 - 40);
+    g.font = '20px "Trebuchet MS"'; g.fillText("Dive for pearl oysters, dodge jellyfish, return to surface for air!", W/2, H/2 + 10);
+    g.fillStyle = '#06b6d4'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap or Click to Play", W/2, H/2 + 75);
+  } else if (G.state === 'gameover') {
+    g.fillStyle = 'rgba(8,51,68,0.85)'; g.fillRect(0,0,W,H);
+    g.fillStyle = '#fff'; g.font = 'bold 36px "Trebuchet MS"'; g.textAlign = 'center';
+    g.fillText("Dive Finished!", W/2, H/2 - 45);
+    g.font = '22px "Trebuchet MS"'; g.fillText(`Final Score: ${G.score} pts`, W/2, H/2);
+    g.fillStyle = G.score >= 1000 ? '#2ecc71' : '#06b6d4';
+    g.fillText(G.score >= 1000 ? "🏆 Golden Pearl Shell Trophy Unlocked!" : "Score 1,000 for the trophy!", W/2, H/2 + 45);
+    g.fillStyle = '#06b6d4'; g.font = 'bold 24px "Trebuchet MS"'; g.fillText("Tap to Play Again", W/2, H/2 + 105);
+  }
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
