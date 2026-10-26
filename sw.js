@@ -1,7 +1,7 @@
 /* Puddlewick Isle service worker: network-first so new releases show up immediately,
    with a cached copy for offline play. Scope is limited to /pi/. */
 // Must stay in sync with APP_VERSION in index.html ('pi-v' + APP_VERSION); tests/run.sh fails on a mismatch.
-const VERSION = 'pi-v1.6.12';
+const VERSION = 'pi-v1.6.13';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon.svg'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
