@@ -147,6 +147,8 @@ input[type=range]{accent-color:var(--leaf)}
 .hchip{font:inherit;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;border:2px solid rgba(90,60,30,.35);background:#fff8ec;color:#5a4028;cursor:pointer}
 .hchip.on{border-color:#3f9fd2;background:#dff2fd}
 .sw button{width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+.sw button.hchip{width:auto;height:auto;border-radius:999px;background:#fff8ec;padding:6px 12px;box-shadow:none;white-space:nowrap}
+.sw button.hchip.on{background:#dff2fd;border-color:#3f9fd2}
 .map{width:100%;height:auto;border-radius:18px;image-rendering:pixelated;background:#3f9fd2}
 #radarMap{display:block;width:110px;height:110px;flex:none;border-radius:24px;border:3px solid rgba(255,255,255,.85);box-shadow:var(--deep);background:rgba(30,80,120,.78);backdrop-filter:blur(6px);pointer-events:none}
 .inv-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
@@ -226,54 +228,6 @@ button{touch-action:manipulation}
 #toolchip{min-height:44px}
 #hud{user-select:none;-webkit-user-select:none}
 :focus-visible{outline:3px solid #f0a840;outline-offset:2px}
-#balloonGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#balloonGame[hidden]{display:none}
-#balloonGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#balloonGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#balloonGameClose:active{transform:scale(.96)}
-#balloonGameFrame{flex:1;border:none;width:100%;min-height:0}
-#critterGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#critterGame[hidden]{display:none}
-#critterGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#critterGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#critterGameClose:active{transform:scale(.96)}
-#critterGameFrame{flex:1;border:none;width:100%;min-height:0}
-#fossilGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#fossilGame[hidden]{display:none}
-#fossilGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#fossilGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#fossilGameClose:active{transform:scale(.96)}
-#fossilGameFrame{flex:1;border:none;width:100%;min-height:0}
-#shellGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#shellGame[hidden]{display:none}
-#shellGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#shellGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#shellGameClose:active{transform:scale(.96)}
-#shellGameFrame{flex:1;border:none;width:100%;min-height:0}
-#campfireGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#campfireGame[hidden]{display:none}
-#campfireGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#campfireGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#campfireGameClose:active{transform:scale(.96)}
-#campfireGameFrame{flex:1;border:none;width:100%;min-height:0}
-#piperjamGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#piperjamGame[hidden]{display:none}
-#piperjamGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#piperjamGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#piperjamGameClose:active{transform:scale(.96)}
-#piperjamGameFrame{flex:1;border:none;width:100%;min-height:0}
-#sunrootGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#sunrootGame[hidden]{display:none}
-#sunrootGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#sunrootGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#sunrootGameClose:active{transform:scale(.96)}
-#sunrootGameFrame{flex:1;border:none;width:100%;min-height:0}
-#diverGame{position:fixed;inset:0;z-index:300;background:#102c42;display:flex;flex-direction:column}
-#diverGame[hidden]{display:none}
-#diverGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#153954;color:#fff;font-weight:700;font-size:17px;padding-top:calc(10px + env(safe-area-inset-top))}
-#diverGameClose{background:#f0a840;border:none;border-radius:10px;padding:9px 18px;min-height:44px;font-weight:700;font-size:15px;cursor:pointer;color:#fff}
-#diverGameClose:active{transform:scale(.96)}
-#diverGameFrame{flex:1;border:none;width:100%;min-height:0}
 #bikeGame{position:fixed;inset:0;z-index:300;background:#0b2a4a;display:flex;flex-direction:column}
 #bikeGame[hidden]{display:none}
 #bikeGameBar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0d2f4a;color:#fff;font-weight:700;font-size:17px}
@@ -293,38 +247,6 @@ button{touch-action:manipulation}
 <noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#2a6f97;color:#fff;font-size:18px;line-height:1.5;padding:calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom));text-align:center">Puddlewick Isle needs JavaScript to play.</div></noscript>
 <canvas id="cv" tabindex="0" aria-label="Puddlewick Isle game world"></canvas>
 
-<div id="balloonGame" hidden>
-  <div id="balloonGameBar"><span><span aria-hidden="true">🎈</span> Hazel's Slingshot Balloon Pop</span><button id="balloonGameClose" aria-label="Close Hazel's Slingshot Balloon Pop"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="balloonGameFrame" title="Hazel's Slingshot Balloon Pop mini-game" allow="autoplay"></iframe>
-</div>
-<div id="critterGame" hidden>
-  <div id="critterGameBar"><span><span aria-hidden="true">🦋</span> Dr. Quillfeather's Critter Safari</span><button id="critterGameClose" aria-label="Close Dr. Quillfeather's Critter Safari"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="critterGameFrame" title="Dr. Quillfeather's Critter Safari mini-game" allow="autoplay"></iframe>
-</div>
-<div id="fossilGame" hidden>
-  <div id="fossilGameBar"><span><span aria-hidden="true">🦴</span> Quillfeather's Fossil Excavator</span><button id="fossilGameClose" aria-label="Close Quillfeather's Fossil Excavator"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="fossilGameFrame" title="Quillfeather's Fossil Excavator mini-game" allow="autoplay"></iframe>
-</div>
-<div id="shellGame" hidden>
-  <div id="shellGameBar"><span><span aria-hidden="true">🐚</span> Tide Pool Shell Sorter</span><button id="shellGameClose" aria-label="Close Tide Pool Shell Sorter"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="shellGameFrame" title="Tide Pool Shell Sorter mini-game" allow="autoplay"></iframe>
-</div>
-<div id="campfireGame" hidden>
-  <div id="campfireGameBar"><span><span aria-hidden="true">🍢</span> Marlowe's Campfire Skewer Grill</span><button id="campfireGameClose" aria-label="Close Marlowe's Campfire Skewer Grill"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="campfireGameFrame" title="Marlowe's Campfire Skewer Grill mini-game" allow="autoplay"></iframe>
-</div>
-<div id="piperjamGame" hidden>
-  <div id="piperjamGameBar"><span><span aria-hidden="true">🎵</span> Piper's Plaza Busker Jam</span><button id="piperjamGameClose" aria-label="Close Piper's Plaza Busker Jam"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="piperjamGameFrame" title="Piper's Plaza Busker Jam mini-game" allow="autoplay"></iframe>
-</div>
-<div id="sunrootGame" hidden>
-  <div id="sunrootGameBar"><span><span aria-hidden="true">🥔</span> Rosie's Sunroot Stalk Dash</span><button id="sunrootGameClose" aria-label="Close Rosie's Sunroot Stalk Dash"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="sunrootGameFrame" title="Rosie's Sunroot Stalk Dash mini-game" allow="autoplay"></iframe>
-</div>
-<div id="diverGame" hidden>
-  <div id="diverGameBar"><span><span aria-hidden="true">🤿</span> Coral Atoll Pearl Diver</span><button id="diverGameClose" aria-label="Close Coral Atoll Pearl Diver"><span aria-hidden="true">✖</span> Close</button></div>
-  <iframe id="diverGameFrame" title="Coral Atoll Pearl Diver mini-game" allow="autoplay"></iframe>
-</div>
 <div id="bikeGame" hidden>
   <div id="bikeGameBar"><span><span aria-hidden="true">🚲</span> Bike Blitz — Spoke Island Trails</span><button id="bikeGameClose" aria-label="Close Bike Blitz"><span aria-hidden="true">✖</span> Close</button></div>
   <iframe id="bikeGameFrame" title="Bike Blitz mini-game" allow="autoplay"></iframe>
@@ -424,7 +346,7 @@ button{touch-action:manipulation}
 <script>
 'use strict';
 (()=>{
-const APP_VERSION='1.6.10';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
+const APP_VERSION='1.6.11';   // keep in sync with VERSION in sw.js (tests/run.sh checks)
 /* =====================================================================
    PUDDLEWICK ISLE: a single-file cozy island life sim
    Sections: utils · data · state · time · world gen · day cycle ·
@@ -3075,22 +2997,6 @@ function openHall(){return convo(async()=>{
   if(!S.flags.hall){S.flags.hall=1;await say(CLERK,`Hi, ${S.name}! Welcome to Resident Services. You can craft at our workbench, redeem Tide Points, take out a home loan, or use the bank.`)}
   else await say(CLERK,pick(Math.random,[`Hello, ${S.name}! How can I help today?`,'Good to see you! Need anything?',`Everyone on ${S.island} seems so cheerful lately!`]));
   closeDlg();openPanel('🏛️','Town Hall',renderHall,{tab:'craft',kind:'hall'})})}
-function openBalloonGame(){if(DLG.on)return;$('balloonGameFrame').src='balloon-pop.html';$('balloonGame').hidden=false;sfx('fanfare')}
-function closeBalloonGame(){$('balloonGame').hidden=true;$('balloonGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openCritterGame(){if(DLG.on)return;$('critterGameFrame').src='critter-blitz.html';$('critterGame').hidden=false;sfx('fanfare')}
-function closeCritterGame(){$('critterGame').hidden=true;$('critterGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openFossilGame(){if(DLG.on)return;$('fossilGameFrame').src='fossil-excavator.html';$('fossilGame').hidden=false;sfx('fanfare')}
-function closeFossilGame(){$('fossilGame').hidden=true;$('fossilGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openShellGame(){if(DLG.on)return;$('shellGameFrame').src='beach-comber.html';$('shellGame').hidden=false;sfx('fanfare')}
-function closeShellGame(){$('shellGame').hidden=true;$('shellGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openCampfireGame(){if(DLG.on)return;$('campfireGameFrame').src='campfire-chef.html';$('campfireGame').hidden=false;sfx('fanfare')}
-function closeCampfireGame(){$('campfireGame').hidden=true;$('campfireGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openPiperjamGame(){if(DLG.on)return;$('piperjamGameFrame').src='piper-jam.html';$('piperjamGame').hidden=false;sfx('fanfare')}
-function closePiperjamGame(){$('piperjamGame').hidden=true;$('piperjamGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openSunrootGame(){if(DLG.on)return;$('sunrootGameFrame').src='sunroot-runner.html';$('sunrootGame').hidden=false;sfx('fanfare')}
-function closeSunrootGame(){$('sunrootGame').hidden=true;$('sunrootGameFrame').src='about:blank';cv.focus({preventScroll:true})}
-function openDiverGame(){if(DLG.on)return;$('diverGameFrame').src='pearl-diver.html';$('diverGame').hidden=false;sfx('fanfare')}
-function closeDiverGame(){$('diverGame').hidden=true;$('diverGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openBikeGame(){if(DLG.on)return;$('bikeGameFrame').src='bike-blitz.html';$('bikeGame').hidden=false;sfx('fanfare')}
 function closeBikeGame(){$('bikeGame').hidden=true;$('bikeGameFrame').src='about:blank';cv.focus({preventScroll:true})}
 function openFishGame(){if(DLG.on)return;$('fishGameFrame').src='fishing-derby.html';$('fishGame').hidden=false;sfx('fanfare')}
@@ -3108,15 +3014,7 @@ function arcadeResult(g,d){if(!S||!S.arcade)return;const A=S.arcade;A.plays[g]++
   if(win){if(!A.trophies[g]){A.trophies[g]=today();mail(g==='fish'?'Marlowe':'Island Arcade',g==='fish'?'You WON my full Fishing Derby! This champion trophy is yours — display it proudly, splish!':'You conquered Bike Blitz! This Trail Blazer trophy is yours — display it proudly!',g==='fish'?'fu_mgfish':'fu_mgbike');toast('🏆 Mini-game trophy won! Check your mailbox!','big');vibrate(200)}
     else{S.pts+=100;toast('🎮 Arcade win: +100 Tide Points!');sfx('points')}}
   save();uiDirty()}
-addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;if(d.pw==='fish')arcadeResult('fish',d);else if(d.pw==='balloon')arcadeResult('balloon',d)
-  else if(d.pw==='critter')arcadeResult('critter',d)
-  else if(d.pw==='fossil')arcadeResult('fossil',d)
-  else if(d.pw==='shell')arcadeResult('shell',d)
-  else if(d.pw==='campfire')arcadeResult('campfire',d)
-  else if(d.pw==='piperjam')arcadeResult('piperjam',d)
-  else if(d.pw==='sunroot')arcadeResult('sunroot',d)
-  else if(d.pw==='diver')arcadeResult('diver',d)
-  else if(d.pw==='bike')arcadeResult('bike',d)});
+addEventListener('message',e=>{const d=e.data;if(!d||typeof d!=='object')return;if(d.pw==='fish')arcadeResult('fish',d);else if(d.pw==='bike')arcadeResult('bike',d)});
 function openDerbyDock(){return convo(async()=>{const P=TOURNEY.P;
   if(!S.flags.derbyDock){S.flags.derbyDock=1;await say(P,`Ahoy-hoy, ${S.name}! This here's my Derby Dock. Saturdays stay friendly up in the plaza, but THIS dock runs my full Fishing Derby any day, ${P.cp}!`);
     learn('r_tacklebox');await say(P,'Every derby angler carries a Tackle box — I just taught you the DIY: just 1 hardwood and 1 clay at any workbench. Bring any fishing rod too — and if your box is not ready yet, I will lend you my spare!')}
@@ -3335,14 +3233,6 @@ const PA={
   // phone
   app:d=>{PAN.tab=d.t;PAN.sub=null;$('pBody').scrollTop=0},
   arcFish:()=>{closePanel();arcLaunch('fish');return false},
-  arcBalloon:()=>{closePanel();openBalloonGame();return false},
-  arcCritter:()=>{closePanel();openCritterGame();return false},
-  arcFossil:()=>{closePanel();openFossilGame();return false},
-  arcShell:()=>{closePanel();openShellGame();return false},
-  arcCampfire:()=>{closePanel();openCampfireGame();return false},
-  arcPiperjam:()=>{closePanel();openPiperjamGame();return false},
-  arcSunroot:()=>{closePanel();openSunrootGame();return false},
-  arcDiver:()=>{closePanel();openDiverGame();return false},
   arcBike:()=>{closePanel();arcLaunch('bike');return false},
   songpv:d=>{if(G.gig&&!G.gig.pv){toast('🎵 Piper is playing for you right now. Listen to the end!');return}if(startGig(d.id,1))toast(`🎵 Previewing "${SONG_BY[d.id][1]}"`)},
   sub:d=>{PAN.sub=d.s},
@@ -3589,25 +3479,9 @@ function renderPhone(){
     case 'arcade':{const A=S.arcade,td=today(),bf=A.bonus.fish===td,bb=A.bonus.bike===td;
       let h=back+`<p>Two mini-games live right on your island. The first play of each, every day, pays <b>+50 🌊 Tide Points</b>. Win one and a trophy arrives by mail!</p><div class="list">`;
       h+=li('🎣',"Marlowe's Fishing Derby",`Plays ${A.plays.fish} · Best ${fmt(A.best.fish)} pts${A.trophies.fish?' · 🏆 trophy won!':''} · ${bf?'bonus claimed today':'daily bonus waiting'}`,rodOwned()?`<button class="btn" data-a="arcFish">▶ Play</button>`:'<span class="mute">Needs a fishing rod</span>');
-      h+=li('🎈','Hazel's Slingshot Balloon Pop',`Plays ${A.plays.balloon||0} · Best score ${fmt(A.best.balloon||0)}${A.trophies.balloon?' · 🏆 trophy won!':''} · ${A.bonus.balloon===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBalloon">▶ Play</button>`);
-      h+=li('🦋','Dr. Quillfeather's Critter Safari',`Plays ${A.plays.critter||0} · Best score ${fmt(A.best.critter||0)}${A.trophies.critter?' · 🏆 trophy won!':''} · ${A.bonus.critter===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCritter">▶ Play</button>`);
-      h+=li('🦴','Quillfeather's Fossil Excavator',`Plays ${A.plays.fossil||0} · Best score ${fmt(A.best.fossil||0)}${A.trophies.fossil?' · 🏆 trophy won!':''} · ${A.bonus.fossil===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcFossil">▶ Play</button>`);
-      h+=li('🐚','Tide Pool Shell Sorter',`Plays ${A.plays.shell||0} · Best score ${fmt(A.best.shell||0)}${A.trophies.shell?' · 🏆 trophy won!':''} · ${A.bonus.shell===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcShell">▶ Play</button>`);
-      h+=li('🍢','Marlowe's Campfire Skewer Grill',`Plays ${A.plays.campfire||0} · Best score ${fmt(A.best.campfire||0)}${A.trophies.campfire?' · 🏆 trophy won!':''} · ${A.bonus.campfire===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCampfire">▶ Play</button>`);
-      h+=li('🎵','Piper's Plaza Busker Jam',`Plays ${A.plays.piperjam||0} · Best score ${fmt(A.best.piperjam||0)}${A.trophies.piperjam?' · 🏆 trophy won!':''} · ${A.bonus.piperjam===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcPiperjam">▶ Play</button>`);
-      h+=li('🥔','Rosie's Sunroot Stalk Dash',`Plays ${A.plays.sunroot||0} · Best score ${fmt(A.best.sunroot||0)}${A.trophies.sunroot?' · 🏆 trophy won!':''} · ${A.bonus.sunroot===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcSunroot">▶ Play</button>`);
-      h+=li('🤿','Coral Atoll Pearl Diver',`Plays ${A.plays.diver||0} · Best score ${fmt(A.best.diver||0)}${A.trophies.diver?' · 🏆 trophy won!':''} · ${A.bonus.diver===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcDiver">▶ Play</button>`);
       h+=li('🚲','Bike Blitz',`Plays ${A.plays.bike} · Best score ${fmt(A.best.bike)}${A.trophies.bike?' · 🏆 trophy won!':''} · ${bb?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBike">▶ Play</button>`);
       h+='</div><h3>How to unlock</h3><div class="list">';
       h+=li('🎣','Fishing Derby','Just carry any fishing rod — Marlowe lends Tackle boxes at the Derby Dock sign (by the island dock) and teaches the Tackle box DIY (1 hardwood + 1 clay). Carrying your own box earns his Golden Lure lesson. Win a Saturday plaza Fishing Derby to learn the Golden fishing rod DIY.','');
-      h+=li('🎈','Hazel's Slingshot Balloon Pop',`Plays ${A.plays.balloon||0} · Best score ${fmt(A.best.balloon||0)}${A.trophies.balloon?' · 🏆 trophy won!':''} · ${A.bonus.balloon===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcBalloon">▶ Play</button>`);
-      h+=li('🦋','Dr. Quillfeather's Critter Safari',`Plays ${A.plays.critter||0} · Best score ${fmt(A.best.critter||0)}${A.trophies.critter?' · 🏆 trophy won!':''} · ${A.bonus.critter===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCritter">▶ Play</button>`);
-      h+=li('🦴','Quillfeather's Fossil Excavator',`Plays ${A.plays.fossil||0} · Best score ${fmt(A.best.fossil||0)}${A.trophies.fossil?' · 🏆 trophy won!':''} · ${A.bonus.fossil===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcFossil">▶ Play</button>`);
-      h+=li('🐚','Tide Pool Shell Sorter',`Plays ${A.plays.shell||0} · Best score ${fmt(A.best.shell||0)}${A.trophies.shell?' · 🏆 trophy won!':''} · ${A.bonus.shell===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcShell">▶ Play</button>`);
-      h+=li('🍢','Marlowe's Campfire Skewer Grill',`Plays ${A.plays.campfire||0} · Best score ${fmt(A.best.campfire||0)}${A.trophies.campfire?' · 🏆 trophy won!':''} · ${A.bonus.campfire===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcCampfire">▶ Play</button>`);
-      h+=li('🎵','Piper's Plaza Busker Jam',`Plays ${A.plays.piperjam||0} · Best score ${fmt(A.best.piperjam||0)}${A.trophies.piperjam?' · 🏆 trophy won!':''} · ${A.bonus.piperjam===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcPiperjam">▶ Play</button>`);
-      h+=li('🥔','Rosie's Sunroot Stalk Dash',`Plays ${A.plays.sunroot||0} · Best score ${fmt(A.best.sunroot||0)}${A.trophies.sunroot?' · 🏆 trophy won!':''} · ${A.bonus.sunroot===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcSunroot">▶ Play</button>`);
-      h+=li('🤿','Coral Atoll Pearl Diver',`Plays ${A.plays.diver||0} · Best score ${fmt(A.best.diver||0)}${A.trophies.diver?' · 🏆 trophy won!':''} · ${A.bonus.diver===td?'bonus claimed today':'daily bonus waiting'}`,`<button class="btn" data-a="arcDiver">▶ Play</button>`);
       h+=li('🚲','Bike Blitz','Play right here, or borrow the free loaner at the Spoke Island trailhead! To ride your own: Cruiser Bike — Bike frame (2 iron + 1 hardwood) + 2 Bike wheels (1 iron + 1 clay each). Cruiser owners learn the Stunt Hopper DIY at the trailhead. A Bike bell (DIY at Bramble\'s) makes any bike 12% faster.','');
       return h+'</div>'}
     case 'cam':return back+'<p>Photo mode hides all menus so you can take a screenshot of your island.</p><button class="btn" data-a="photo"><span aria-hidden="true">📷</span> Start photo mode</button>';
@@ -3878,17 +3752,9 @@ $('toolchip').onclick=()=>cycleTool(1);$('bWish').onclick=wish;
 for(const [id,fn] of [['bBag',openInv],['bPhone',()=>openPhone()]])$(id).onclick=e=>{PAN.op=e.currentTarget;try{fn()}finally{PAN.op=null}};
 $('bRadar').onclick=toggleRadar;
 $('bBike').onclick=toggleBikeMount;
-$('balloonGameClose').onclick=closeBalloonGame;
-$('critterGameClose').onclick=closeCritterGame;
-$('fossilGameClose').onclick=closeFossilGame;
-$('shellGameClose').onclick=closeShellGame;
-$('campfireGameClose').onclick=closeCampfireGame;
-$('piperjamGameClose').onclick=closePiperjamGame;
-$('sunrootGameClose').onclick=closeSunrootGame;
-$('diverGameClose').onclick=closeDiverGame;
 $('bikeGameClose').onclick=closeBikeGame;
 $('fishGameClose').onclick=closeFishGame;
-addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('balloonGame').hidden)closeBalloonGame();else if(!$('critterGame').hidden)closeCritterGame();else if(!$('fossilGame').hidden)closeFossilGame();else if(!$('shellGame').hidden)closeShellGame();else if(!$('campfireGame').hidden)closeCampfireGame();else if(!$('piperjamGame').hidden)closePiperjamGame();else if(!$('sunrootGame').hidden)closeSunrootGame();else if(!$('diverGame').hidden)closeDiverGame();else if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
+addEventListener('keydown',e=>{if(e.code!=='Escape')return;if(!$('fishGame').hidden)closeFishGame();else if(!$('bikeGame').hidden)closeBikeGame()});
 {const stick=$('stick'),knob=$('knob');let jid=null;
   const moveJ=e=>{const r=stick.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),R=r.width/2-12,d=Math.hypot(dx,dy),m=Math.min(1,d/R),nx=d?dx/d:0,ny=d?dy/d:0;
     G.joy={x:nx,y:ny,m};knob.style.transform=`translate(${nx*m*R}px,${ny*m*R}px)`};
@@ -3947,7 +3813,7 @@ function notes(){
 
 /* =============================== TITLE / BOOT =============================== */
 const HAIRSTYLES=[['swept','💇 Swept'],['spiky','⚡ Spiky · boy'],['crop','✂️ Short Crop · boy'],['long','🌺 Long · girl'],['ponytail','🎀 Ponytail · girl']];
-const look={skin:SKINS[1],hair:HAIRS[0],shirt:SHIRTS[4],hairStyle:'swept'};
+const look={skin:SKINS[4],hair:HAIRS[0],shirt:SHIRTS[4],hairStyle:'swept'};
 function styleChips(){const el=$('swStyle');if(!el)return;el.innerHTML=HAIRSTYLES.map(([id,n])=>`<button type="button" class="hchip${look.hairStyle===id?' on':''}" data-hs="${id}">${n}</button>`).join('');
   el.onclick=e=>{const b=e.target.closest('button[data-hs]');if(!b)return;look.hairStyle=b.dataset.hs;[...el.children].forEach(x=>x.classList.toggle('on',x===b));drawPreview()}}
 function swatches(id,list,key){const el=$(id);el.innerHTML=list.map(c=>`<button type="button" style="--c:${c}" data-c="${c}" aria-label="${key} color ${c}" class="${look[key]===c?'on':''}"></button>`).join('');
@@ -3985,7 +3851,8 @@ let FOOT0=null;
 function boot(){
   {const ft=document.querySelector('#title .foot');if(FOOT0==null)FOOT0=ft.innerHTML;ft.style.color='';
     ft.innerHTML=isTouch?'<span id="tVer"></span>Drag the stick to move (push gently to tiptoe) · 🏃 to run · A button for action · 🔧 button to switch tools · 🎒 for pockets · 📱 for phone<br>Original fan-made game inspired by cozy island life sims. Progress saves in this browser.':FOOT0}
-  $('tVer').textContent=`v${APP_VERSION} · `;swatches('swSkin',SKINS,'skin');swatches('swHair',HAIRS,'hair');swatches('swShirt',SHIRTS,'shirt');styleChips();drawPreview();resize();
+  $('tVer').textContent=`v${APP_VERSION} · `;swatches('swSkin',SKINS,'skin');swatches('swHair',HAIRS,'hair');swatches('swShirt',SHIRTS,'shirt');styleChips();drawPreview();
+window.addEventListener('load',()=>{try{if(!$('swSkin').children.length)swatches('swSkin',SKINS,'skin');if(!$('swHair').children.length)swatches('swHair',HAIRS,'hair');if(!$('swShirt').children.length)swatches('swShirt',SHIRTS,'shirt');if(!$('swStyle').children.length)styleChips();drawPreview()}catch(e){}});resize();
   // rawSaved keeps the stored string even when it is damaged, so New Game still asks twice before overwriting it
   let rawSaved=null,saved=null,bak=null;try{rawSaved=localStorage.getItem(SAVE_KEY);bak=localStorage.getItem(BAK_KEY)}catch(e){}
   $('tContinue').hidden=true;$('tDmg').hidden=true;delete $('newForm').dataset.ok;$('btnNew').textContent='🏝️ Start a new island';
